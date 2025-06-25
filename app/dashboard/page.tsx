@@ -7,6 +7,7 @@ import CreateSetController from "../components/controllers/CreateSetController";
 
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 type StatCards = {
   title: string;
@@ -78,6 +79,7 @@ export default function Dashboard() {
     category: string
   ): void => {
     //create a set
+    toast.success("Set created successfully!");
     setSetCards((prevSetCards) => {
       return [
         ...prevSetCards,
@@ -95,6 +97,7 @@ export default function Dashboard() {
   };
 
   const onDeleteSet = (id: number): void => {
+    toast.success("Set deleted successfully");
     setSetCards((prevSetCards) => {
       return prevSetCards.filter((prevSetCard) => {
         return prevSetCard.id !== id;
@@ -126,13 +129,6 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold text-gray-900">
             Your Learning Sets
           </h2>
-          {/*<button
-            className="flex justify-center items-center bg-black text-white p-3 rounded-md hover:bg-gray-800 active:bg-white active:text-black 
-             transition-colors duration-200 cursor-pointer"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create New Set
-          </button>*/}
           <CreateSetController onCreateSet={createSet} />
         </div>
 

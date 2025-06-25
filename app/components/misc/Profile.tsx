@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import { LogOut, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type ProfileProps = {
   onSignOut: () => void;
@@ -11,6 +13,8 @@ type ProfileProps = {
 };
 
 export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+  const router = useRouter();
+
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const profileButtonRef = useRef<HTMLDivElement>(null);
 
@@ -27,6 +31,32 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const deleteAccount = async (e) => {
+    e.preventDefault();
+    //console.log("Deleting account...");
+
+    try {
+      const response = await fetch("/api/delete-user", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        toast.error("An error occurred.");
+        return;
+      }
+
+      //success, which means the account was deleted
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Successfully deleted account.");
+        router.replace("/");
+        return;
+      }
+    } catch (error) {
+      toast.error("An error occurred while trying to delete the account.");
+    }
+  };
 
   return (
     <div className="relative inline-block text-left" ref={profileButtonRef}>
@@ -63,6 +93,15 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
               <span className="ml-2">Sign Out</span>
             </button>
           </Link>
+
+          <button
+            type="button"
+            className="cursor-pointer flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
+            onClick={deleteAccount}
+          >
+            <User className="text-xs text-red-400" />
+            <span className="ml-2">Delete Account</span>
+          </button>
         </div>
       )}
     </div>

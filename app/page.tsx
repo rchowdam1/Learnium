@@ -8,9 +8,11 @@ export default function Home() {
       <header className="bg-[#142937] text-[#f5ede3]">
         <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Learnium</h1>
-          <button className="rounded-full border-2 border-[#f5ede3] bg-transparent px-4 py-2 font-semibold transition hover:bg-[#f5ede3]/10 hover:scale-105">
-            Sign Up
-          </button>
+          <Link href="/signup">
+            <button className="rounded-full border-2 border-[#f5ede3] cursor-pointer bg-transparent px-4 py-2 font-semibold transition hover:bg-[#f5ede3]/10 hover:scale-105">
+              Sign Up
+            </button>
+          </Link>
         </nav>
       </header>
 
@@ -26,9 +28,11 @@ export default function Home() {
             learn on the go anytime, anywhere.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <button className="rounded-full bg-[#142937] px-8 py-3 text-[#f5ede3] font-semibold shadow-lg transition hover:scale-105">
-              Get Started
-            </button>
+            <Link href="/login">
+              <button className="rounded-full bg-[#142937] cursor-pointer px-8 py-3 text-[#f5ede3] font-semibold shadow-lg transition hover:scale-105">
+                Get Started
+              </button>
+            </Link>
             <Link href="#information">
               <button className="rounded-full border-2 border-[#142937] px-8 py-3 font-semibold transition hover:bg-[#142937]/10 hover:scale-105">
                 Learn More

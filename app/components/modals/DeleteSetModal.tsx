@@ -33,13 +33,13 @@ export default function DeleteSetModal({
 
         <div className="mt-10 flex justify-around items-center">
           <button
-            className="py-3 px-7 bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm cursor-pointer transition-colors duration-200"
+            className="py-3 px-7 bg-gray-100 hover:bg-gray-200 rounded-xs border-0 shadow-sm cursor-pointer transition-colors duration-200"
             onClick={onClose}
           >
-            <span className="font-semibold">No</span>
+            <span className="">No</span>
           </button>
           <button
-            className="py-3 px-7 bg-red-500 hover:bg-red-400 rounded-lg shadow-sm text-white cursor-pointer transition-colors duration-200"
+            className="py-3 px-7 bg-red-50 hover:bg-red-100 rounded-xs shadow-sm text-red-400 border border-red-400 cursor-pointer transition-colors duration-200"
             onClick={() => {
               onDelete();
               onClose();
