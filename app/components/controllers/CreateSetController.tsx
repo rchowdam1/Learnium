@@ -6,7 +6,12 @@ import CreateSetModal from "../modals/CreateSetModal";
 export default function CreateSetController({
   onCreateSet,
 }: {
-  onCreateSet: (title: string, description: string, category: string) => void;
+  onCreateSet: (
+    title: string,
+    description: string,
+    category: string,
+    numLessons?: number
+  ) => void;
 }) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
 

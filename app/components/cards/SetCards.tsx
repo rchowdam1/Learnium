@@ -3,6 +3,8 @@
 import { BookOpen, EllipsisVertical, Play } from "lucide-react";
 import Progress from "../misc/Progress";
 import SetDropdown from "../modals/SetDropdown";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type SetCardProps = {
   id: number;
@@ -28,6 +30,8 @@ export default function SetCard({
   // convert date to readable format
   const readDate: Date = new Date(date);
 
+  const router = useRouter();
+
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
@@ -40,6 +44,21 @@ export default function SetCard({
   const onSetDelete = () => {
     console.log("deleting");
     onDeleteSet(id);
+  };
+
+  const goToSet = async () => {
+    /*try {
+      const response = await fetch(`/api/get-set-data/${id}`);
+
+      if (response.ok) {
+        const data = await response.json();
+
+        console.log(data, "data received from get-set-data");
+      }
+    } catch (error) {
+      console.log("Error fetching set data");
+    }*/
+    router.replace(`/sets/${id}`);
   };
 
   return (
@@ -74,7 +93,7 @@ export default function SetCard({
         </div>
         <div className="mt-1">
           <Progress
-            width={25}
+            width={365}
             percentage={(completedLessons / totalLessons) * 100}
           />
         </div>
@@ -87,10 +106,12 @@ export default function SetCard({
           <span>Created at {dateString}</span>
         </div>
 
-        <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
-          <Play className="w-4 h-4 mr-2" />
-          <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
-        </button>
+        <Link href={`/sets/${id}`}>
+          <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
+            <Play className="w-4 h-4 mr-2" />
+            <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
+          </button>
+        </Link>
       </div>
     </div>
   );

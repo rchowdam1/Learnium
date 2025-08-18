@@ -4,6 +4,7 @@ import { BookOpen } from "lucide-react";
 import Profile from "../misc/Profile";
 import toast from "react-hot-toast";
 import { createSupabaseClient } from "@/lib/supabase";
+import Link from "next/link";
 
 import { useState, useEffect } from "react";
 

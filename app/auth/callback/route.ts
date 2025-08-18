@@ -59,8 +59,6 @@ export async function GET(request: Request) {
           console.log("Failed to create profile for user:", insertError);
         }
       }
-
-      //resume 6/21 log in through google again to see if failed insertion is an RLS Issue
     }
 
     if (!error) {

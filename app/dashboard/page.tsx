@@ -25,10 +25,29 @@ type SetCards = {
   date: string;
 };
 
+type SetResponse = {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  numLessons: number;
+  date: string;
+  profile_id: string;
+  is_flagged: boolean;
+};
+
+type APIResponse = {
+  data?: SetResponse;
+  error?: string;
+};
+
 export default function Dashboard() {
+  // state for skeleton loading
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [setCards, setSetCards] = useState<SetCards[]>([
-    {
-      id: 1,
+    /*{
+      id: 10,
       title: "Spanish Basics",
       category: "Communication",
       description: "Learn fundamental Spanish vocabulary and phrases",
@@ -37,7 +56,7 @@ export default function Dashboard() {
       date: new Date().toISOString(),
     },
     {
-      id: 2,
+      id: 11,
       title: "JavaScript Fundamentals",
       category: "Technology",
       description: "Master the basics of JavaScript programming",
@@ -46,14 +65,14 @@ export default function Dashboard() {
       date: new Date().toISOString(),
     },
     {
-      id: 3,
+      id: 12,
       title: "Digital Marketing",
       category: "Business",
       description: "Learn essential digital marketing strategies",
       totalLessons: 8,
       completedLessons: 0,
       date: new Date().toISOString(),
-    },
+    },*/
   ]);
   const sampleStatCards: StatCards[] = [
     {
@@ -76,7 +95,9 @@ export default function Dashboard() {
   const createSet = (
     title: string,
     description: string,
-    category: string
+    category: string,
+    numLessons?: number,
+    setId?: number
   ): void => {
     //create a set
     toast.success("Set created successfully!");
@@ -84,11 +105,11 @@ export default function Dashboard() {
       return [
         ...prevSetCards,
         {
-          id: prevSetCards.length + 1,
+          id: setId ?? 0,
           title: title,
           category: category,
           description: description,
-          totalLessons: 10,
+          totalLessons: numLessons ?? 5,
           completedLessons: 0,
           date: new Date().toISOString(),
         },
@@ -104,6 +125,46 @@ export default function Dashboard() {
       });
     });
   };
+
+  // load up the sets of the user
+  useEffect(() => {
+    const loadSets = async () => {
+      try {
+        const response = await fetch("/api/get-sets");
+
+        if (!response.ok) {
+          toast.error("Could not fetch sets - 115");
+          return;
+        }
+
+        const data = await response.json();
+        if (data.data) {
+          console.log(data.data, "fetched sets");
+          const sets = data.data;
+
+          setSetCards(
+            sets
+              .filter((set) => set.completed === false)
+              .map((set) => ({
+                id: set.id,
+                title: set.title,
+                category: set.category,
+                description: set.description,
+                totalLessons: set.numLessons,
+                completedLessons: set.completedLessons || 0,
+                date: set.date,
+              }))
+          );
+          setLoading(false);
+          toast.success("Fetched sets");
+        }
+      } catch (error) {
+        toast.error("Could not fetch sets - 124");
+      }
+    };
+
+    loadSets();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,6 +196,17 @@ export default function Dashboard() {
         {/*Learning Set Cards*/}
         <br />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
+          {loading &&
+            Array(3)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <div
+                    className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                    key={index}
+                  />
+                );
+              })}
           {setCards.map((setCard, index) => {
             return (
               <SetCard

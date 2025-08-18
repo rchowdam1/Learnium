@@ -47,9 +47,14 @@ export async function updateSession(request: NextRequest) {
 
   const url = request.nextUrl.clone();
 
-  const protectedPaths: string[] = ["/dashboard", "/sets", "/profile"];
+  const protectedPaths: string[] = [
+    "/dashboard",
+    "/sets",
+    "/profile",
+    "/subscriptions",
+  ];
 
-  console.log(url.pathname);
+  //console.log(url.pathname);
 
   let trespass: boolean = false;
 

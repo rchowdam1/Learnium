@@ -10,14 +10,20 @@ import toast from "react-hot-toast";
 type OutputSchema = z.infer<typeof zOutputSchema>;
 
 type CreateSetResponse = {
-  response?: OutputSchema;
+  setId?: number;
+  parsedResponse?: OutputSchema;
   error?: string;
 };
 
 type CreateModalProps = {
   open: boolean;
   onClose: () => void;
-  onCreateSet: (title: string, description: string, category: string) => void;
+  onCreateSet: (
+    title: string,
+    description: string,
+    category: string,
+    numLessons?: number
+  ) => void;
 };
 
 export default function CreateSetModal({
@@ -168,6 +174,9 @@ export default function CreateSetModal({
 
     setIsLoading(true);
 
+    let numLessons: number | undefined = 0;
+    let setId: number | undefined = undefined;
+
     if (!validateInputs()) {
       setIsLoading(false);
       return;
@@ -198,11 +207,18 @@ export default function CreateSetModal({
       if (data.error) {
         if (data.error === "Could not process your request")
           toast.error("Sorry! We can't make this set for you");
+        else if (data.error === "User does not have any set requests remaining")
+          toast.error(
+            "You have ran out of requests. Please wait until the next day for more requests"
+          );
+        else toast.error(data.error);
         setIsLoading(false);
         return;
       }
 
       console.log(data, "data from input-check api");
+      numLessons = data.parsedResponse?.lessons.length;
+      setId = data.setId;
     } catch (error) {
       alert(error);
       setIsLoading(false);
@@ -210,7 +226,7 @@ export default function CreateSetModal({
     }
 
     // inputs are valid, create the set
-    onCreateSet(title, description, category);
+    onCreateSet(title, description, category, numLessons, setId);
     setIsLoading(false);
     handleClose();
   };

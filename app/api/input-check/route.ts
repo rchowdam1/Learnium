@@ -6,6 +6,12 @@ import { zOutputSchema } from "@/app/schema/OutputSchema";
 import { z } from "zod";
 import { createClient } from "@/lib/server";
 import { createSet } from "@/actions/dbops";
+import {
+  decrementRequests,
+  resetSets,
+  updateSetResetDate,
+} from "@/actions/ProfileUpdates";
+import { profile } from "console";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -55,7 +61,90 @@ export async function POST(request: Request) {
     );
   }
 
-  // openai key, env file,
+  // check if user has remaning set requests
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profileData, error: profileError } = await supabase
+    .from("profile")
+    .select("*")
+    .eq("id", user?.id)
+    .single();
+
+  if (profileError) {
+    console.log("Could not retrieve profile");
+    return NextResponse.json(
+      { error: "Could not retrieve profile" },
+      {
+        status: 200,
+      }
+    );
+  }
+
+  // if 'sets_refresh_at' is null (such as when the user makes a set for the first time), set the value the next today
+  if (profileData.sets_refresh_at === null) {
+    const result = await updateSetResetDate(); // 'sets_remaining' is still 1
+    if (result.success === false) {
+      console.log("Could not update the set reset date");
+    }
+  }
+
+  // if 'sets_remaining' == 0 and 'sets_refresh_at' <= today, then call resetSets()
+  const today = new Date().toISOString().split("T")[0];
+
+  const setsRefreshAt = profileData.sets_refresh_at
+    ? profileData.sets_refresh_at.split("T")[0]
+    : null;
+  console.log("The set refresh date is", setsRefreshAt);
+
+  if (
+    profileData.sets_remaining === 0 &&
+    setsRefreshAt &&
+    setsRefreshAt <= today
+  ) {
+    // if it's past the refresh date, reset the set requests
+    let result = await updateSetResetDate();
+    if (result.success === false) {
+      return NextResponse.json(
+        { error: "Could not update the reset date" },
+        { status: 200 }
+      );
+    }
+
+    // result.success == true
+    result = await resetSets();
+
+    if (result.success === false) {
+      return NextResponse.json(
+        { error: "Could not reset the remaining set requests" },
+        { status: 200 }
+      );
+    }
+
+    // result.success == true
+  }
+
+  // at this point before the LLM API call has been made, we need to update the remaining requests of the user accordingly
+  const result = await decrementRequests();
+  if (result.success === false) {
+    // check if user does not have any requests remaining
+
+    if (result.message === "User does not have any set requests remaining") {
+      return NextResponse.json({ error: result.message }, { status: 200 });
+    }
+
+    return NextResponse.json(
+      {
+        error: "An error occurred while trying to decrease 'sets_remaining'",
+      },
+      {
+        status: 200,
+      }
+    );
+  }
 
   // system prompt
   const systemPrompt: string = `You are a very knowledgeable teacher and specialize in providing microlearning sets
@@ -66,19 +155,6 @@ export async function POST(request: Request) {
   description given by the user is not plausible, or contains illegal or unethical content, do not generate
   any lessons and set "flagged" as true. If "flagged" is true, then set all of the properties as empty strings. As you're generating the lessons, make sure that
   the lessons are related to the description and are easily digestible by the user`;
-
-  /*const response = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: systemPrompt },
-      {
-        role: "user",
-        content: `The description given is "${data.description}". Generate the microlearning set`,
-      },
-    ],
-    temperature: 0.7,
-    response_format: zodResponseFormat(zOutputSchema, "output_schema"),
-  });*/
 
   const response = await openai.responses.parse({
     model: "gpt-4o",
@@ -97,19 +173,11 @@ export async function POST(request: Request) {
     },
   });
 
-  //const parsedResponse = response.choices[0].message.content as OutputSchema;
-
   const parsedResponse = response.output_parsed;
   console.log(
     parsedResponse
     /*`| this response used ${response.usage?.total_tokens}, with ${response.usage?.prompt_tokens} prompt tokens and ${response.usage?.completion_tokens} completion tokens`*/
   );
-
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   if (parsedResponse && parsedResponse.flagged) {
     // add to the flagged table
@@ -130,12 +198,33 @@ export async function POST(request: Request) {
     );
   }
 
+  let numLessons = 0;
   // create the sets
   if (parsedResponse) {
     const title = data.title;
     const description = data.description;
     const category = data.category;
-    console.log(createSet(parsedResponse, title, description, category));
+    const result = await createSet(
+      parsedResponse,
+      title,
+      description,
+      category
+    );
+
+    if (result === false) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Set creation in the database was unsuccessful",
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      parsedResponse,
+      setId: result.id,
+    });
   }
 
   return NextResponse.json(

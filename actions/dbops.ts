@@ -6,7 +6,7 @@ export async function createSet(
   title: string,
   description: string,
   category: string
-) {
+): Promise<false | { id: number; lessonCount: number }> {
   const supabase = await createClient();
 
   const {
@@ -19,7 +19,7 @@ export async function createSet(
     return false;
   }
 
-  /* create the set
+  /* 1. create the set
    *  Attributes:
    *     - profile_id
    *     - title
@@ -45,20 +45,92 @@ export async function createSet(
     return false;
   }
 
+  let lessonCount = 0;
+
   /*
    * For each of the lessons from the input create the lessons, paragraphs, quizzes, questions, and options
    * There will be the same number of lessons and quizzes
    */
 
-  parsedResponse.lessons.forEach(async (lesson, key) => {
-    /*
-     *  Create the lessons (contains the paragraphs and quizzes, need to create multiple)
-     *  Attributes:
-     *    - set_id
-     *    - title
-     *    - position
-     *
-     */
+  // 2. Create lessons, paragraphs, quizzes, questions, and options
+  for (let i = 0; i < parsedResponse.lessons.length; i++) {
+    const lesson = parsedResponse.lessons[i];
+
+    const { data: curLesson, error: createLessonError } = await supabase
+      .from("lessons")
+      .insert({ set_id: set.id, title: lesson.title, position: i })
+      .select()
+      .single();
+
+    if (createLessonError) {
+      console.log("Could not create lesson");
+      return false;
+    }
+
+    // Paragraphs
+    for (let j = 0; j < lesson.paragraphs.length; j++) {
+      const paragraph = lesson.paragraphs[j];
+
+      const { error: paragraphError } = await supabase
+        .from("paragraphs")
+        .insert({ lesson_id: curLesson.id, content: paragraph, position: j });
+
+      if (paragraphError) {
+        console.log("Could not create paragraph");
+        return false;
+      }
+    }
+
+    // Quiz
+    const currentQuiz = parsedResponse.quizzes[i];
+    const { data: quiz, error: createQuizError } = await supabase
+      .from("quizzes")
+      .insert({ lesson_id: curLesson.id, title: currentQuiz.title })
+      .select()
+      .single();
+
+    if (createQuizError) {
+      console.log("Could not create quiz");
+      return false;
+    }
+
+    // Questions and Options
+    for (let q = 0; q < currentQuiz.questions.length; q++) {
+      const question = currentQuiz.questions[q];
+      const { data: curQuestion, error: createQuestionError } = await supabase
+        .from("questions")
+        .insert({
+          quiz_id: quiz.id,
+          question: question.question,
+          answer: question.answer,
+          position: q,
+        })
+        .select()
+        .single();
+
+      if (createQuestionError) {
+        console.log("Could not create question");
+        return false;
+      }
+
+      for (let o = 0; o < question.options.length; o++) {
+        const option = question.options[o];
+        const { error: createOptionError } = await supabase
+          .from("options")
+          .insert({ question_id: curQuestion.id, option: option, position: o });
+
+        if (createOptionError) {
+          console.log("Could not create option");
+          return false;
+        }
+      }
+    }
+
+    lessonCount++;
+  }
+
+  /*parsedResponse.lessons.forEach(async (lesson, key) => {
+   
     const { data: curLesson, error: createLessonError } = await supabase
       .from("lessons")
       .insert({
@@ -74,13 +146,7 @@ export async function createSet(
       return false;
     }
 
-    /**
-     * Create the Paragraphs
-     * Attributes:
-     *    - lesson_id
-     *    - content
-     *    - position
-     */
+   
 
     // loop through each paragraph per lesson
     lesson.paragraphs.forEach(async (paragraph, key) => {
@@ -100,12 +166,7 @@ export async function createSet(
 
     // assign the corresponding quiz to its lesson
     const currentQuiz = parsedResponse.quizzes[key];
-    /**
-     * Now create the quiz
-     * Attributes:
-     * - lesson_id
-     * - title
-     */
+    
 
     const { data: quiz, error: createQuizError } = await supabase
       .from("quizzes")
@@ -124,14 +185,7 @@ export async function createSet(
     // now add the questions to the quiz
 
     currentQuiz.questions.forEach(async (question, quesKey) => {
-      /**
-       * Now create the questions
-       * Attributes:
-       * - quiz_id
-       * - question
-       * - answer
-       * - position
-       */
+     
 
       const { data: curQuestion, error: createQuestionError } = await supabase
         .from("questions")
@@ -152,13 +206,7 @@ export async function createSet(
       // now need to make the options for each question
 
       question.options.forEach(async (option, optionKey) => {
-        /**
-         * Now create the options
-         * Attributes:
-         * - question_id
-         * - option
-         * - position
-         */
+        
 
         const { data: optionData, error: createOptionError } = await supabase
           .from("options")
@@ -174,7 +222,7 @@ export async function createSet(
         }
       });
     });
-  });
+  });*/
 
-  return true;
+  return { id: set.id, lessonCount };
 }
