@@ -129,100 +129,43 @@ export async function createSet(
     lessonCount++;
   }
 
-  /*parsedResponse.lessons.forEach(async (lesson, key) => {
-   
-    const { data: curLesson, error: createLessonError } = await supabase
-      .from("lessons")
-      .insert({
-        set_id: set?.id,
-        title: lesson.title,
-        position: key,
-      })
-      .select()
-      .single();
-
-    if (createLessonError) {
-      console.log("Could not create lesson");
-      return false;
-    }
-
-   
-
-    // loop through each paragraph per lesson
-    lesson.paragraphs.forEach(async (paragraph, key) => {
-      const { data: curParagraph, error: paragraphError } = await supabase
-        .from("paragraphs")
-        .insert({
-          lesson_id: curLesson?.id,
-          content: paragraph,
-          position: key,
-        });
-
-      if (paragraphError) {
-        console.log("Could not create paragraph");
-        return false;
-      }
-    });
-
-    // assign the corresponding quiz to its lesson
-    const currentQuiz = parsedResponse.quizzes[key];
-    
-
-    const { data: quiz, error: createQuizError } = await supabase
-      .from("quizzes")
-      .insert({
-        lesson_id: curLesson?.id,
-        title: currentQuiz.title, // should be the same as the title of the current lesson
-      })
-      .select()
-      .single();
-
-    if (createQuizError) {
-      console.log("Could not create quiz");
-      return false;
-    }
-
-    // now add the questions to the quiz
-
-    currentQuiz.questions.forEach(async (question, quesKey) => {
-     
-
-      const { data: curQuestion, error: createQuestionError } = await supabase
-        .from("questions")
-        .insert({
-          quiz_id: quiz?.id,
-          question: question.question,
-          answer: question.answer,
-          position: quesKey,
-        })
-        .select()
-        .single();
-
-      if (createQuestionError) {
-        console.log("Could not create question");
-        return false;
-      }
-
-      // now need to make the options for each question
-
-      question.options.forEach(async (option, optionKey) => {
-        
-
-        const { data: optionData, error: createOptionError } = await supabase
-          .from("options")
-          .insert({
-            question_id: curQuestion?.id,
-            option: option,
-            position: optionKey,
-          });
-
-        if (createOptionError) {
-          console.log("Could not create option");
-          return false;
-        }
-      });
-    });
-  });*/
-
   return { id: set.id, lessonCount };
+}
+
+export async function createBuddy(
+  title: string,
+  description: string,
+  category: string
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.log("Could not retrieve authenticated user in actions");
+    return false;
+  }
+
+  // create the buddy
+
+  const { data: buddy, error: createBuddyError } = await supabase
+    .from("study_bots")
+    .insert({
+      profile_id: user?.id,
+      bot_name: title,
+      description: description,
+      category: category,
+    })
+    .select()
+    .single();
+
+  if (createBuddyError) {
+    console.log("Error creating study buddy");
+    return false;
+  }
+
+  return { id: buddy.id };
 }

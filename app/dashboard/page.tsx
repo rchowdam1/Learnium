@@ -3,11 +3,13 @@
 import AuthNav from "../components/nav/AuthNav";
 import StatCard from "../components/cards/StatCards";
 import SetCard from "../components/cards/SetCards";
+import StudyBuddyCard from "../components/cards/StudyBuddyCards";
 import CreateSetController from "../components/controllers/CreateSetController";
 
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
 
 type StatCards = {
   title: string;
@@ -23,6 +25,13 @@ type SetCards = {
   totalLessons: number;
   completedLessons: number;
   date: string;
+};
+
+type StudyBuddyCards = {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
 };
 
 type SetResponse = {
@@ -74,6 +83,11 @@ export default function Dashboard() {
       date: new Date().toISOString(),
     },*/
   ]);
+
+  // state to toggle between learning sets and ai studdy buddy
+  const [isLearningSetsActive, setIsLearningSetsActive] =
+    useState<boolean>(true);
+  const [studyBuddySets, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
   const sampleStatCards: StatCards[] = [
     {
       title: "Total Sets",
@@ -117,6 +131,26 @@ export default function Dashboard() {
     });
   };
 
+  const createStudyBuddy = (
+    title: string,
+    description: string,
+    category: string,
+    buddyId?: number
+  ): void => {
+    toast.success("Study Buddy created successfully!");
+    setStudyBuddySets((prevStudyBuddySets) => {
+      return [
+        ...prevStudyBuddySets,
+        {
+          id: buddyId ?? 0,
+          title: title,
+          description: description,
+          category: category,
+        },
+      ];
+    });
+  };
+
   const onDeleteSet = (id: number): void => {
     toast.success("Set deleted successfully");
     setSetCards((prevSetCards) => {
@@ -126,7 +160,7 @@ export default function Dashboard() {
     });
   };
 
-  // load up the sets of the user
+  // load up the sets of the user and/or study buddies
   useEffect(() => {
     const loadSets = async () => {
       try {
@@ -139,7 +173,7 @@ export default function Dashboard() {
 
         const data = await response.json();
         if (data.data) {
-          console.log(data.data, "fetched sets");
+          //console.log(data.data, "fetched sets");
           const sets = data.data;
 
           setSetCards(
@@ -163,7 +197,41 @@ export default function Dashboard() {
       }
     };
 
+    const loadBuddies = async () => {
+      try {
+        const response = await fetch("/api/get-buddies");
+
+        if (!response.ok) {
+          toast.error("Could not fetch study buddies");
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.data) {
+            const buddies = data.data;
+            setStudyBuddySets(
+              buddies.map((buddy, index) => {
+                return {
+                  id: buddy.id,
+                  title: buddy.bot_name,
+                  category: buddy.category,
+                  description: buddy.description,
+                };
+              })
+            );
+            toast.success("Fetched study buddies.");
+          }
+          setLoading(false);
+        }
+      } catch (error) {
+        toast.error("Could not fetch study buddies");
+      }
+    };
+
     loadSets();
+    loadBuddies();
   }, []);
 
   return (
@@ -187,42 +255,99 @@ export default function Dashboard() {
 
         {/* Learning Sets */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Your Learning Sets
-          </h2>
-          <CreateSetController onCreateSet={createSet} />
+          <div className="px-3 py-2 bg-gray-200 rounded-md flex">
+            <h2
+              className={`text-2xl px-2 py-1 ${
+                isLearningSetsActive ? "bg-white" : ""
+              } font-bold text-gray-900 rounded-md cursor-pointer`}
+              onClick={() => setIsLearningSetsActive(true)}
+            >
+              Learning Sets
+            </h2>
+            <h2
+              className={`text-2xl font-bold px-2 py-1 ${
+                isLearningSetsActive ? "" : "bg-white"
+              } text-gray-900 rounded-md cursor-pointer`}
+              onClick={() => setIsLearningSetsActive(false)}
+            >
+              Study Buddies
+            </h2>
+          </div>
+
+          {isLearningSetsActive && (
+            <CreateSetController onCreateSet={createSet} />
+          )}
+          {!isLearningSetsActive && (
+            <CreateStudyBuddyController onCreateStudyBuddy={createSet} />
+          )}
         </div>
 
         {/*Learning Set Cards*/}
         <br />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
-          {loading &&
-            Array(3)
-              .fill(0)
-              .map((_, index) => {
+        {isLearningSetsActive && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
+            {loading &&
+              Array(3)
+                .fill(0)
+                .map((_, index) => {
+                  return (
+                    <div
+                      className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                      key={index}
+                    />
+                  );
+                })}
+            {setCards.map((setCard, index) => {
+              return (
+                <SetCard
+                  key={index}
+                  id={setCard.id}
+                  title={setCard.title}
+                  category={setCard.category}
+                  description={setCard.description}
+                  totalLessons={setCard.totalLessons}
+                  completedLessons={setCard.completedLessons}
+                  date={setCard.date}
+                  onDeleteSet={onDeleteSet}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {!isLearningSetsActive && (
+          <div>
+            <span className="text-gray-500 text-md">
+              Upload your study materials and chat with AI to enhance your
+              learning
+            </span>
+            <br />
+            {!studyBuddySets.length && (
+              <span className="font-bold text-lg">
+                No Study Buddies created yet. Upload study materials to get
+                started!
+              </span>
+            )}
+            <br />
+            <br />
+            {/* Study Buddy UI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
+              {studyBuddySets.map((buddy, index) => {
+                //console.log("buddy.title: ", buddy.title);
                 return (
-                  <div
-                    className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                  <StudyBuddyCard
                     key={index}
+                    id={buddy.id}
+                    title={buddy.title}
+                    category={buddy.category}
+                    description={buddy.description}
                   />
                 );
               })}
-          {setCards.map((setCard, index) => {
-            return (
-              <SetCard
-                key={index}
-                id={setCard.id}
-                title={setCard.title}
-                category={setCard.category}
-                description={setCard.description}
-                totalLessons={setCard.totalLessons}
-                completedLessons={setCard.completedLessons}
-                date={setCard.date}
-                onDeleteSet={onDeleteSet}
-              />
-            );
-          })}
-        </div>
+            </div>
+          </div>
+        )}
+
         <br />
         <br />
       </main>

@@ -90,11 +90,11 @@ export async function GET(request: Request) {
     })
   );
 
-  console.log("The response is", response);
+  /*console.log("The response is", response);
   console.log(
     "Type of set.created_at (timestamptz) ->",
     typeof setData[0].created_at
-  );
+  );*/
   return NextResponse.json(
     {
       data: response,

@@ -1,4 +1,7 @@
+"use client";
 import { Check, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function SubscriptionCards({
   free,
@@ -7,6 +10,8 @@ export default function SubscriptionCards({
   free: boolean;
   isSubscribed: boolean;
 }) {
+  const router = useRouter();
+
   // Free Plan Card
   const freeFeatures = [
     "1 set request per day",
@@ -65,6 +70,55 @@ export default function SubscriptionCards({
             ? "bg-blue-400 hover:bg-blue-300 cursor-not-allowed"
             : "bg-black hover:bg-gray-600 cursor-pointer"
         } ${free ? "text-gray-600" : "text-white"}`}
+        onClick={async () => {
+          if ((free && !isSubscribed) || (!free && isSubscribed)) {
+            return;
+          }
+
+          if (free && isSubscribed) {
+            // click to go to customer portal
+            const res = await fetch("/api/customer-portal", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({}),
+            });
+
+            if (!res.ok) {
+              console.log("Error creating customer portal session");
+              return;
+            }
+
+            const data = await res.json();
+            if (data.url) {
+              router.push(data.url);
+              return;
+            } else {
+              toast.error(data.error);
+              return;
+            }
+          }
+
+          const res = await fetch("/api/checkout", {
+            // click to go to checkout
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              isSubscribed,
+            }),
+          });
+
+          if (!res.ok) {
+            console.log("Error creating checkout session");
+            return;
+          }
+
+          const data = await res.json();
+          router.push(data.url);
+        }}
       >
         {free
           ? isSubscribed
