@@ -88,6 +88,7 @@ export default function Dashboard() {
   const [isLearningSetsActive, setIsLearningSetsActive] =
     useState<boolean>(true);
   const [studyBuddySets, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
+  const [profileData, setProfileData] = useState<StatCards[]>([]);
   const sampleStatCards: StatCards[] = [
     {
       title: "Total Sets",
@@ -111,7 +112,7 @@ export default function Dashboard() {
     description: string,
     category: string,
     numLessons?: number,
-    setId?: number
+    setId?: number,
   ): void => {
     //create a set
     toast.success("Set created successfully!");
@@ -135,7 +136,7 @@ export default function Dashboard() {
     title: string,
     description: string,
     category: string,
-    buddyId?: number
+    buddyId?: number,
   ): void => {
     toast.success("Study Buddy created successfully!");
     setStudyBuddySets((prevStudyBuddySets) => {
@@ -187,7 +188,7 @@ export default function Dashboard() {
                 totalLessons: set.numLessons,
                 completedLessons: set.completedLessons || 0,
                 date: set.date,
-              }))
+              })),
           );
           setLoading(false);
           toast.success("Fetched sets");
@@ -219,7 +220,7 @@ export default function Dashboard() {
                   category: buddy.category,
                   description: buddy.description,
                 };
-              })
+              }),
             );
             toast.success("Fetched study buddies.");
           }
@@ -230,8 +231,44 @@ export default function Dashboard() {
       }
     };
 
+    const getProfInfo = async () => {
+      try {
+        const response = await fetch("/api/get-profile-data");
+
+        if (!response.ok) {
+          toast.error("Could not fetch profile data");
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          setProfileData([
+            {
+              title: "Total Sets",
+              icon: 1,
+              content: (data.setsCreated - data.setsCompleted).toString(),
+            },
+            {
+              title: "Completed Lessons",
+              icon: 2,
+              content: data.completedLessons.toString(),
+            },
+            {
+              title: "Overall Progress",
+              icon: 3,
+              content: data.overallProgress.toString() + "%",
+            },
+          ]);
+        }
+      } catch (error) {
+        toast.error("Could not fetch profile data");
+      }
+    };
+
     loadSets();
     loadBuddies();
+    getProfInfo();
   }, []);
 
   return (
@@ -241,16 +278,28 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         {/*Stat Cards*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
-          {sampleStatCards.map((statCard, index) => {
-            return (
-              <StatCard
-                key={index}
-                title={statCard.title}
-                icon={statCard.icon}
-                content={statCard.content}
-              />
-            );
-          })}
+          {profileData.length === 0 &&
+            Array(3)
+              .fill(0)
+              .map((_, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="h-30 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                  />
+                );
+              })}
+          {profileData.length > 0 &&
+            profileData.map((statCard, index) => {
+              return (
+                <StatCard
+                  key={index}
+                  title={statCard.title}
+                  icon={statCard.icon}
+                  content={statCard.content}
+                />
+              );
+            })}
         </div>
 
         {/* Learning Sets */}
@@ -297,21 +346,22 @@ export default function Dashboard() {
                     />
                   );
                 })}
-            {setCards.map((setCard, index) => {
-              return (
-                <SetCard
-                  key={index}
-                  id={setCard.id}
-                  title={setCard.title}
-                  category={setCard.category}
-                  description={setCard.description}
-                  totalLessons={setCard.totalLessons}
-                  completedLessons={setCard.completedLessons}
-                  date={setCard.date}
-                  onDeleteSet={onDeleteSet}
-                />
-              );
-            })}
+            {!loading &&
+              setCards.map((setCard, index) => {
+                return (
+                  <SetCard
+                    key={index}
+                    id={setCard.id}
+                    title={setCard.title}
+                    category={setCard.category}
+                    description={setCard.description}
+                    totalLessons={setCard.totalLessons}
+                    completedLessons={setCard.completedLessons}
+                    date={setCard.date}
+                    onDeleteSet={onDeleteSet}
+                  />
+                );
+              })}
           </div>
         )}
 
