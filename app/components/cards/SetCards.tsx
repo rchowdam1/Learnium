@@ -79,7 +79,7 @@ export default function SetCard({
       </div>
 
       {/*Card Description*/}
-      <div className="mt-3">
+      <div className="mt-3 h-12 overflow-y-auto no-scrollbar">
         <span className="text-gray-500">{description}</span>
       </div>
 

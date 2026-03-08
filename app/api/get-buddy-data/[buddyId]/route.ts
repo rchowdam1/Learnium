@@ -9,7 +9,7 @@ import { createClient } from "@/lib/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ buddyId: string }> }
+  { params }: { params: Promise<{ buddyId: string }> },
 ) {
   const supabase = await createClient();
 
@@ -27,7 +27,7 @@ export async function GET(
     console.log("Could not retrieve the study buddy");
     return NextResponse.json(
       { error: "Could not retrieve the study buddy" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -42,14 +42,14 @@ export async function GET(
     console.log("Could not retrieve study buddy chats");
     return NextResponse.json(
       { error: "Could not retrieve study buddy chats" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  console.log("title:", buddyData.bot_name);
+  console.log("chat:", chatData);
   // success
   return NextResponse.json(
     { title: buddyData.bot_name, chats: chatData },
-    { status: 200 }
+    { status: 200 },
   );
 }

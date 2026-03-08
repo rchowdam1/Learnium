@@ -179,7 +179,7 @@ export async function GET() {
 
   let overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
   let averageQuizScore = ((totalQuizScore / numQuizzesCompleted) * 100).toFixed(
-    2
+    2,
   );
 
   // Get the top categories of the user
@@ -191,7 +191,7 @@ export async function GET() {
   });
 
   const sortedEntries = Object.entries(categoryCounts).sort(
-    (a, b) => b[1] - a[1]
+    (a, b) => b[1] - a[1],
   );
   for (const [category, count] of sortedEntries) {
     if (topCategories.length < 3 && count > 0) {
@@ -199,6 +199,7 @@ export async function GET() {
     }
   }
 
+  console.log("requests remaining: ", requestsRemaining);
   return NextResponse.json({
     success: true,
     username: username,

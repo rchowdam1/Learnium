@@ -48,4 +48,4 @@ logic.txt
 /rag/chroma_db/
 /rag/Dockerfile
 
-/lib/
+/lib/admin.ts

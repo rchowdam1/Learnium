@@ -327,7 +327,7 @@ export default function Dashboard() {
             <CreateSetController onCreateSet={createSet} />
           )}
           {!isLearningSetsActive && (
-            <CreateStudyBuddyController onCreateStudyBuddy={createSet} />
+            <CreateStudyBuddyController onCreateStudyBuddy={createStudyBuddy} />
           )}
         </div>
 

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       { error: "Could not retrieve profile" },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
     if (result.success === false) {
       return NextResponse.json(
         { error: "Could not update the reset date" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
     if (result.success === false) {
       return NextResponse.json(
         { error: "Could not reset the remaining set requests" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -142,8 +142,17 @@ export async function POST(request: Request) {
       },
       {
         status: 200,
-      }
+      },
     );
+  }
+
+  // temporary code, used for debugging
+  if (result.success === true) {
+    console.log(
+      "Should have successfully decremented the user's remaining set requests",
+    );
+    // ok so this worked for the ocean set but not for the aws set
+    // next, try to reset the set requests for rithiknchowdam and if it does not work then debug
   }
 
   // system prompt
@@ -175,7 +184,7 @@ export async function POST(request: Request) {
 
   const parsedResponse = response.output_parsed;
   console.log(
-    parsedResponse
+    parsedResponse,
     /*`| this response used ${response.usage?.total_tokens}, with ${response.usage?.prompt_tokens} prompt tokens and ${response.usage?.completion_tokens} completion tokens`*/
   );
 
@@ -194,7 +203,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { error: "Could not process your request" },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -208,7 +217,7 @@ export async function POST(request: Request) {
       parsedResponse,
       title,
       description,
-      category
+      category,
     );
 
     if (result === false) {
@@ -217,7 +226,7 @@ export async function POST(request: Request) {
           success: false,
           message: "Set creation in the database was unsuccessful",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -233,6 +242,6 @@ export async function POST(request: Request) {
     },
     {
       status: 200,
-    }
+    },
   );
 }

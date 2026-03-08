@@ -146,7 +146,7 @@ export default function ProfilePage() {
           const data = await response.json();
 
           if (data.success) {
-            toast.success("Fetched profile data");
+            toast.success("Requests remaining: ", data.requestsRemaining);
             setLoading(false);
             setUsername(data.username);
             setEmail(data.email);
@@ -320,15 +320,15 @@ export default function ProfilePage() {
                           index === 0
                             ? "Completed Lessons"
                             : index === 1
-                            ? "Overall Progress"
-                            : "Average Quiz Score"
+                              ? "Overall Progress"
+                              : "Average Quiz Score"
                         }
                         data={
                           index === 0
                             ? `${completedLessons}`
                             : index === 1
-                            ? `${overallProgress}%`
-                            : `${averageQuizScore}%`
+                              ? `${overallProgress}%`
+                              : `${averageQuizScore}%`
                         }
                       />
                     );

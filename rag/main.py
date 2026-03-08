@@ -1,6 +1,7 @@
 import os
 import io
 from pathlib import Path
+import sys
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import Chroma
@@ -17,14 +18,18 @@ from pydantic import BaseModel
 # load environment variables from .env.local
 # __file__ is the current file. .parent gets the folder
 # .parent.parent moves up one level
-#env_path = Path(__file__).resolve().parent.parent / '.env.local'
+env_path = Path(__file__).resolve().parent.parent / '.env.local'
 
 # load the specific file
-#load_dotenv(dotenv_path=env_path)
-load_dotenv()
+load_dotenv(dotenv_path=env_path)
+
 
 # get variable
 openai_api_key = os.getenv("OPENAI_API_KEY")
+
+if not openai_api_key:
+    print("OPENAI_API_KEY is not accessible from this file.")
+    sys.exit(1)
 
 
 app = FastAPI()
@@ -41,7 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-llm = ChatOpenAI(model_name="gpt-4", temperature=0.7)
+model = ChatOpenAI(model_name="gpt-4", temperature=0.7)
 
 
 @app.get("/")
@@ -162,7 +167,7 @@ class ChatRequest(BaseModel):
 
 # chat request endpoint
 @app.post("/api/chat")
-def chat_request(request: ChatRequest):
+async def chat_request(request: ChatRequest):
     print(f"Question: {request.question} with Buddy with ID {request.buddy_id}")
 
     # convert the query to an embedding and search for the 3 most relevant chunks
@@ -199,7 +204,6 @@ def chat_request(request: ChatRequest):
     prompt = prompt_template.format(context_text=context_text, query=request.question)
 
     # Generate the answer using OpenAI
-    model = ChatOpenAI()
     response_text = model.invoke(prompt)
 
     # save the response

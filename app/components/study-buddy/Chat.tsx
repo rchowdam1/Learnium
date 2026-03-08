@@ -32,7 +32,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
   // resume here 1/13 figure out why chats aren't loading
   const chatWindowRef = useRef(null);
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[] | undefined>(undefined);
   const [title, setTitle] = useState<string>("");
   const [currentMessage, setCurrentMessage] = useState<string>("");
 
@@ -120,9 +120,11 @@ export default function Chat({ buddyId }: { buddyId: string }) {
         }
       } else {
         toast.error("Something went wrong when trying to chat with AI");
+        return; // if there is no response from the AI, we don't want to save the user message in database
       }
     } catch (error) {
       toast.error(error as string);
+      return; // if there is an error with the AI, we don't want to save the user message in database
     }
 
     // once you get the message, store the user and assistant message in the database
@@ -141,7 +143,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
 
       if (!response.ok) {
         toast.error(
-          "Something went wrong when trying to store messages in database"
+          "Something went wrong when trying to store messages in database",
         );
       } else {
         const data = await response.json();
@@ -183,10 +185,10 @@ export default function Chat({ buddyId }: { buddyId: string }) {
       <div
         ref={chatWindowRef}
         className={`h-90 w-full border-b border-b-gray-300 pb-3 overflow-y-auto ${
-          !messages.length && "bg-gray-400 animate-pulse"
+          messages === undefined && "bg-gray-400 animate-pulse"
         }`}
       >
-        {messages.length > 0 && (
+        {messages !== undefined && (
           <div className="flex items-start ml-2 mt-3">
             <Bubble role={false} />
             <ChatMessage
@@ -195,30 +197,31 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           </div>
         )}
 
-        {messages.map((message, index) => {
-          return (
-            <div
-              key={index}
-              className={`flex items-start mt-3 ${
-                message.is_user_message
-                  ? "justify-end mr-2"
-                  : "justify-start ml-2"
-              }`}
-            >
-              {message.is_user_message ? (
-                <>
-                  <ChatMessage message={message.message} />
-                  <Bubble role={message.is_user_message} />
-                </>
-              ) : (
-                <>
-                  <Bubble role={message.is_user_message} />
-                  <ChatMessage message={message.message} />
-                </>
-              )}
-            </div>
-          );
-        })}
+        {messages &&
+          messages.map((message, index) => {
+            return (
+              <div
+                key={index}
+                className={`flex items-start mt-3 ${
+                  message.is_user_message
+                    ? "justify-end mr-2"
+                    : "justify-start ml-2"
+                }`}
+              >
+                {message.is_user_message ? (
+                  <>
+                    <ChatMessage message={message.message} />
+                    <Bubble role={message.is_user_message} />
+                  </>
+                ) : (
+                  <>
+                    <Bubble role={message.is_user_message} />
+                    <ChatMessage message={message.message} />
+                  </>
+                )}
+              </div>
+            );
+          })}
       </div>
 
       {/**Text input Segment */}
