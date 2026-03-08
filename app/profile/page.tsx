@@ -46,7 +46,7 @@ const SetCard = ({
   isSubscribed: boolean;
 }) => {
   return (
-    <div className="w-95 min-h-40 rounded-md border-2 border-gray-200 bg-white px-4 py-3 flex flex-col">
+    <div className="w-full min-h-40 rounded-md border-2 border-gray-200 bg-white px-4 py-3 flex flex-col">
       {/** Title and Completed Badge */}
       <div className="flex justify-between items-start">
         <span className="font-semibold text-lg">{title}</span>
@@ -56,7 +56,7 @@ const SetCard = ({
       </div>
 
       {/** Description and Date */}
-      <div className="mt-2 text-sm text-gray-500 text-left">
+      <div className="mt-2 text-sm text-gray-500 text-left line-clamp-2">
         <span>{description}</span> <br />
         <span className="mt-1">Completed on {date}</span>
       </div>
@@ -341,12 +341,23 @@ export default function ProfilePage() {
             </div>
 
             {/**Completed Sets */}
-            <div className="px-4 py-5 bg-white rounded-lg shadow-md relative">
-              <div className="flex items-center relative">
-                <CheckCircle className="w-7 h-7 text-green-500" />
-                <span className="ml-3 text-2xl font-bold">Completed Sets</span>
+            <div
+              className={`px-4 py-5 bg-white rounded-lg shadow-md relative mx-auto transition-all duration-300 col-span-full ${
+                displayCompletedSets
+                  ? "w-full max-w-4xl"
+                  : "w-fit min-w-[400px]"
+              }`}
+            >
+              <div className="flex items-center justify-between relative gap-8">
+                <div className="flex items-center">
+                  <CheckCircle className="w-7 h-7 text-green-500" />
+                  <span className="ml-3 text-2xl font-bold">
+                    Completed Sets
+                  </span>
+                </div>
+
                 <button
-                  className="absolute right-3 font-semibold hover:bg-gray-200 px-2 py-1 rounded-full cursor-pointer border-2 border-gray-200 transition-colors duration-200"
+                  className="font-semibold hover:bg-gray-200 px-2 py-1 rounded-full cursor-pointer border-2 border-gray-200 transition-colors duration-200 whitespace-nowrap"
                   onClick={() => setDisplayCompletedSets(!displayCompletedSets)}
                 >
                   {displayCompletedSets ? "Hide" : `View (${setsCompleted})`}
@@ -354,42 +365,34 @@ export default function ProfilePage() {
               </div>
 
               {/**The actual sets */}
-              <div className="flex flex-col items-center mt-4 space-y-5">
-                {displayCompletedSets && (
-                  <>
-                    {setData &&
-                    setData.filter((set) => set.completed).length > 0 ? (
-                      setData
-                        .filter((set) => set.completed)
-                        .map((set, index) => {
-                          return (
-                            <SetCard
-                              key={index}
-                              title={set.title}
-                              description={set.description}
-                              date={
-                                set.completed_at
-                                  ? formatDate(set.completed_at)
-                                  : "N/A"
-                              }
-                              isSubscribed={isSubscribed || false}
-                            />
-                          );
-                        })
-                    ) : (
-                      <span className="mt-3 font-semibold text-xl">
-                        You haven't completed any sets
-                      </span>
-                    )}
-                  </>
-                  /*<SetCard
-                    title="React Fundamentals"
-                    description="Learn the basics of React development"
-                    date="7/16/2025"
-                    isSubscribed={false}
-                  />*/
-                )}
-              </div>
+              {displayCompletedSets && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 mt-4 w-full px-5 py-5">
+                  {setData &&
+                  setData.filter((set) => set.completed).length > 0 ? (
+                    setData
+                      .filter((set) => set.completed)
+                      .map((set, index) => {
+                        return (
+                          <SetCard
+                            key={index}
+                            title={set.title}
+                            description={set.description}
+                            date={
+                              set.completed_at
+                                ? formatDate(set.completed_at)
+                                : "N/A"
+                            }
+                            isSubscribed={isSubscribed || false}
+                          />
+                        );
+                      })
+                  ) : (
+                    <span className="mt-3 font-semibold text-xl">
+                      You haven't completed any sets
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
