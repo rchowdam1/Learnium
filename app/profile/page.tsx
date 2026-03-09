@@ -56,8 +56,8 @@ const SetCard = ({
       </div>
 
       {/** Description and Date */}
-      <div className="mt-2 text-sm text-gray-500 text-left line-clamp-2">
-        <span>{description}</span> <br />
+      <div className="mt-2 text-sm text-gray-500 text-left">
+        <span className="line-clamp-1">{description}</span> <br />
         <span className="mt-1">Completed on {date}</span>
       </div>
 
@@ -103,7 +103,7 @@ const StatCard = ({
   data: string;
 }) => {
   return (
-    <div className="h-27 w-90 bg-white rounded-lg shadow-md relative">
+    <div className="h-27 w-full bg-white rounded-lg shadow-md relative">
       {icon === 1 ? (
         <Trophy className="absolute top-4 right-4 w-5 h-5" />
       ) : icon === 2 ? (
@@ -210,7 +210,8 @@ export default function ProfilePage() {
         )}
         {!loading && (
           <div className="max-w-5xl mt-6 p-6 mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="w-110 bg-white rounded-lg shadow-md pb-3">
+            {/**Profile Card */}
+            <div className="w-full h-full bg-white rounded-lg shadow-md pb-3">
               <div className="flex justify-around pt-10">
                 {/*<CircleUser className="w-20 h-20 relative bottom-3" />*/}
                 {/*User Circle*/}
@@ -307,6 +308,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/*Stat Cards*/}
             <div className="flex flex-col gap-6">
               {completedLessons && overallProgress && averageQuizScore ? (
                 Array(3)
@@ -343,9 +345,7 @@ export default function ProfilePage() {
             {/**Completed Sets */}
             <div
               className={`px-4 py-5 bg-white rounded-lg shadow-md relative mx-auto transition-all duration-300 col-span-full ${
-                displayCompletedSets
-                  ? "w-full max-w-4xl"
-                  : "w-fit min-w-[400px]"
+                displayCompletedSets ? "w-full" : "w-fit min-w-[400px]"
               }`}
             >
               <div className="flex items-center justify-between relative gap-8">
@@ -366,7 +366,7 @@ export default function ProfilePage() {
 
               {/**The actual sets */}
               {displayCompletedSets && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 mt-4 w-full px-5 py-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 w-full px-5 py-5">
                   {setData &&
                   setData.filter((set) => set.completed).length > 0 ? (
                     setData
