@@ -15,6 +15,7 @@ export type Message = {
   bot_id?: number;
   is_user_message: boolean;
   message: string;
+  loading?: boolean;
 };
 
 export type APIResponse = {

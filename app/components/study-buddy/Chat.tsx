@@ -16,14 +16,24 @@ function Bubble({ role }: { role: boolean }) {
   );
 }
 
-function ChatMessage({ message }: { message: string }) {
+function ChatMessage({
+  message,
+  loading,
+}: {
+  message: string;
+  loading?: boolean;
+}) {
   return (
     <div
       className="px-3 py-3 mx-3 rounded-md bg-gray-200 max-w-[85%]
         break-words
         whitespace-pre-wrap"
     >
-      {message}
+      {loading ? (
+        <span className="text-black animate-pulse">Thinking...</span>
+      ) : (
+        message
+      )}
     </div>
   );
 }
@@ -85,6 +95,11 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           is_user_message: true,
           message: messageToSend,
         },
+        {
+          is_user_message: false,
+          message: "",
+          loading: true,
+        },
       ];
     });
 
@@ -93,68 +108,81 @@ export default function Chat({ buddyId }: { buddyId: string }) {
 
     let assistantMessage: string = "";
 
+    /**
+     * First, check if the user has chats remaining for the day. If not, show a toast error and return.
+     * If they do, send the message to the RAG API. If there is an error with the API, show toast error and return.
+     * If there is not error with RAG, store the user and assistant message in the database.
+     * Decrement chats_remaining by 1 using supabase rpc function
+     */
+
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch("/api/send-chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          question: messageToSend,
-          buddy_id: buddyId,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        if (data.response) {
-          console.log(data.response);
-          assistantMessage = data.response;
-          setMessages((prevMessages) => {
-            return [
-              ...prevMessages,
-              { is_user_message: false, message: data.response },
-            ];
-          });
-        }
-      } else {
-        toast.error("Something went wrong when trying to chat with AI");
-        return; // if there is no response from the AI, we don't want to save the user message in database
-      }
-    } catch (error) {
-      toast.error(error as string);
-      return; // if there is an error with the AI, we don't want to save the user message in database
-    }
-
-    // once you get the message, store the user and assistant message in the database
-    try {
-      const response = await fetch("/api/save-chat-message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          buddyId: buddyId,
           userMessage: messageToSend,
-          assistantMessage: assistantMessage,
+          buddyId: buddyId,
         }),
       });
 
       if (!response.ok) {
+        const data = await response.json();
         toast.error(
-          "Something went wrong when trying to store messages in database",
+          data.message || "An error occurred while sending the message",
+        );
+        throw new Error(
+          data.message || "An error occurred while sending the message",
         );
       } else {
         const data = await response.json();
 
-        if (data.message) {
-          // success
-          toast.success(data.message); // for now
+        if (!data.success) {
+          if (data.message === "User has no chats remaining for the day") {
+            toast.error(
+              "You have no chats remaining for the day. Please try again tomorrow!",
+            );
+            setMessages((prevMessages) => {
+              //prevMessages?.pop(); // remove the loading message
+              prevMessages[prevMessages.length - 1] = {
+                is_user_message: false,
+                message:
+                  "You have no chats remaining for the day. Please try again tomorrow!",
+              };
+              return [...prevMessages];
+            });
+            return;
+          }
+
+          toast.error(
+            data.message || "An error occurred while sending the message",
+          );
+          throw new Error(
+            data.message || "An error occurred while sending the message",
+          );
+        } else {
+          const assistantMessage = data.assistantMessage;
+          setMessages((prevMessages) => {
+            //prevMessages?.pop(); // remove the loading message
+            prevMessages[prevMessages.length - 1] = {
+              is_user_message: false,
+              message: assistantMessage,
+            };
+            return [...prevMessages];
+          });
         }
       }
     } catch (error) {
       toast.error(error as string);
+      setMessages((prevMessages) => {
+        //prevMessages?.pop(); // remove the loading message
+        prevMessage[prevMessages.length - 1] = {
+          is_user_message: false,
+          message: "Sorry, an error occurred while trying to get a response.",
+        };
+        return [...prevMessages];
+      });
     }
 
     e.target.value = "";
@@ -216,7 +244,11 @@ export default function Chat({ buddyId }: { buddyId: string }) {
                 ) : (
                   <>
                     <Bubble role={message.is_user_message} />
-                    <ChatMessage message={message.message} />
+                    {message.loading ? (
+                      <ChatMessage message={message.message} loading={true} />
+                    ) : (
+                      <ChatMessage message={message.message} />
+                    )}
                   </>
                 )}
               </div>
