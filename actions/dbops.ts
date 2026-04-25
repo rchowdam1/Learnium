@@ -5,7 +5,7 @@ export async function createSet(
   parsedResponse: OutputSchema,
   title: string,
   description: string,
-  category: string
+  category: string,
 ): Promise<false | { id: number; lessonCount: number }> {
   const supabase = await createClient();
 
@@ -135,7 +135,7 @@ export async function createSet(
 export async function createBuddy(
   title: string,
   description: string,
-  category: string
+  category: string,
 ) {
   const supabase = await createClient();
 
@@ -168,4 +168,25 @@ export async function createBuddy(
   }
 
   return { id: buddy.id };
+}
+
+export async function storeBuddyDocuments(buddyId: number, files: File[]) {
+  const supabase = await createClient();
+
+  for (const file of files) {
+    const { data, error: uploadError } = await supabase
+      .from("study_bot_documents")
+      .insert({
+        study_bot_id: buddyId,
+        document_name: file.name,
+        document_size: file.size,
+      });
+
+    if (uploadError) {
+      console.log(`Error storing document ${file.name} for buddy ${buddyId}`);
+      return false;
+    }
+  }
+
+  return true;
 }
