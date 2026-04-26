@@ -32,6 +32,12 @@ type StudyBuddyCards = {
   title: string;
   category: string;
   description: string;
+  documents: {
+    id: number;
+    studyBuddyId: number;
+    name: string;
+    size: number;
+  }[];
 };
 
 type SetResponse = {
@@ -211,7 +217,8 @@ export default function Dashboard() {
 
         if (data.success) {
           if (data.data) {
-            const buddies = data.data;
+            const buddies = data.data.buddyData;
+            const documents = data.data.documentData;
             setStudyBuddySets(
               buddies.map((buddy, index) => {
                 return {
@@ -219,6 +226,7 @@ export default function Dashboard() {
                   title: buddy.bot_name,
                   category: buddy.category,
                   description: buddy.description,
+                  documents: documents.length > 0 ? documents[index] : [],
                 };
               }),
             );
@@ -391,6 +399,7 @@ export default function Dashboard() {
                     title={buddy.title}
                     category={buddy.category}
                     description={buddy.description}
+                    documents={buddy.documents}
                   />
                 );
               })}

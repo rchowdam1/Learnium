@@ -11,6 +11,12 @@ type StudyBuddyCardProps = {
   title: string;
   category: string;
   description: string;
+  documents: {
+    id: number;
+    studyBuddyId: number;
+    name: string;
+    size: number;
+  }[];
 };
 
 export default function StudyBuddyCard({
@@ -18,6 +24,7 @@ export default function StudyBuddyCard({
   title,
   category,
   description,
+  documents,
 }: StudyBuddyCardProps) {
   const router = useRouter();
 
@@ -65,7 +72,8 @@ export default function StudyBuddyCard({
       <DocumentModal
         open={documentModalOpen}
         onClose={() => setDocumentModalOpen(false)}
-        documents={Array(5).fill({ id: 1, name: "Document 1", size: 123450 })}
+        documents={documents}
+        buddyName={title}
       />
     </div>
   );
