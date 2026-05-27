@@ -1,14 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Play } from "lucide-react";
+import { Play, Newspaper } from "lucide-react";
+import DocumentModal from "../modals/DocumentModal";
 
 type StudyBuddyCardProps = {
   id: number;
   title: string;
   category: string;
   description: string;
+  documents: {
+    id: number;
+    studyBuddyId: number;
+    name: string;
+    size: number;
+  }[];
 };
 
 export default function StudyBuddyCard({
@@ -16,8 +24,11 @@ export default function StudyBuddyCard({
   title,
   category,
   description,
+  documents,
 }: StudyBuddyCardProps) {
   const router = useRouter();
+
+  const [documentModalOpen, setDocumentModalOpen] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col justify-between h-70 w-100 bg-white rounded-sm bg-card text-card-foreground shadow-sm px-4 py-5">
@@ -39,14 +50,31 @@ export default function StudyBuddyCard({
       </div>
 
       {/*Date and Continue/Start button*/}
-      <div className="mt-12 flex items-center justify-between">
+      <div className="mt-12 flex items-center gap-2">
         <Link href={`/buddy/${id}`}>
           <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
             <Play className="w-4 h-4 mr-2" />
             <span>Chat</span>
           </button>
         </Link>
+
+        {/*View Documents button*/}
+        <button
+          className="flex items-center h-9 rounded-md px-3 bg-gray-500 text-white hover:bg-gray-300 active:bg-gray-400 transition-colors duration-200 cursor-pointer"
+          onClick={() => setDocumentModalOpen(true)}
+        >
+          <Newspaper className="w-4 h-4 mr-2" />
+          <span>View Documents</span>
+        </button>
       </div>
+
+      {/*Document Modal*/}
+      <DocumentModal
+        open={documentModalOpen}
+        onClose={() => setDocumentModalOpen(false)}
+        documents={documents}
+        buddyName={title}
+      />
     </div>
   );
 }

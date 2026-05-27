@@ -5,7 +5,7 @@ import {
   updateSetResetDate,
   resetSets,
 } from "@/actions/ProfileUpdates";
-import { createBuddy } from "@/actions/dbops";
+import { createBuddy, storeBuddyDocuments } from "@/actions/dbops";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json(
       { error: "User not authenticated" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     console.log("Could not retrieve profile - create buddy");
     return NextResponse.json(
       { error: "Could not retrieve profile" },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     if (result.success === false) {
       return NextResponse.json(
         { error: "Could not update the reset date" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     if (result.success === false) {
       return NextResponse.json(
         { error: "Could not reset the remaining set requests" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "No remaining requests" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         success: false,
         message: "Something went wrong while creating the buddy",
       },
-      { status: 200 }
+      { status: 200 },
     );
   }
 
@@ -126,8 +126,26 @@ export async function POST(request: Request) {
   // console.log(files);
   // now store files in backend
 
+  // store the documents used to create this study buddy in supabase table
+  const files = data.getAll("files") as File[];
+
+  const storeDocumentsResult = await storeBuddyDocuments(
+    createBuddyResult.id,
+    files,
+  );
+
+  if (storeDocumentsResult === false) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Something went wrong while storing the documents",
+      },
+      { status: 200 },
+    );
+  } // test
+
   return NextResponse.json(
     { success: true, buddyId: createBuddyResult.id },
-    { status: 200 }
+    { status: 200 },
   );
 }
