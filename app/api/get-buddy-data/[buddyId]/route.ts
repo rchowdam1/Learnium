@@ -46,7 +46,7 @@ export async function GET(
     );
   }
 
-  console.log("chat:", chatData);
+  //console.log("chat:", chatData);
   // success
   return NextResponse.json(
     { title: buddyData.bot_name, chats: chatData },
