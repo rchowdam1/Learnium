@@ -16,6 +16,8 @@ from fastapi import FastAPI, Form, File, UploadFile, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from scache import set_cache_entry, search_cache
+
 # load environment variables from .env.local
 # __file__ is the current file. .parent gets the folder
 # .parent.parent moves up one level
@@ -171,8 +173,24 @@ class ChatRequest(BaseModel):
 async def chat_request(request: ChatRequest):
     print(f"Question: {request.question} with Buddy with ID {request.buddy_id}")
 
-    # convert the query to an embedding and search for the 3 most relevant chunks
     query = request.question
+
+    # first check if the question is in the semantic cache
+    result = search_cache(prompt=query, buddy_id=request.buddy_id)
+
+    if result["success"]:
+        # cache hit, return response
+        response = result["response"].data[0].response
+
+        print("Success: True, Cached: True")
+
+        return {
+            "response": response, "cached_response": True
+        } 
+
+
+    # convert the query to an embedding and search for the 3 most relevant chunks
+    
     results = vector_store.similarity_search(query=query, k=3, filter={"buddy_id": request.buddy_id})
 
     if not results:
@@ -210,8 +228,13 @@ async def chat_request(request: ChatRequest):
     # save the response
     response = response_text.content
 
+    # since this response was retrieved from the LLM, store it in cache
+    result = set_cache_entry(prompt=query, response=response, buddy_id=request.buddy_id)
+
+    print("Success: True, Cached: False")
+
     return {
-        "response": response,
+        "response": response, "cached_response": False, "cache_success": result["success"]
     }
     
 
