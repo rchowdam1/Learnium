@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Review Session Summary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;family=Bricolage+Grotesque:wght@800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#416900",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#142937",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e2ea",
+                        "surface-container-low": "#f1f3fb",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#91db2a",
+                        "surface-dim": "#d7dae1",
+                        "tertiary-container": "#3a2200",
+                        "on-secondary-container": "#457000",
+                        "background": "#f8f9ff",
+                        "surface-container-highest": "#e0e2ea",
+                        "inverse-on-surface": "#eef1f8",
+                        "outline": "#73777c",
+                        "secondary-fixed": "#acf847",
+                        "secondary-container": "#acf847",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e5e8f0",
+                        "on-tertiary-container": "#c77e00",
+                        "outline-variant": "#c3c7cc",
+                        "primary": "#001421",
+                        "on-surface-variant": "#43474b",
+                        "on-surface": "#181c21",
+                        "surface-container": "#ebeef5",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "on-secondary-fixed": "#102000",
+                        "inverse-primary": "#b4c9dc",
+                        "on-primary-container": "#7c91a2",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed-variant": "#354958",
+                        "on-background": "#181c21",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#071e2b",
+                        "primary-fixed": "#d0e5f8",
+                        "surface-tint": "#4c6171",
+                        "tertiary": "#1e0f00",
+                        "inverse-surface": "#2d3136"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "base": "4px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xxl": "48px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "container-max": "1200px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-main": ["Inter"],
+                        "label-ui": ["Space Grotesk"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"],
+                        "headline-md": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .star-icon {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-main antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full flex justify-between items-center px-gutter w-full h-16 bg-surface text-primary border-b border-outline-variant flat no shadows z-50">
+<button class="text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Review Session</h1>
+<button class="text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Main Content Canvas - Suppressed Navigation Shell as it is a linear flow -->
+<main class="flex-grow pt-[80px] pb-[80px] flex items-center justify-center px-margin-mobile md:px-gutter">
+<div class="w-full max-w-md mx-auto">
+<div class="bg-surface border border-outline-variant rounded-xl p-xl flex flex-col items-center text-center space-y-lg relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-surface to-surface-container-low opacity-50 z-0"></div>
+<div class="relative z-10 w-full flex flex-col items-center space-y-md">
+<!-- Nova Logo Representation (Geometric Star) -->
+<div class="w-16 h-16 bg-primary flex items-center justify-center rounded-full shadow-[0_0_20px_rgba(20,41,55,0.1)]">
+<div class="w-8 h-8 bg-surface star-icon"></div>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary">Session Complete</h2>
+</div>
+<div class="relative z-10 w-full">
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-md flex items-center justify-between">
+<span class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-wider">XP Earned</span>
+<div class="flex items-center space-x-xs">
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-data-tabular text-data-tabular text-primary">+25</span>
+</div>
+</div>
+</div>
+<div class="relative z-10 w-full">
+<div class="bg-tertiary-fixed-dim/20 border border-tertiary-fixed-dim rounded-lg p-md flex flex-col sm:flex-row items-center justify-center space-y-sm sm:space-y-0 sm:space-x-sm">
+<span class="material-symbols-outlined text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-ui text-label-ui text-on-tertiary-container">Streak saved — day 12</span>
+</div>
+</div>
+<div class="relative z-10 w-full pt-md">
+<button class="w-full bg-primary text-on-primary font-label-ui text-label-ui py-md px-lg rounded-lg hover:bg-on-primary-fixed-variant transition-colors active:scale-95 duration-150 flex items-center justify-center shadow-[0_4px_12px_rgba(0,20,33,0.15)] uppercase tracking-widest">
+                        Back to Dashboard
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

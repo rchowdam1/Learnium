@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Home Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "tertiary-container": "#3a2200",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#102000",
+                    "on-primary-fixed-variant": "#354958",
+                    "surface-tint": "#4c6171",
+                    "primary-container": "#142937",
+                    "on-primary-container": "#7c91a2",
+                    "on-secondary-fixed-variant": "#304f00",
+                    "surface-container-low": "#f1f3fb",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary": "#ffffff",
+                    "background": "#f8f9ff",
+                    "outline": "#73777c",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#acf847",
+                    "on-primary-fixed": "#071e2b",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#d7dae1",
+                    "surface-container-highest": "#e0e2ea",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-high": "#e5e8f0",
+                    "surface-container": "#ebeef5",
+                    "secondary": "#416900",
+                    "on-surface": "#181c21",
+                    "on-tertiary-container": "#c77e00",
+                    "on-secondary-container": "#457000",
+                    "primary": "#001421",
+                    "on-surface-variant": "#43474b",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e0e2ea",
+                    "outline-variant": "#c3c7cc",
+                    "primary-fixed-dim": "#b4c9dc",
+                    "inverse-on-surface": "#eef1f8",
+                    "tertiary-fixed": "#ffddb8",
+                    "tertiary": "#1e0f00",
+                    "secondary-container": "#acf847",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#181c21",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#2a1700",
+                    "surface": "#f8f9ff",
+                    "primary-fixed": "#d0e5f8",
+                    "inverse-primary": "#b4c9dc",
+                    "inverse-surface": "#2d3136",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#91db2a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "md": "16px",
+                    "sm": "12px",
+                    "xl": "32px",
+                    "xs": "8px",
+                    "xxl": "48px",
+                    "base": "4px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "container-max": "1200px"
+            },
+            "fontFamily": {
+                    "data-tabular": [
+                            "Space Grotesk"
+                    ],
+                    "display-lg-mobile": [
+                            "Bricolage Grotesque"
+                    ],
+                    "display-lg": [
+                            "Bricolage Grotesque"
+                    ],
+                    "body-main": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Bricolage Grotesque"
+                    ],
+                    "label-ui": [
+                            "Space Grotesk"
+                    ]
+            },
+            "fontSize": {
+                    "data-tabular": [
+                            "18px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "36px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "body-main": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "label-ui": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface-bright');
+            color: theme('colors.on-surface');
+        }
+        
+        /* Custom Progress Ring styles */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        .mascot-nova {
+            /* Sharp, geometric, brutalist edge styling */
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-main antialiased min-h-screen flex flex-col pt-16 pb-16 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 flex justify-between items-center px-margin-mobile h-16 w-full z-50 bg-surface dark:bg-primary border-b border-outline-variant dark:border-outline transition-colors duration-200 ease-in-out md:px-lg">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-on-primary font-display-lg-mobile text-display-lg-mobile text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary dark:text-on-primary text-xl">Learnium</h1>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex items-center gap-lg h-full">
+<a class="h-full flex items-center px-sm text-primary dark:text-on-primary font-bold border-b-2 border-primary" href="#">
+<span class="font-label-ui text-label-ui">Home</span>
+</a>
+<a class="h-full flex items-center px-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-primary-container transition-colors duration-200 ease-in-out" href="#">
+<span class="font-label-ui text-label-ui">Explore</span>
+</a>
+<a class="h-full flex items-center px-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-primary-container transition-colors duration-200 ease-in-out" href="#">
+<span class="font-label-ui text-label-ui">League</span>
+</a>
+<a class="h-full flex items-center px-sm text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-primary-container transition-colors duration-200 ease-in-out" href="#">
+<span class="font-label-ui text-label-ui">Profile</span>
+</a>
+</nav>
+<div class="flex items-center gap-sm font-label-ui text-label-ui text-primary dark:text-on-primary bg-surface-container-low px-sm py-xs rounded-full border border-outline-variant">
+<div class="flex items-center gap-1 text-tertiary-container">
+<span class="font-data-tabular text-data-tabular">5</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<div class="w-px h-4 bg-outline-variant"></div>
+<div class="flex items-center gap-1 text-primary">
+<span class="font-data-tabular text-data-tabular">1.2k</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">diamond</span>
+</div>
+<div class="w-px h-4 bg-outline-variant"></div>
+<div class="text-on-surface-variant">Lvl.12</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-xl flex flex-col gap-lg md:gap-xxl">
+<!-- Hero Section -->
+<section class="flex flex-col gap-sm">
+<h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary tracking-tight">What's next, Alex?</h2>
+<!-- Current Course Card (Raised Surface) -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col md:flex-row items-center gap-lg relative overflow-hidden group hover:border-primary transition-colors duration-300">
+<!-- Decorative background elements -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-secondary-fixed/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex-grow flex flex-col gap-xs z-10 w-full md:w-auto">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant font-label-ui text-label-ui rounded uppercase text-[10px] tracking-widest border border-outline-variant">In Progress</span>
+<span class="px-2 py-1 bg-tertiary-container text-tertiary-fixed font-label-ui text-label-ui rounded uppercase text-[10px] tracking-widest border border-tertiary-fixed-dim/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                             x5 Streak
+                        </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">System Design for Scale</h3>
+<p class="text-on-surface-variant font-body-main mt-1">Module 4: Distributed Caching Strategies</p>
+<button class="mt-sm self-start bg-primary text-on-primary font-label-ui text-label-ui px-lg py-sm rounded border border-primary hover:bg-surface-container-lowest hover:text-primary transition-colors duration-200">
+                        Resume Lesson
+                    </button>
+</div>
+<!-- Progress Ring -->
+<div class="relative w-32 h-32 flex-shrink-0 z-10 flex items-center justify-center bg-surface-container-low rounded-full border border-outline-variant shadow-sm">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<!-- Background Circle -->
+<circle class="text-surface-variant" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<!-- Progress Circle -->
+<circle class="text-secondary progress-ring__circle" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="138.16" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-data-tabular text-data-tabular text-2xl text-primary">45%</span>
+</div>
+</div>
+</article>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Main Content Column -->
+<div class="md:col-span-8 flex flex-col gap-lg">
+<!-- Nova Nudge -->
+<aside class="bg-surface-bright border border-tertiary-fixed-dim rounded-lg p-md flex items-start gap-md relative overflow-hidden shadow-sm">
+<div class="absolute inset-0 bg-gradient-to-r from-tertiary-fixed-dim/10 to-transparent pointer-events-none"></div>
+<div class="w-10 h-10 bg-tertiary-container flex-shrink-0 flex items-center justify-center mascot-nova z-10 shadow-inner">
+<span class="material-symbols-outlined text-tertiary-fixed text-lg" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col gap-1 z-10">
+<span class="font-label-ui text-label-ui text-tertiary-container uppercase tracking-wider text-xs">Nova Says:</span>
+<p class="font-body-main text-on-surface text-sm">"3 days since your last system design lesson. Efficiency is dropping. Let's fix that."</p>
+</div>
+</aside>
+<!-- Lesson Path -->
+<section class="flex flex-col gap-sm">
+<div class="flex justify-between items-end mb-sm border-b border-outline-variant pb-2">
+<h3 class="font-headline-md text-headline-md text-primary">Upcoming Path</h3>
+<a class="font-label-ui text-label-ui text-on-surface-variant hover:text-primary transition-colors" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-md relative">
+<!-- Path Line -->
+<div class="absolute left-6 top-6 bottom-6 w-px bg-outline-variant md:block hidden"></div>
+<!-- Lesson 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex items-center gap-md hover:border-secondary transition-colors group relative z-10 md:ml-12">
+<div class="absolute -left-12 w-6 h-6 rounded-full border-2 border-secondary bg-surface-container-lowest hidden md:flex items-center justify-center">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+</div>
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center border border-outline-variant flex-shrink-0 group-hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary">dns</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-ui text-label-ui text-primary text-base">Load Balancing Basics</h4>
+<p class="font-body-main text-sm text-on-surface-variant">Est. 15 mins • Theory</p>
+</div>
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Lesson 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-md flex items-center gap-md hover:border-secondary transition-colors group relative z-10 md:ml-12 opacity-80">
+<div class="absolute -left-12 w-6 h-6 rounded-full border-2 border-outline-variant bg-surface-container-lowest hidden md:flex items-center justify-center"></div>
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center border border-outline-variant flex-shrink-0 group-hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary">database</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-ui text-label-ui text-primary text-base">Database Sharding</h4>
+<p class="font-body-main text-sm text-on-surface-variant">Est. 20 mins • Interactive</p>
+</div>
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" disabled="">
+<span class="material-symbols-outlined text-sm">lock</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Side Column (Desktop Only for visual balance, Bento Grid style) -->
+<div class="hidden md:flex flex-col gap-lg col-span-4">
+<article class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-sm shadow-sm h-full">
+<h3 class="font-label-ui text-label-ui text-primary uppercase tracking-wider border-b border-outline-variant pb-2">Weekly Stats</h3>
+<div class="grid grid-cols-2 gap-sm mt-2">
+<div class="bg-surface-container p-sm rounded border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-data-tabular text-data-tabular text-2xl text-primary">4h</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant text-xs mt-1">Learning Time</span>
+</div>
+<div class="bg-surface-container p-sm rounded border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-data-tabular text-data-tabular text-2xl text-secondary">A-</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant text-xs mt-1">Avg Score</span>
+</div>
+</div>
+<div class="mt-auto pt-sm border-t border-outline-variant">
+<a class="font-label-ui text-label-ui text-primary hover:underline flex items-center justify-between" href="#">
+                             View Detailed Report
+                             <span class="material-symbols-outlined text-sm">chevron_right</span>
+</a>
+</div>
+</article>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-margin-mobile py-2 h-16 bg-surface dark:bg-primary border-t border-outline-variant dark:border-outline">
+<a class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-bold scale-95 active:scale-90 transition-transform duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container p-2 rounded w-16" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-ui text-label-ui text-[10px] mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant scale-95 active:scale-90 transition-transform duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container p-2 rounded w-16" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-ui text-label-ui text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant scale-95 active:scale-90 transition-transform duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container p-2 rounded w-16" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-ui text-label-ui text-[10px] mt-1">League</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant scale-95 active:scale-90 transition-transform duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container p-2 rounded w-16" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-ui text-label-ui text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple animation trigger for the progress ring to simulate loading
+        document.addEventListener('DOMContentLoaded', () => {
+            const circle = document.querySelector('.progress-ring__circle');
+            if(circle) {
+                const radius = circle.r.baseVal.value;
+                const circumference = radius * 2 * Math.PI;
+                circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                
+                // Start empty
+                circle.style.strokeDashoffset = circumference;
+                
+                // Animate to 45% (100 - 45 = 55% offset)
+                setTimeout(() => {
+                    const offset = circumference - (45 / 100) * circumference;
+                    circle.style.strokeDashoffset = offset;
+                }, 100);
+            }
+        });
+    </script>
+</body></html>

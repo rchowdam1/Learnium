@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Level Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Space+Grotesk:wght@700&amp;family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#ffffff",
+                      "primary-fixed-dim": "#b4c9dc",
+                      "on-surface-variant": "#43474b",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#ffddb8",
+                      "on-tertiary-fixed": "#2a1700",
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#73777c",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#acf847",
+                      "secondary": "#416900",
+                      "primary-container": "#142937",
+                      "surface-container-low": "#f1f3fb",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "on-secondary-fixed": "#102000",
+                      "on-primary-fixed": "#071e2b",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "on-primary-container": "#7c91a2",
+                      "surface-variant": "#e0e2ea",
+                      "surface-container": "#ebeef5",
+                      "outline-variant": "#c3c7cc",
+                      "tertiary-container": "#3a2200",
+                      "on-secondary-fixed-variant": "#304f00",
+                      "tertiary": "#1e0f00",
+                      "surface-container-highest": "#e0e2ea",
+                      "secondary-fixed-dim": "#91db2a",
+                      "background": "#f8f9ff",
+                      "inverse-on-surface": "#eef1f8",
+                      "surface-bright": "#f8f9ff",
+                      "primary": "#001421",
+                      "on-error-container": "#93000a",
+                      "surface": "#f8f9ff",
+                      "inverse-surface": "#2d3136",
+                      "secondary-fixed": "#acf847",
+                      "inverse-primary": "#b4c9dc",
+                      "on-primary-fixed-variant": "#354958",
+                      "surface-dim": "#d7dae1",
+                      "primary-fixed": "#d0e5f8",
+                      "on-tertiary-container": "#c77e00",
+                      "on-background": "#181c21",
+                      "surface-container-high": "#e5e8f0",
+                      "on-surface": "#181c21",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-tint": "#4c6171",
+                      "on-secondary-container": "#457000"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "base": "4px",
+                      "xxl": "48px",
+                      "margin-mobile": "16px",
+                      "container-max": "1200px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "gutter": "24px",
+                      "lg": "24px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Bricolage Grotesque"
+                      ],
+                      "label-ui": [
+                              "Space Grotesk"
+                      ],
+                      "display-lg-mobile": [
+                              "Bricolage Grotesque"
+                      ],
+                      "display-lg": [
+                              "Bricolage Grotesque"
+                      ],
+                      "data-tabular": [
+                              "Space Grotesk"
+                      ],
+                      "body-main": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "label-ui": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "data-tabular": [
+                              "18px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-main": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .glow-lime {
+            box-shadow: 0 0 20px 0px rgba(172, 248, 71, 0.4);
+        }
+        .glow-surface {
+            box-shadow: 0 0 40px 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        .progress-ring {
+            stroke-dasharray: 283; /* 2 * pi * r (r=45) */
+            stroke-dashoffset: 283;
+            animation: fillRing 1.5s ease-out forwards 0.5s;
+        }
+
+        @keyframes fillRing {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .pop-in {
+            opacity: 0;
+            transform: scale(0.9);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.5s ease-out forwards 0.8s;
+        }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black text-on-surface antialiased overflow-hidden h-screen flex flex-col items-center justify-center relative">
+<!-- Dimmed Background Context (Mock Dashboard) -->
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none filter blur-sm">
+<div class="p-gutter h-full flex flex-col gap-gutter">
+<div class="h-20 bg-surface-variant rounded-lg"></div>
+<div class="flex gap-gutter h-40">
+<div class="flex-1 bg-surface-variant rounded-lg"></div>
+<div class="flex-1 bg-surface-variant rounded-lg"></div>
+</div>
+<div class="h-64 bg-surface-variant rounded-lg"></div>
+</div>
+</div>
+<!-- Celebration Overlay Container -->
+<div class="relative z-10 w-full max-w-sm px-margin-mobile flex flex-col items-center justify-center pop-in">
+<!-- Main Card -->
+<div class="w-full bg-surface-variant rounded-[16px] border border-outline border-opacity-30 p-xl flex flex-col items-center glow-surface relative overflow-hidden">
+<!-- Confetti/Starburst Hint -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-30 flex justify-center items-center">
+<svg class="animate-spin" fill="none" height="200" style="animation-duration: 20s;" viewbox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+<path d="M100 0L105.8 85.2L195.1 69.1L113.6 100L195.1 130.9L105.8 114.8L100 200L94.2 114.8L4.9 130.9L86.4 100L4.9 69.1L94.2 85.2L100 0Z" fill="#acf847" opacity="0.2"></path>
+<path d="M100 25L103.5 90L170 79L108 100L170 121L103.5 110L100 175L96.5 110L30 121L92 100L30 79L96.5 90L100 25Z" fill="#b4c9dc" opacity="0.1"></path>
+</svg>
+</div>
+<!-- Level Badge -->
+<div class="relative w-32 h-32 mb-lg flex items-center justify-center">
+<!-- Progress Ring Base -->
+<svg class="absolute inset-0 w-full h-full -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#43474b" stroke-width="4"></circle>
+<!-- Progress Ring Fill -->
+<circle class="progress-ring" cx="50" cy="50" fill="none" r="45" stroke="#acf847" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<!-- Inner Circle -->
+<div class="w-20 h-20 bg-primary-container rounded-full flex items-center justify-center border-2 border-primary-fixed-dim">
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-primary">6</span>
+</div>
+</div>
+<!-- Headlines -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-primary text-center mb-base">Level Up!</h1>
+<p class="font-body-main text-body-main text-on-surface-variant text-center mb-lg">You've reached Level 6. Your intellect is expanding.</p>
+<!-- Rewards Section -->
+<div class="flex flex-col items-center gap-md w-full fade-up">
+<!-- XP Pill -->
+<div class="bg-secondary-container text-on-secondary-container font-label-ui text-label-ui px-4 py-2 rounded-full flex items-center gap-2 glow-lime">
+<span class="material-symbols-outlined text-[18px]">military_tech</span>
+<span>+50 XP Earned</span>
+</div>
+<!-- CTA -->
+<button class="w-full h-12 bg-on-primary text-primary font-label-ui text-label-ui rounded-lg mt-md active:scale-95 transition-transform flex items-center justify-center">
+                    Keep going
+                </button>
+</div>
+</div>
+</div>
+</body></html>

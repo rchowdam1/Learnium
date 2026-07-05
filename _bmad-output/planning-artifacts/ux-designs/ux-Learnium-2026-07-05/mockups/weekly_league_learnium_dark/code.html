@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Learnium - Leagues</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ebeef5",
+                        "on-primary-fixed-variant": "#354958",
+                        "inverse-primary": "#b4c9dc",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#73777c",
+                        "surface-container-low": "#f1f3fb",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#43474b",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "surface-container-highest": "#e0e2ea",
+                        "primary": "#001421",
+                        "on-background": "#181c21",
+                        "outline-variant": "#c3c7cc",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "tertiary": "#1e0f00",
+                        "surface-tint": "#4c6171",
+                        "surface-variant": "#e0e2ea",
+                        "on-primary-fixed": "#071e2b",
+                        "on-secondary-fixed": "#102000",
+                        "primary-container": "#142937",
+                        "tertiary-fixed": "#ffddb8",
+                        "secondary-fixed-dim": "#91db2a",
+                        "secondary": "#416900",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#3a2200",
+                        "on-primary-container": "#7c91a2",
+                        "surface-container-high": "#e5e8f0",
+                        "on-surface": "#181c21",
+                        "on-secondary-container": "#457000",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#c77e00",
+                        "secondary-fixed": "#acf847",
+                        "inverse-on-surface": "#eef1f8",
+                        "primary-fixed": "#d0e5f8",
+                        "inverse-surface": "#2d3136",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#d7dae1",
+                        "secondary-container": "#acf847"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "sm": "12px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-ui": ["Space Grotesk"],
+                        "data-tabular": ["Space Grotesk"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "body-main": ["Inter"],
+                        "display-lg-mobile": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+        .zone-glow { position: relative; }
+        .zone-glow::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(172, 248, 71, 0.05) 0%, transparent 100%);
+            pointer-events: none; z-index: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-primary dark:bg-primary text-on-surface dark:text-on-primary font-body-main antialiased selection:bg-secondary-fixed selection:text-primary min-h-screen flex flex-col pb-safe">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-dim font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 transition-colors duration-200 ease-in-out">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined fill text-[24px]">trophy</span>
+<span>Silver League</span>
+</div>
+<div class="flex items-center gap-xs font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant bg-surface-container-high dark:bg-surface-container-highest px-3 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>2d 14h</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[88px] pb-[104px] px-margin-mobile max-w-container-max mx-auto w-full">
+<div class="flex flex-col gap-base relative">
+<!-- Promotion Zone -->
+<div class="zone-glow rounded-xl border border-secondary-fixed/20 overflow-hidden mb-sm bg-surface-container-highest/5 relative z-10">
+<div class="px-sm py-xs bg-secondary-fixed/10 font-label-ui text-label-ui text-secondary-fixed uppercase tracking-wider flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> Promotion Zone
+                </div>
+<div class="flex flex-col">
+<!-- Rank 1 -->
+<div class="flex items-center px-md py-sm border-b border-white/5 hover:bg-white/5 transition-colors">
+<span class="font-data-tabular text-data-tabular w-8 text-secondary-fixed text-center">1</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 border border-secondary-fixed/50 shadow-[0_0_10px_rgba(172,248,71,0.2)]">
+<img class="w-full h-full object-cover" data-alt="A striking portrait photo of an adult professional learner, styled with high contrast dramatic studio lighting against a dark navy background. The person looks confident, reflecting a premium corporate modern aesthetic. Minimalist and sharp." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA81UoquiZntqB-ro-OvBA8I1JvhQiWUFgf6PWRT-F4QPJyftcBLQKGbdzpbd-SY42kuUtsz6QwZuO2-cfLLvxwvA_P05ho7IzdfU2BBICv285Ht-TEzHrnzb0fXmVmBVBKkxl8zFBNpVbdRbi6-h520qBRWu7PSEg_JY6cCmpBIaD7IvvCS4bDnmv-WEv3IU0jBBfJI7aXqS4BPRBZnnIA_BcGgwkqgKta9RoOcbP4grW8T4rOk9Ro"/>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white">Eleanor Rigby</span>
+<span class="font-data-tabular text-data-tabular text-white ml-sm">4,520</span>
+</div>
+<!-- Rank 2 -->
+<div class="flex items-center px-md py-sm border-b border-white/5 hover:bg-white/5 transition-colors">
+<span class="font-data-tabular text-data-tabular w-8 text-on-surface-variant dark:text-outline-variant text-center">2</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 border border-white/10">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male professional in his 30s, looking focused. Lit with subtle cinematic lighting, set against a dark, minimalist brutalist background. High visual fidelity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMcrI9ESRkZoW0zeLYvphzLYqDo0L8vbUNaaALq5T5O-1HUqbHw6k-lW8UrXoeVP9vi_WAwFAy7Ixw9Qj8-UM9IEcakwKZ605zc5YIZQg5ArciT_-6dt0AiujKvF4xLmA4QaGZP0nDd5GhXoitU18mvRVDbhORcTf--qMnwjNiQnsWb4MWeKYngb8PWR0HNxnjvyyksAOHIYgBG7vBg5644RNQ_OuKEjPx5QtcnOOnxwgCG-WVMhd6"/>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/90">James Holden</span>
+<span class="font-data-tabular text-data-tabular text-white ml-sm">4,110</span>
+</div>
+<!-- Rank 3 -->
+<div class="flex items-center px-md py-sm border-b border-white/5 hover:bg-white/5 transition-colors">
+<span class="font-data-tabular text-data-tabular w-8 text-on-surface-variant dark:text-outline-variant text-center">3</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 border border-white/10">
+<img class="w-full h-full object-cover" data-alt="Portrait of an elegant female executive, glowing rim light, deep space navy background, corporate modern look, sharp and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxmAhdy0OGgmKfnEZecWsVqOLufsptEOMCAamyteMeR5B0DRl3mXxXq95M6RtR3YVPIrdrcblt-AGbONoXKCAF489G0-Y1_we_9UfRJQcalSpjT7AuYPvqfLK8jsU46zj0R6boVw-qXjGmpt84_vmznPJN3HUUtNESsqQ-Bj85P8pXypby5_JyatlxWRyoLtNEXsPa2KT4Gc_yZ8PLEpaaMQKYvDoU6DghL1F-0E9Kp5kqw0xIqwk_"/>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/90">Sarah Connor</span>
+<span class="font-data-tabular text-data-tabular text-white ml-sm">3,895</span>
+</div>
+</div>
+</div>
+<!-- Standard Ranks -->
+<div class="flex flex-col gap-[1px] bg-white/5 rounded-xl overflow-hidden relative z-10 border border-white/5">
+<!-- Rank 4 -->
+<div class="flex items-center px-md py-sm bg-primary hover:bg-white/5 transition-colors">
+<span class="font-data-tabular text-data-tabular w-8 text-on-surface-variant dark:text-outline-variant text-center">4</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0">
+<div class="w-full h-full flex items-center justify-center bg-surface-container-high text-on-primary-fixed-variant font-label-ui">MJ</div>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/80">Michael J.</span>
+<span class="font-data-tabular text-data-tabular text-white/80 ml-sm">3,200</span>
+</div>
+<!-- Current User Row (Rank 5) -->
+<div class="flex items-center px-md py-sm bg-primary-container relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-fixed shadow-[0_0_15px_rgba(172,248,71,0.6)]"></div>
+<span class="font-data-tabular text-data-tabular w-8 text-secondary-fixed text-center z-10 relative">5</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 border border-secondary-fixed/30 z-10 relative">
+<img class="w-full h-full object-cover" data-alt="A self-portrait style photo of a modern professional, well-lit, wearing smart casual attire. The background is a sleek, dark gradient. The aesthetic is serious play, mature and witty." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnEgR5Syqau3PGIXO1dwmriSqt9Ht-1KJtxYkOsE5IrDCPAuO7kDRtbrbkTE0mUawUHcrmWhMju5r0TmnNmsRkgBv6tJ5Eh8czb7HahakUKbyjmzWOrsoPPxojrfGFo9HDHDertNhg5Suui8W4t1VCvYMuXSPaf47WA44K3KSehaKm663BVfm4O9Cl-Mqr2fpjPo4l49Esb5zXSO-VQjReljRrvOcOFUPV70DKGpGS-xuU65Ix3-5C"/>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white font-semibold z-10 relative">You</span>
+<span class="font-data-tabular text-data-tabular text-secondary-fixed ml-sm z-10 relative">2,950</span>
+</div>
+<!-- Rank 6 -->
+<div class="flex items-center px-md py-sm bg-primary hover:bg-white/5 transition-colors">
+<span class="font-data-tabular text-data-tabular w-8 text-on-surface-variant dark:text-outline-variant text-center">6</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0">
+<div class="w-full h-full flex items-center justify-center bg-surface-container-high text-on-primary-fixed-variant font-label-ui">AL</div>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/80">Ada Lovelace</span>
+<span class="font-data-tabular text-data-tabular text-white/80 ml-sm">2,810</span>
+</div>
+</div>
+<!-- Demotion Zone -->
+<div class="mt-md rounded-xl border border-error/20 overflow-hidden bg-primary/50 relative z-10">
+<div class="px-sm py-xs bg-error/10 font-label-ui text-label-ui text-error/80 uppercase tracking-wider flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> Demotion Zone
+                </div>
+<div class="flex flex-col">
+<!-- Rank 29 -->
+<div class="flex items-center px-md py-sm border-b border-white/5 opacity-75">
+<span class="font-data-tabular text-data-tabular w-8 text-outline-variant text-center">29</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 grayscale">
+<div class="w-full h-full flex items-center justify-center bg-surface-container-highest text-outline font-label-ui">TT</div>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/60">Tim T.</span>
+<span class="font-data-tabular text-data-tabular text-white/60 ml-sm">450</span>
+</div>
+<!-- Rank 30 -->
+<div class="flex items-center px-md py-sm opacity-50">
+<span class="font-data-tabular text-data-tabular w-8 text-outline-variant text-center">30</span>
+<div class="w-10 h-10 rounded-full bg-surface-variant mx-sm overflow-hidden flex-shrink-0 grayscale">
+<div class="w-full h-full flex items-center justify-center bg-surface-container-highest text-outline font-label-ui">BB</div>
+</div>
+<span class="flex-grow font-body-main text-body-main truncate text-white/60">Bob B.</span>
+<span class="font-data-tabular text-data-tabular text-white/60 ml-sm">120</span>
+</div>
+</div>
+</div>
+<div class="h-6 w-full opacity-0">Spacer</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-surface-dim font-label-ui text-label-ui border-t border-outline-variant dark:border-outline fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-[env(safe-area-inset-bottom,16px)] h-20 md:hidden">
+<!-- Home (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">home</span>
+<span class="text-[11px]">Home</span>
+</a>
+<!-- Learn (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">menu_book</span>
+<span class="text-[11px]">Learn</span>
+</a>
+<!-- Review (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">history_edu</span>
+<span class="text-[11px]">Review</span>
+</a>
+<!-- Leagues (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed-dim rounded-xl px-4 py-1 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined fill mb-1 text-primary dark:text-primary-fixed-dim">military_tech</span>
+<span class="text-[11px] text-primary dark:text-primary-fixed-dim">Leagues</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">person</span>
+<span class="text-[11px]">Profile</span>
+</a>
+</nav>
+</body></html>

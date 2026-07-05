@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nova Assistant - System Design for Scale</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400..600&amp;family=Space+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed": "#102000",
+                    "secondary-fixed": "#acf847",
+                    "on-background": "#181c21",
+                    "surface-container": "#ebeef5",
+                    "surface-container-low": "#f1f3fb",
+                    "on-tertiary-container": "#c77e00",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#3a2200",
+                    "secondary-container": "#acf847",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "secondary": "#416900",
+                    "on-error": "#ffffff",
+                    "surface-tint": "#4c6171",
+                    "inverse-surface": "#2d3136",
+                    "on-surface": "#181c21",
+                    "outline": "#73777c",
+                    "on-primary-fixed": "#071e2b",
+                    "inverse-on-surface": "#eef1f8",
+                    "tertiary-fixed": "#ffddb8",
+                    "primary-container": "#142937",
+                    "error-container": "#ffdad6",
+                    "primary": "#001421",
+                    "on-primary-fixed-variant": "#354958",
+                    "tertiary": "#1e0f00",
+                    "on-surface-variant": "#43474b",
+                    "on-secondary-container": "#457000",
+                    "surface-variant": "#e0e2ea",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d7dae1",
+                    "on-secondary-fixed-variant": "#304f00",
+                    "primary-fixed-dim": "#b4c9dc",
+                    "inverse-primary": "#b4c9dc",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#d0e5f8",
+                    "outline-variant": "#c3c7cc",
+                    "on-tertiary-fixed": "#2a1700",
+                    "surface-container-highest": "#e0e2ea",
+                    "surface-container-high": "#e5e8f0",
+                    "secondary-fixed-dim": "#91db2a",
+                    "background": "#f8f9ff",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#7c91a2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "sm": "12px",
+                    "margin-mobile": "16px",
+                    "container-max": "1200px",
+                    "xs": "8px",
+                    "gutter": "24px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "data-tabular": [
+                            "Space Grotesk"
+                    ],
+                    "body-main": [
+                            "Inter"
+                    ],
+                    "label-ui": [
+                            "Space Grotesk"
+                    ],
+                    "display-lg": [
+                            "Bricolage Grotesque"
+                    ],
+                    "headline-md": [
+                            "Bricolage Grotesque"
+                    ],
+                    "display-lg-mobile": [
+                            "Bricolage Grotesque"
+                    ]
+            },
+            "fontSize": {
+                    "data-tabular": [
+                            "18px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-main": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-ui": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "36px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #000000; /* Pure black override for dark mode */
+            color: #ffffff;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Gradient text utility */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Custom scrollbar for chat */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased overflow-hidden h-screen flex flex-col font-body-main">
+<!-- App Shell (Navigation suppressed per rules as this is a focused task/chat view inside a lesson) -->
+<!-- TopAppBar from JSON -->
+<header class="bg-surface-bright dark:bg-primary border-b border-outline-variant flat no shadows flex items-center justify-between px-margin-mobile h-16 w-full z-50 shrink-0">
+<div class="flex items-center gap-xs">
+<!-- Leading Avatar -->
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-secondary-fixed">
+<img class="w-full h-full object-cover" data-alt="A sharp, geometric, minimalist North Star icon symbolizing 'Nova', constructed with bright lime green hairline strokes against a deep midnight navy background. The style is modern, professional, and slightly brutalist, avoiding any soft or bubbly characteristics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-h-v4SFdx2gDb6eZUoUIumnlZQUX9VBoGjRWsuqS5tubAKXkUlEoJbvS6S1I5u999NRJk1IohsHP4iwhFZJdAR5-iHXvE-EZQAjAZ_FMF0THfHYQ2ekjbUkx6LpDUraoDGVaDFlud5eTcqdIv1cJlb146dUXEw3gZtfhmMKf9pz-GR9eGuUN6wTMBFvHZM69rpUeMef33eZwv1L23fn7kBT-69jBT0U9Nn0Lw1_R_NLPzQ_jSj9uE"/>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-primary-fixed tracking-tight">Nova Assistant</h1>
+</div>
+<div class="flex items-center gap-sm">
+<div class="px-xs py-[2px] rounded border border-outline-variant bg-surface-container-highest dark:bg-primary-container text-on-surface-variant dark:text-on-primary-container font-label-ui text-[10px] uppercase tracking-wider flex items-center gap-[2px]">
+<span class="w-1.5 h-1.5 rounded-full bg-error block"></span>
+                Quota Reached
+            </div>
+<button aria-label="More options" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface dark:text-on-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area: Split View Desktop, Stacked Mobile -->
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+<!-- Background/Context: Lesson Content (Dimmed/Blurred slightly to focus on chat) -->
+<section class="hidden md:flex flex-1 flex-col p-lg overflow-y-auto opacity-40 border-r border-outline-variant transition-opacity duration-500 relative select-none pointer-events-none">
+<div class="max-w-3xl mx-auto w-full">
+<div class="mb-sm text-on-primary-container font-label-ui text-label-ui uppercase tracking-widest">Module 4 · Lesson 12</div>
+<h2 class="font-display-lg text-display-lg text-on-primary mb-xl">System Design for Scale</h2>
+<div class="prose prose-invert prose-lg max-w-none font-body-main text-on-primary-container leading-relaxed space-y-md">
+<p>When engineering systems that must handle millions of concurrent operations, vertical scaling (adding more power to a single machine) quickly hits physical and financial ceilings. The architectural pivot to horizontal scaling involves distributing the load across commodity hardware.</p>
+<div class="p-md rounded-lg border border-outline-variant bg-primary-container my-xl">
+<h3 class="font-headline-md text-xl mb-xs text-secondary-fixed">Database Sharding</h3>
+<p class="text-sm">Sharding involves partitioning your database into smaller, faster, more easily managed parts called data shards. The word shard means a small part of a whole.</p>
+</div>
+<p>However, distributed architectures introduce new complexities, particularly around state management and data consistency. The CAP theorem dictates that in the presence of a network partition, one has to choose between consistency and availability.</p>
+</div>
+</div>
+</section>
+<!-- Chat Interface (Active Area) -->
+<section class="flex flex-col w-full md:w-[450px] lg:w-[500px] h-full bg-black shrink-0 relative z-10 border-l border-outline-variant shadow-[-20px_0_40px_rgba(0,20,33,0.5)]">
+<!-- Context Header (Mobile Only) -->
+<div class="md:hidden px-margin-mobile py-sm border-b border-outline-variant bg-primary-container/50 backdrop-blur-md sticky top-0 z-20 flex justify-between items-center">
+<span class="font-label-ui text-xs text-on-primary-container uppercase tracking-wider truncate">Context: System Design for Scale</span>
+<span class="material-symbols-outlined text-on-primary-container text-sm" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-margin-mobile md:p-md space-y-xl scrollbar-hide">
+<!-- Nova Message -->
+<div class="flex gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container shrink-0 flex items-center justify-center overflow-hidden border border-secondary-fixed mt-1">
+<img class="w-full h-full object-cover" data-alt="A sharp, geometric, minimalist North Star icon symbolizing 'Nova', constructed with bright lime green hairline strokes against a deep midnight navy background. The style is modern, professional, and slightly brutalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVilZvl_GXz5c7KXd6ygHCkKlulpJCA7Q3ZThmNajfdd8Detn8C3fbCPxdB7_pX7RR3hSP03K4PiC92DPbtGuQ2uKKfsyxFFnhafTJzbqc6Fw0G3zz-HtItYWQsSxnEnh3XZP8cZCYFGexoK46mjJR8MdIzsYymgdozQMbtAF3Y6Fb8Vsm_QTBSDikTA01ujdEttVDRoW4fXuvIWG5OfXE8x1GDxoxNWRiN3W4t_q8kPfwf9kbOr9O"/>
+</div>
+<div class="flex flex-col gap-1 max-w-[85%]">
+<span class="font-label-ui text-[10px] text-on-primary-container uppercase tracking-wider ml-1">Nova</span>
+<div class="bg-primary-container border border-outline-variant rounded-2xl rounded-tl-sm p-sm text-on-primary font-body-main text-[15px] leading-relaxed shadow-sm">
+<p>Think of database sharding like splitting a massive library into specialized branches across a city. Instead of everyone crowding into the Central Library to find a book (bottleneck!), fiction goes to the West branch, history to the East branch. </p>
+<p class="mt-2">It speeds up queries and distributes the load, but the brutal reality is that cross-shard joins become a logistical nightmare.</p>
+</div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-sm flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-surface-tint shrink-0 flex items-center justify-center overflow-hidden border border-outline-variant mt-1">
+<span class="material-symbols-outlined text-on-primary text-sm" data-icon="person">person</span>
+</div>
+<div class="flex flex-col gap-1 items-end max-w-[85%]">
+<span class="font-label-ui text-[10px] text-on-primary-container uppercase tracking-wider mr-1">You</span>
+<div class="bg-surface-variant border border-outline-variant rounded-2xl rounded-tr-sm p-sm text-on-surface font-body-main text-[15px] leading-relaxed shadow-sm">
+<p>Thanks! How does consistent hashing help with that?</p>
+</div>
+</div>
+</div>
+<!-- Spacer to ensure scrolling past the absolute positioned upsell -->
+<div class="h-48"></div>
+</div>
+<!-- Bottom Interaction Area -->
+<div class="p-margin-mobile md:p-md bg-gradient-to-t from-black via-black to-transparent absolute bottom-0 w-full pt-xxl flex flex-col gap-sm pb-lg">
+<!-- Upsell Card (Out of Quota State) -->
+<div class="bg-primary border border-secondary-fixed/50 rounded-xl p-md shadow-[0_10px_30px_-10px_rgba(172,248,71,0.15)] relative overflow-hidden backdrop-blur-xl animate-in slide-in-from-bottom-4 duration-500 ease-out">
+<!-- Decorative subtle glow -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-fixed rounded-full blur-[60px] opacity-10 pointer-events-none"></div>
+<div class="flex items-start gap-sm relative z-10">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center shrink-0 border border-secondary-fixed/30 text-secondary-fixed">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div class="flex flex-col gap-xs">
+<h4 class="font-data-tabular text-data-tabular text-on-primary leading-tight">Out of free queries</h4>
+<p class="font-body-main text-sm text-on-primary-container mb-2">You’ve reached today's limit. Learnium Plus lifts the cap for unlimited deep-dives and complex problem solving.</p>
+<button class="bg-[#84CC16] hover:bg-[#9de42b] text-primary font-label-ui text-label-ui px-md py-xs rounded-lg transition-colors w-full flex items-center justify-center gap-xs mt-1 shadow-[0_0_15px_rgba(132,204,22,0.4)]">
+<span class="material-symbols-outlined text-[18px]" data-icon="stars">stars</span>
+                                Upgrade to Plus
+                            </button>
+</div>
+</div>
+</div>
+<!-- Input Field (Disabled State) -->
+<div class="relative w-full group">
+<div class="absolute inset-0 bg-secondary-fixed rounded-xl blur-[2px] opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
+<div class="relative flex items-center bg-inverse-surface border border-outline-variant rounded-xl p-1 overflow-hidden opacity-70 cursor-not-allowed">
+<div class="pl-sm pr-xs text-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
+</div>
+<input class="flex-1 bg-transparent border-none text-on-surface-variant font-body-main text-sm focus:ring-0 placeholder:text-outline py-xs cursor-not-allowed" disabled="" placeholder="Plus required to continue..." type="text"/>
+<button class="w-8 h-8 rounded-lg bg-surface-tint/50 text-outline flex items-center justify-center shrink-0 mr-1 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[18px]" data-icon="arrow_upward">arrow_upward</span>
+</button>
+</div>
+</div>
+<div class="text-center w-full">
+<span class="font-label-ui text-[10px] text-on-primary-container uppercase tracking-wider opacity-60">Nova can make mistakes. Verify critical info.</span>
+</div>
+</div>
+</section>
+</main>
+</body></html>

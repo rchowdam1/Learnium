@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Nova Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed": "#102000",
+                        "secondary-fixed": "#acf847",
+                        "on-background": "#181c21",
+                        "surface-container": "#ebeef5",
+                        "surface-container-low": "#f1f3fb",
+                        "on-tertiary-container": "#c77e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#3a2200",
+                        "secondary-container": "#acf847",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "secondary": "#416900",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#4c6171",
+                        "inverse-surface": "#2d3136",
+                        "on-surface": "#181c21",
+                        "outline": "#73777c",
+                        "on-primary-fixed": "#071e2b",
+                        "inverse-on-surface": "#eef1f8",
+                        "tertiary-fixed": "#ffddb8",
+                        "primary-container": "#142937",
+                        "error-container": "#ffdad6",
+                        "primary": "#001421",
+                        "on-primary-fixed-variant": "#354958",
+                        "tertiary": "#1e0f00",
+                        "on-surface-variant": "#43474b",
+                        "on-secondary-container": "#457000",
+                        "surface-variant": "#e0e2ea",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d7dae1",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "inverse-primary": "#b4c9dc",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d0e5f8",
+                        "outline-variant": "#c3c7cc",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-container-high": "#e5e8f0",
+                        "secondary-fixed-dim": "#91db2a",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-error-container": "#93000a",
+                        "on-primary-container": "#7c91a2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "4px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "margin-mobile": "16px",
+                        "container-max": "1200px",
+                        "xs": "8px",
+                        "gutter": "24px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "data-tabular": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "label-ui": ["Space Grotesk"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "display-lg-mobile": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .dot-flashing {
+            position: relative;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: #001421;
+            color: #001421;
+            animation: dot-flashing 1s infinite linear alternate;
+            animation-delay: 0.5s;
+        }
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color: #001421;
+            color: #001421;
+            animation: dot-flashing 1s infinite alternate;
+        }
+        .dot-flashing::before {
+            left: -12px;
+            animation-delay: 0s;
+        }
+        .dot-flashing::after {
+            left: 12px;
+            animation-delay: 1s;
+        }
+
+        @keyframes dot-flashing {
+            0% {
+                background-color: #001421;
+            }
+            50%, 100% {
+                background-color: #c3c7cc;
+            }
+        }
+        
+        .chat-container {
+            height: calc(100vh - 64px - 100px); /* viewport - header - footer */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface h-screen overflow-hidden flex flex-col font-body-main">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface-bright dark:bg-primary text-on-surface dark:text-on-primary border-b border-outline-variant flex items-center justify-between px-margin-mobile h-16 w-full z-50 transition-colors">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-[28px] font-bold" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-primary-fixed">Nova Assistant</h1>
+</div>
+<button aria-label="More options" class="hover:bg-surface-container-high transition-colors p-xs rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-16 flex flex-col relative w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter">
+<!-- Context Header -->
+<div class="py-md text-center border-b border-outline-variant">
+<p class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-widest">Lesson Context</p>
+<h2 class="font-headline-md text-[20px] text-primary mt-base">System Design for Scale</h2>
+</div>
+<!-- Chat Area -->
+<div class="flex-1 overflow-y-auto py-xl flex flex-col gap-lg chat-container scroll-smooth" id="chatHistory">
+<!-- Nova Message -->
+<div class="flex gap-md max-w-[85%] sm:max-w-[75%] items-start">
+<div class="w-10 h-10 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg rounded-tl-none shadow-sm">
+<p class="font-body-main text-body-main text-on-surface">Load balancing is like a traffic cop for your servers. It distributes incoming traffic across multiple servers to ensure no single server is overwhelmed.</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-md max-w-[85%] sm:max-w-[75%] items-start self-end flex-row-reverse">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary" data-icon="person">person</span>
+</div>
+<div class="bg-primary text-on-primary p-md rounded-lg rounded-tr-none shadow-sm">
+<p class="font-body-main text-body-main text-on-primary">Can you explain the difference between L4 and L7 balancing?</p>
+</div>
+</div>
+<!-- Nova Typing Indicator -->
+<div class="flex gap-md max-w-[85%] sm:max-w-[75%] items-start">
+<div class="w-10 h-10 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg rounded-tl-none shadow-sm flex items-center h-[52px]">
+<div class="dot-flashing ml-xs"></div>
+<span class="sr-only">Nova is thinking...</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Input Area -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant p-margin-mobile md:px-gutter fixed bottom-0 w-full z-40">
+<div class="max-w-container-max mx-auto flex flex-col gap-xs">
+<form class="relative flex items-center w-full" onsubmit="event.preventDefault();">
+<input aria-label="Chat input" class="w-full bg-surface-container-lowest border border-outline-variant rounded-full py-sm pl-md pr-xxl font-body-main text-body-main text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors h-[56px]" placeholder="Ask anything about this lesson..." type="text"/>
+<button aria-label="Send message" class="absolute right-base top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center hover:bg-on-primary-fixed transition-colors active:scale-95" type="submit">
+<span class="material-symbols-outlined text-[20px]" data-icon="send">send</span>
+</button>
+</form>
+<div class="flex justify-between items-center px-xs">
+<p class="font-label-ui text-label-ui text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim" data-icon="electric_bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">electric_bolt</span>
+                    Quota: 3/10 free chats remaining
+                </p>
+<a class="font-label-ui text-label-ui text-primary hover:underline" href="#">Upgrade</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile Only) - Semantic Rules apply, but this is a deep dive/task context, so we suppress it as per instruction "Automatic Suppression: Task-Focused... implies a temporary departure". -->
+</body></html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Share Milestone</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400..700&amp;family=Space+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Design System -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-background": "#181c21",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "primary": "#001421",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "surface-tint": "#4c6171",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#181c21",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#acf847",
+                        "on-secondary-fixed": "#102000",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#f1f3fb",
+                        "on-secondary-container": "#457000",
+                        "on-primary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "on-tertiary-container": "#c77e00",
+                        "outline": "#73777c",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-dim": "#d7dae1",
+                        "primary-fixed": "#d0e5f8",
+                        "on-primary-container": "#7c91a2",
+                        "surface-variant": "#e0e2ea",
+                        "outline-variant": "#c3c7cc",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#43474b",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-primary-fixed-variant": "#354958",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-container": "#3a2200",
+                        "secondary-container": "#acf847",
+                        "surface": "#f8f9ff",
+                        "inverse-primary": "#b4c9dc",
+                        "tertiary": "#1e0f00",
+                        "primary-container": "#142937",
+                        "surface-container-high": "#e5e8f0",
+                        "secondary": "#416900",
+                        "secondary-fixed-dim": "#91db2a",
+                        "surface-container": "#ebeef5",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3136",
+                        "on-primary-fixed": "#071e2b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "label-ui": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Ambient shadow for the dark card */
+        .ambient-shadow {
+            box-shadow: 0 20px 40px -10px rgba(0, 20, 33, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-dim dark:bg-[#080b0f] min-h-screen flex items-center justify-center p-lg font-body-main antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Share Card Container -->
+<main class="w-full max-w-[400px]">
+<!-- The Card -->
+<article class="bg-[#0b0e14] border border-outline/20 rounded-[24px] p-xl flex flex-col items-center text-center ambient-shadow relative overflow-hidden group">
+<!-- Subtle background glow -->
+<div class="absolute inset-0 bg-gradient-to-br from-secondary-container/5 via-transparent to-transparent opacity-50"></div>
+<!-- Top Section: Brand & Context -->
+<header class="w-full flex justify-between items-center mb-xl relative z-10">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary-fixed text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-md text-headline-md text-on-surface dark:text-surface-container-lowest tracking-tight">Learnium</span>
+</div>
+<div class="px-sm py-xs rounded-full border border-outline/30 bg-surface-container-lowest/5">
+<span class="font-label-ui text-label-ui text-outline-variant">Milestone Reached</span>
+</div>
+</header>
+<!-- Center Section: The Badge & Mascot -->
+<section class="mb-lg relative z-10 w-full flex flex-col items-center">
+<!-- Nova Starburst Graphic Container -->
+<div class="relative w-[180px] h-[180px] flex items-center justify-center mb-lg">
+<!-- Geometric structural rays (Nova representation) -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full h-[1px] bg-secondary-fixed/40 rotate-0"></div>
+<div class="w-full h-[1px] bg-secondary-fixed/40 rotate-45 absolute"></div>
+<div class="w-full h-[1px] bg-secondary-fixed/40 rotate-90 absolute"></div>
+<div class="w-full h-[1px] bg-secondary-fixed/40 rotate-135 absolute"></div>
+<!-- Inner ring -->
+<div class="absolute w-[120px] h-[120px] rounded-full border border-secondary-fixed/30 border-dashed animate-[spin_30s_linear_infinite]"></div>
+</div>
+<!-- Core Badge -->
+<div class="w-[100px] h-[100px] bg-secondary-fixed text-on-secondary-fixed flex flex-col items-center justify-center rounded-2xl rotate-45 shadow-[0_0_30px_rgba(172,248,71,0.3)] transition-transform duration-500 group-hover:scale-105">
+<div class="-rotate-45 flex flex-col items-center">
+<span class="font-label-ui text-label-ui opacity-80 uppercase tracking-widest mb-1">Level</span>
+<span class="font-display-lg-mobile text-display-lg-mobile leading-none">6</span>
+</div>
+</div>
+</div>
+<!-- Primary Announcement -->
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-surface-container-lowest mb-xs max-w-[280px] leading-tight">
+                    Priya reached <br/>
+<span class="text-secondary-fixed">Level 6</span> <br/>
+                    on Learnium
+                </h1>
+</section>
+<!-- Bottom Section: Stats -->
+<footer class="w-full pt-lg border-t border-outline/20 relative z-10 flex flex-col gap-md">
+<div class="flex justify-center items-center gap-md">
+<!-- Streak Stat -->
+<div class="flex items-center gap-xs bg-tertiary-container/30 px-md py-sm rounded-lg border border-tertiary-fixed-dim/20">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-data-tabular text-data-tabular text-tertiary-fixed-dim">12-Day Streak</span>
+</div>
+<!-- Divider -->
+<div class="w-[1px] h-[24px] bg-outline/30"></div>
+<!-- XP Stat -->
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular text-surface-variant">4,250 Total XP</span>
+</div>
+</div>
+</footer>
+</article>
+<!-- Action Buttons (Outside the shareable card area for UI context) -->
+<div class="mt-lg flex gap-md justify-center">
+<button class="bg-surface-container-lowest text-on-surface px-lg py-sm rounded-lg font-label-ui text-label-ui hover:bg-surface-variant transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                Share to Story
+            </button>
+<button class="bg-transparent border border-outline-variant text-surface-container-lowest px-lg py-sm rounded-lg font-label-ui text-label-ui hover:bg-surface-container-lowest/10 transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                Save
+            </button>
+</div>
+</main>
+</body></html>

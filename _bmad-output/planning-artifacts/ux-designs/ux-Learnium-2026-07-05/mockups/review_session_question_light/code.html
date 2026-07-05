@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Review Session - Learnium</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from design system -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#416900",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#142937",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e0e2ea",
+                    "surface-container-low": "#f1f3fb",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface": "#f8f9ff",
+                    "secondary-fixed-dim": "#91db2a",
+                    "surface-dim": "#d7dae1",
+                    "tertiary-container": "#3a2200",
+                    "on-secondary-container": "#457000",
+                    "background": "#f8f9ff",
+                    "surface-container-highest": "#e0e2ea",
+                    "inverse-on-surface": "#eef1f8",
+                    "outline": "#73777c",
+                    "secondary-fixed": "#acf847",
+                    "secondary-container": "#acf847",
+                    "primary-fixed-dim": "#b4c9dc",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#e5e8f0",
+                    "on-tertiary-container": "#c77e00",
+                    "outline-variant": "#c3c7cc",
+                    "primary": "#001421",
+                    "on-surface-variant": "#43474b",
+                    "on-surface": "#181c21",
+                    "surface-container": "#ebeef5",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-secondary-fixed-variant": "#304f00",
+                    "on-secondary-fixed": "#102000",
+                    "inverse-primary": "#b4c9dc",
+                    "on-primary-container": "#7c91a2",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#354958",
+                    "on-background": "#181c21",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#071e2b",
+                    "primary-fixed": "#d0e5f8",
+                    "surface-tint": "#4c6171",
+                    "tertiary": "#1e0f00",
+                    "inverse-surface": "#2d3136"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "base": "4px",
+                    "sm": "12px",
+                    "lg": "24px",
+                    "xxl": "48px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "container-max": "1200px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "body-main": [
+                            "Inter"
+                    ],
+                    "label-ui": [
+                            "Space Grotesk"
+                    ],
+                    "display-lg-mobile": [
+                            "Bricolage Grotesque"
+                    ],
+                    "display-lg": [
+                            "Bricolage Grotesque"
+                    ],
+                    "data-tabular": [
+                            "Space Grotesk"
+                    ],
+                    "headline-md": [
+                            "Bricolage Grotesque"
+                    ]
+            },
+            "fontSize": {
+                    "body-main": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-ui": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "36px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "data-tabular": [
+                            "18px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        .progress-dot {
+            transition: all 0.3s ease;
+        }
+        
+        .option-card {
+            transition: all 0.2s ease;
+        }
+        
+        .option-card:hover:not(.selected) {
+            border-color: theme('colors.primary');
+        }
+        
+        .option-card.selected {
+            background-color: theme('colors.surface-container-lowest');
+            border-color: theme('colors.primary');
+            box-shadow: 0 0 0 1px theme('colors.primary') inset;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-main text-body-main antialiased selection:bg-secondary selection:text-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline z-50">
+<div class="flex justify-between items-center px-gutter w-full h-16 max-w-container-max mx-auto">
+<button aria-label="Close session" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed truncate px-4">Review Session</h1>
+<button aria-label="Settings" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors active:scale-95 duration-150 text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area (Nav suppressed due to transactional nature of review session) -->
+<main class="flex-1 flex flex-col pt-24 pb-32 px-margin-mobile md:px-gutter max-w-2xl mx-auto w-full relative z-10">
+<!-- Progress Indicator -->
+<div aria-label="Progress: 3 of 10" class="flex items-center justify-center gap-2 mb-xl">
+<!-- Completed -->
+<div class="w-3 h-3 rounded-full bg-secondary progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-secondary progress-dot"></div>
+<!-- Current -->
+<div class="w-3 h-3 rounded-full bg-primary progress-dot scale-125"></div>
+<!-- Upcoming -->
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+<div class="w-3 h-3 rounded-full bg-surface-variant progress-dot"></div>
+</div>
+<!-- Question Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-lg md:p-xl mb-xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded border border-outline-variant mb-6">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">psychology</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant tracking-wider uppercase text-xs">System Design</span>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-6 leading-tight">
+                What is the primary benefit of horizontal scaling?
+            </h2>
+<p class="text-on-surface-variant">
+                Consider the implications for fault tolerance, cost, and overall system architecture when comparing it to vertical scaling (upgrading a single machine).
+            </p>
+</div>
+<!-- Options Container -->
+<div aria-labelledby="question-heading" class="flex flex-col gap-sm" role="radiogroup">
+<!-- Option 1 -->
+<label class="option-card flex items-start p-md bg-surface border border-outline-variant rounded-lg cursor-pointer group">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border border-outline-variant flex items-center justify-center mt-0.5 group-hover:border-primary transition-colors bg-surface-container-lowest">
+<div class="w-3 h-3 rounded-full bg-transparent group-[.selected]:bg-primary transition-colors"></div>
+</div>
+<div class="ml-4 flex-1">
+<span class="block font-label-ui text-label-ui text-primary mb-1">Option A</span>
+<span class="block text-on-surface">It simplifies application architecture by using fewer, more powerful machines.</span>
+</div>
+<input class="sr-only" name="answer" type="radio" value="a"/>
+</label>
+<!-- Option 2 (Selected) -->
+<label class="option-card selected flex items-start p-md bg-surface border border-outline-variant rounded-lg cursor-pointer group">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border border-primary flex items-center justify-center mt-0.5 bg-surface-container-lowest">
+<div class="w-3 h-3 rounded-full bg-primary transition-colors"></div>
+</div>
+<div class="ml-4 flex-1">
+<span class="block font-label-ui text-label-ui text-primary mb-1">Option B</span>
+<span class="block text-on-surface">It improves fault tolerance and allows for virtually infinite capacity expansion by adding more machines.</span>
+</div>
+<input checked="" class="sr-only" name="answer" type="radio" value="b"/>
+</label>
+<!-- Option 3 -->
+<label class="option-card flex items-start p-md bg-surface border border-outline-variant rounded-lg cursor-pointer group">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border border-outline-variant flex items-center justify-center mt-0.5 group-hover:border-primary transition-colors bg-surface-container-lowest">
+<div class="w-3 h-3 rounded-full bg-transparent group-[.selected]:bg-primary transition-colors"></div>
+</div>
+<div class="ml-4 flex-1">
+<span class="block font-label-ui text-label-ui text-primary mb-1">Option C</span>
+<span class="block text-on-surface">It reduces the latency of network calls between microservices automatically.</span>
+</div>
+<input class="sr-only" name="answer" type="radio" value="c"/>
+</label>
+<!-- Option 4 -->
+<label class="option-card flex items-start p-md bg-surface border border-outline-variant rounded-lg cursor-pointer group">
+<div class="flex-shrink-0 w-6 h-6 rounded-full border border-outline-variant flex items-center justify-center mt-0.5 group-hover:border-primary transition-colors bg-surface-container-lowest">
+<div class="w-3 h-3 rounded-full bg-transparent group-[.selected]:bg-primary transition-colors"></div>
+</div>
+<div class="ml-4 flex-1">
+<span class="block font-label-ui text-label-ui text-primary mb-1">Option D</span>
+<span class="block text-on-surface">It eliminates the need for a load balancer in the system design.</span>
+</div>
+<input class="sr-only" name="answer" type="radio" value="d"/>
+</label>
+</div>
+</main>
+<!-- Bottom Action Bar (Sticky) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-md border-t border-outline-variant p-4 z-40 flex justify-center">
+<div class="max-w-2xl w-full">
+<button class="w-full bg-primary text-on-primary font-label-ui text-label-ui py-4 px-6 rounded-lg hover:bg-primary/90 transition-colors active:scale-[0.98] duration-150 flex items-center justify-center gap-2" type="button">
+<span>Check Answer</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Interactive Script for Option Selection -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = document.querySelectorAll('.option-card');
+            
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove selected class and uncheck all
+                    options.forEach(opt => {
+                        opt.classList.remove('selected');
+                        const innerDot = opt.querySelector('.w-3.h-3');
+                        if(innerDot) {
+                             opt.querySelector('.w-6.h-6').classList.remove('border-primary');
+                             opt.querySelector('.w-6.h-6').classList.add('border-outline-variant');
+                             innerDot.classList.remove('bg-primary');
+                             innerDot.classList.add('bg-transparent');
+                        }
+                    });
+                    
+                    // Add selected class to clicked
+                    option.classList.add('selected');
+                    const innerDot = option.querySelector('.w-3.h-3');
+                    if(innerDot) {
+                         option.querySelector('.w-6.h-6').classList.add('border-primary');
+                         option.querySelector('.w-6.h-6').classList.remove('border-outline-variant');
+                         innerDot.classList.add('bg-primary');
+                         innerDot.classList.remove('bg-transparent');
+                    }
+                    
+                    // Trigger radio input
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                    }
+                });
+            });
+        });
+    </script>
+</body></html>

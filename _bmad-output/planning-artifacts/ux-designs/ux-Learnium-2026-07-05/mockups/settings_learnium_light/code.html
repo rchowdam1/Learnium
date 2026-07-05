@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - Learnium</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f1f3fb",
+                        "surface-container-high": "#e5e8f0",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-surface": "#181c21",
+                        "on-secondary-container": "#457000",
+                        "surface-container-highest": "#e0e2ea",
+                        "on-background": "#181c21",
+                        "surface-container": "#ebeef5",
+                        "secondary-container": "#acf847",
+                        "on-secondary-fixed": "#102000",
+                        "on-surface-variant": "#43474b",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "outline": "#73777c",
+                        "on-primary-fixed-variant": "#354958",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e2ea",
+                        "surface-tint": "#4c6171",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#071e2b",
+                        "secondary-fixed": "#acf847",
+                        "inverse-surface": "#2d3136",
+                        "on-tertiary-container": "#c77e00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "primary-fixed": "#d0e5f8",
+                        "tertiary": "#1e0f00",
+                        "on-error-container": "#93000a",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed": "#ffddb8",
+                        "tertiary-container": "#3a2200",
+                        "secondary-fixed-dim": "#91db2a",
+                        "inverse-primary": "#b4c9dc",
+                        "on-tertiary-fixed": "#2a1700",
+                        "secondary": "#416900",
+                        "primary": "#001421",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "on-primary-container": "#7c91a2",
+                        "primary-container": "#142937",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c3c7cc",
+                        "surface-dim": "#d7dae1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Bricolage Grotesque"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "body-main": ["Inter"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "label-ui": ["Space Grotesk"],
+                        "data-tabular": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .toggle-checkbox:checked { right: 0; border-color: theme('colors.primary'); }
+        .toggle-checkbox:checked + .toggle-label { background-color: theme('colors.primary'); }
+        .toggle-checkbox { right: 0; z-index: 1; border-color: theme('colors.outline'); transition: all 0.3s; }
+        .toggle-label { width: 48px; height: 24px; background-color: theme('colors.surface-container-highest'); border-radius: 9999px; transition: all 0.3s; }
+        .toggle-knob { width: 20px; height: 20px; background-color: white; border-radius: 50%; top: 2px; left: 2px; transition: all 0.3s; }
+        .toggle-checkbox:checked ~ .toggle-knob { transform: translateX(24px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-main antialiased bg-background pb-xxl">
+<!-- TopAppBar (From JSON) -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline flat no shadows">
+<button class="flex items-center justify-center p-sm text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors rounded-full active:scale-95 duration-100">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-headline-md-mobile text-headline-md-mobile text-primary dark:text-inverse-primary flex-1 text-center pr-12">Settings</h1>
+</header>
+<!-- Main Content Area -->
+<main class="pt-[80px] px-margin-mobile flex flex-col gap-xl max-w-container-max mx-auto">
+<!-- Section: Learning Goals -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-widest pl-xs">Learning Goals</h2>
+<div class="bg-surface rounded-lg border border-outline-variant flex flex-col overflow-hidden">
+<!-- Daily Goal -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col gap-xs">
+<span class="font-label-ui text-label-ui text-on-surface">Daily Goal</span>
+<span class="font-body-main text-body-main text-on-surface-variant text-sm">Regular (30 mins/day)</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Reminder Time -->
+<div class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex flex-col gap-xs">
+<span class="font-label-ui text-label-ui text-on-surface">Reminder Time</span>
+<span class="font-data-tabular text-data-tabular text-primary">08:00 AM</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">schedule</span>
+</div>
+</div>
+</section>
+<!-- Section: Privacy & Leagues -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-widest pl-xs">Privacy &amp; Leagues</h2>
+<div class="bg-surface rounded-lg border border-outline-variant flex flex-col overflow-hidden">
+<!-- League Participation Toggle -->
+<div class="flex items-center justify-between p-md">
+<div class="flex flex-col gap-xs pr-md">
+<span class="font-label-ui text-label-ui text-on-surface">League Participation</span>
+<span class="font-body-main text-body-main text-on-surface-variant text-sm">Compete with others on the leaderboard.</span>
+</div>
+<div class="relative inline-block w-[48px] h-[24px] align-middle select-none flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer opacity-0" id="league-toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-container-highest cursor-pointer" for="league-toggle"></label>
+<div class="toggle-knob absolute shadow-sm pointer-events-none"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Appearance -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-widest pl-xs">Appearance</h2>
+<div class="bg-surface rounded-lg border border-outline-variant flex flex-col p-md gap-md">
+<span class="font-label-ui text-label-ui text-on-surface">Theme</span>
+<!-- Segmented Control -->
+<div class="flex bg-surface-container p-1 rounded-lg border border-outline-variant/50">
+<button class="flex-1 py-sm font-label-ui text-label-ui text-primary bg-surface shadow-sm border border-outline-variant/20 rounded-md transition-all text-center">Light</button>
+<button class="flex-1 py-sm font-label-ui text-label-ui text-on-surface-variant hover:text-on-surface rounded-md transition-all text-center">Dark</button>
+<button class="flex-1 py-sm font-label-ui text-label-ui text-on-surface-variant hover:text-on-surface rounded-md transition-all text-center">System</button>
+</div>
+</div>
+</section>
+<!-- Section: Account -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-widest pl-xs">Account</h2>
+<div class="bg-surface rounded-lg border border-outline-variant flex flex-col overflow-hidden">
+<div class="flex items-center p-md border-b border-outline-variant bg-surface-container-lowest">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-md text-headline-md mr-md shrink-0">
+                        A
+                    </div>
+<div class="flex flex-col overflow-hidden">
+<span class="font-label-ui text-label-ui text-on-surface truncate">Alex Rivera</span>
+<span class="font-body-main text-body-main text-on-surface-variant text-sm truncate">alex.rivera@example.com</span>
+</div>
+</div>
+<a class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors group" href="#">
+<span class="font-label-ui text-label-ui text-primary">Manage Subscription</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-[20px]">open_in_new</span>
+</a>
+</div>
+</section>
+<!-- Section: Danger Zone -->
+<section class="flex flex-col gap-md mt-md">
+<h2 class="font-label-ui text-label-ui text-error uppercase tracking-widest pl-xs">Danger Zone</h2>
+<div class="bg-error-container/20 rounded-lg border border-error/30 flex flex-col p-md gap-md">
+<div class="flex flex-col gap-xs">
+<span class="font-label-ui text-label-ui text-error">Delete Account</span>
+<span class="font-body-main text-body-main text-on-surface-variant text-sm">
+                        Permanently delete your account and all learning data. According to GDPR, this action is irreversible after a 30-day grace period.
+                    </span>
+</div>
+<button class="w-full py-md px-lg bg-surface border border-error text-error font-label-ui text-label-ui rounded-lg hover:bg-error-container hover:text-on-error-container active:scale-[0.98] transition-all flex justify-center items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]" data-weight="fill">delete_forever</span>
+                    Delete My Account
+                </button>
+</div>
+</section>
+<!-- Bottom spacing for mobile -->
+<div class="h-8"></div>
+</main>
+<script>
+        // Simple interactivity for demonstration
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const knob = this.parentElement.querySelector('.toggle-knob');
+                if(this.checked) {
+                    knob.style.transform = 'translateX(24px)';
+                } else {
+                    knob.style.transform = 'translateX(0)';
+                }
+            });
+        });
+    </script>
+</body></html>

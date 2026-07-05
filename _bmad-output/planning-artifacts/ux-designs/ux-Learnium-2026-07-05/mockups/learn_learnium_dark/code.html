@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Learn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ebeef5",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3136",
+                        "on-primary-fixed": "#071e2b",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-container": "#3a2200",
+                        "secondary-container": "#acf847",
+                        "surface": "#f8f9ff",
+                        "inverse-primary": "#b4c9dc",
+                        "tertiary": "#1e0f00",
+                        "primary-container": "#142937",
+                        "surface-container-high": "#e5e8f0",
+                        "secondary": "#416900",
+                        "secondary-fixed-dim": "#91db2a",
+                        "outline": "#73777c",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-dim": "#d7dae1",
+                        "primary-fixed": "#d0e5f8",
+                        "on-primary-container": "#7c91a2",
+                        "surface-variant": "#e0e2ea",
+                        "outline-variant": "#c3c7cc",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#43474b",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-primary-fixed-variant": "#354958",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-background": "#181c21",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "primary": "#001421",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "surface-tint": "#4c6171",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#181c21",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#acf847",
+                        "on-secondary-fixed": "#102000",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#f1f3fb",
+                        "on-secondary-container": "#457000",
+                        "on-primary": "#ffffff",
+                        "background": "#000000", /* Overridden to Pure Black for this prompt */
+                        "on-tertiary-container": "#c77e00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-ui": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #000000; color: #ffffff; }
+        .dark-surface-override { background-color: #0C1116; border-color: #2d3136; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-main antialiased pb-xxl md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-primary w-full top-0 sticky border-b border-outline-variant dark:border-outline z-40 hidden md:flex">
+<div class="flex justify-between items-center px-margin-mobile py-sm md:px-lg w-full max-w-[1200px] mx-auto">
+<div class="flex items-center gap-xs">
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full border border-outline-variant dark:border-outline object-cover" data-alt="A small, stylized geometric avatar representing a user profile, rendered in crisp white lines on a dark background, embodying a modern, brutalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0MhIbjsKNby7vA8QUlVmIcmvzoJqtuRPcVK7iRMhUQa4Npw9LKzjx1hYQzIgL8aR3gp_nywTE7OYP2uC7Hln2ANyr3NhUnNtqPGz9_9phj5bsEEOTxDDESeFPwz4AK-wL-8-NMOePuFO1gy9kur_Nzu_bGim_3mwYGp4TJjYCMfNsAaWn6tze_jewydMU6p2THxgCCIe-WpFcRzvoEdxrDCdd8UPdg8GvgbQyIAE3sL_R6wZj5WxB"/>
+<span class="font-headline-md text-headline-md tracking-tighter text-primary dark:text-surface-lowest uppercase">LEARNIUM</span>
+</div>
+<nav class="flex gap-lg">
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150 flex flex-col items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-ui text-label-ui">Home</span>
+</a>
+<a class="text-primary dark:text-surface-lowest hover:opacity-80 transition-opacity active:scale-95 duration-150 flex flex-col items-center gap-xs font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-ui text-label-ui">Learn</span>
+</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150 flex flex-col items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu_book</span>
+<span class="font-label-ui text-label-ui">Review</span>
+</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150 flex flex-col items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">emoji_events</span>
+<span class="font-label-ui text-label-ui">Leagues</span>
+</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150 flex flex-col items-center gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-ui text-label-ui">Profile</span>
+</a>
+</nav>
+<button class="text-secondary dark:text-secondary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-150">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-[1200px] mx-auto px-margin-mobile md:px-lg py-xl flex flex-col gap-xxl">
+<!-- Top Section: Course Generation -->
+<section class="flex flex-col gap-sm">
+<h1 class="font-headline-md text-headline-md mobile:font-headline-md-mobile mobile:text-headline-md-mobile text-on-tertiary">What do you want to learn today?</h1>
+<div class="flex flex-col md:flex-row gap-sm items-start md:items-stretch">
+<div class="flex-grow w-full relative">
+<input class="w-full bg-inverse-surface border border-outline dark:border-surface-dim rounded px-md py-sm font-body-main text-body-main text-on-tertiary placeholder-outline-variant focus:outline-none focus:border-surface-lowest focus:ring-1 focus:ring-surface-lowest transition-colors" placeholder="e.g. Quantum Computing, High-Stakes Negotiation..." type="text"/>
+</div>
+<button class="bg-surface-lowest text-on-surface font-label-ui text-label-ui px-lg py-sm rounded border border-surface-lowest hover:bg-surface-variant hover:border-surface-variant transition-colors whitespace-nowrap active:scale-95">
+                    Generate Course
+                </button>
+</div>
+</section>
+<!-- Main Content: Learning Paths -->
+<section class="flex flex-col gap-lg">
+<h2 class="font-headline-md text-headline-md text-on-tertiary border-b border-inverse-surface pb-sm">Your Learning Paths</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Card 1 -->
+<article class="dark-surface-override border rounded p-lg flex flex-col gap-md hover:border-surface-lowest transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-surface-lowest/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<header class="flex justify-between items-start">
+<div class="flex flex-col gap-xs">
+<span class="font-label-ui text-label-ui text-surface-dim uppercase tracking-wider">Infrastructure</span>
+<h3 class="font-headline-md text-headline-md text-on-tertiary">System Design for Scale</h3>
+</div>
+<span class="font-data-tabular text-data-tabular text-secondary-container bg-primary-container px-sm py-xs rounded border border-primary-container">60%</span>
+</header>
+<p class="font-body-main text-body-main text-outline-variant flex-grow">
+                        Master load balancing and horizontal scaling.
+                    </p>
+<footer class="flex justify-between items-center mt-sm">
+<span class="font-label-ui text-label-ui text-outline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+                            12 lessons
+                        </span>
+<div class="w-1/2 h-1 bg-inverse-surface rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-[60%] shadow-[0_0_8px_rgba(172,248,71,0.5)]"></div>
+</div>
+</footer>
+</article>
+<!-- Card 2 -->
+<article class="dark-surface-override border rounded p-lg flex flex-col gap-md hover:border-surface-lowest transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-surface-lowest/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<header class="flex justify-between items-start">
+<div class="flex flex-col gap-xs">
+<span class="font-label-ui text-label-ui text-surface-dim uppercase tracking-wider">Psychology</span>
+<h3 class="font-headline-md text-headline-md text-on-tertiary">Behavioral Economics</h3>
+</div>
+<span class="font-data-tabular text-data-tabular text-surface-lowest bg-inverse-surface px-sm py-xs rounded border border-outline">25%</span>
+</header>
+<p class="font-body-main text-body-main text-outline-variant flex-grow">
+                        Understanding cognitive biases and choice architecture.
+                    </p>
+<footer class="flex flex-col gap-xs mt-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-ui text-label-ui text-outline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                8 lessons
+                            </span>
+<div class="w-1/2 h-1 bg-inverse-surface rounded-full overflow-hidden">
+<div class="h-full bg-surface-lowest w-[25%]"></div>
+</div>
+</div>
+<span class="font-label-ui text-[10px] text-error flex items-center gap-[2px] opacity-80 pt-xs border-t border-inverse-surface mt-xs">
+<span class="material-symbols-outlined text-[12px]">info</span>
+                            AI-generated — verify important facts
+                        </span>
+</footer>
+</article>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-surface dark:bg-primary border-t border-outline-variant dark:border-outline fixed bottom-0 left-0 w-full flex justify-around items-center px-base pb-4 pt-2 z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-ui text-label-ui">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed font-bold hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-ui text-label-ui">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu_book</span>
+<span class="font-label-ui text-label-ui">Review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">emoji_events</span>
+<span class="font-label-ui text-label-ui">Leagues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 gap-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-ui text-label-ui">Profile</span>
+</a>
+</nav>
+</body></html>

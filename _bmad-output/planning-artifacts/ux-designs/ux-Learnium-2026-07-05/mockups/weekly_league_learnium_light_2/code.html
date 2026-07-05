@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Silver League</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400..700&amp;family=Space+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ebeef5",
+                        "on-primary-fixed-variant": "#354958",
+                        "inverse-primary": "#b4c9dc",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#73777c",
+                        "surface-container-low": "#f1f3fb",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#43474b",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#f8f9ff",
+                        "surface-container-highest": "#e0e2ea",
+                        "primary": "#001421",
+                        "on-background": "#181c21",
+                        "outline-variant": "#c3c7cc",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "tertiary": "#1e0f00",
+                        "surface-tint": "#4c6171",
+                        "surface-variant": "#e0e2ea",
+                        "on-primary-fixed": "#071e2b",
+                        "on-secondary-fixed": "#102000",
+                        "primary-container": "#142937",
+                        "tertiary-fixed": "#ffddb8",
+                        "secondary-fixed-dim": "#91db2a",
+                        "secondary": "#416900",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#3a2200",
+                        "on-primary-container": "#7c91a2",
+                        "surface-container-high": "#e5e8f0",
+                        "on-surface": "#181c21",
+                        "on-secondary-container": "#457000",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#c77e00",
+                        "secondary-fixed": "#acf847",
+                        "inverse-on-surface": "#eef1f8",
+                        "primary-fixed": "#d0e5f8",
+                        "inverse-surface": "#2d3136",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#d7dae1",
+                        "secondary-container": "#acf847"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "safe-bottom": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "label-ui": ["Space Grotesk"],
+                        "data-tabular": ["Space Grotesk"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "body-main": ["Inter"],
+                        "display-lg-mobile": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tabular-nums-custom {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen pt-16 pb-20 md:pb-0 font-body-main">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline flat no shadows transition-colors duration-200 ease-in-out md:px-lg md:h-20 lg:max-w-container-max lg:mx-auto lg:left-0 lg:right-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">trophy</span>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim tracking-tight">Silver League</h1>
+</div>
+<div class="flex items-center gap-xs font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant bg-surface-container-low px-sm py-xs rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-xs">schedule</span>
+<span>2d 14h</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-lg py-lg flex flex-col gap-sm md:flex-row md:gap-gutter">
+<!-- Desktop Sidebar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col w-64 flex-shrink-0 sticky top-24 self-start bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm">
+<nav class="flex flex-col gap-sm">
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-ui text-label-ui">Home</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-ui text-label-ui">Learn</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="font-label-ui text-label-ui">Review</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg bg-primary-container text-on-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-label-ui text-label-ui">Leagues</span>
+</a>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-ui text-label-ui">Profile</span>
+</a>
+</nav>
+<div class="mt-lg pt-lg border-t border-outline-variant">
+<div class="bg-surface-container-low rounded-lg p-md text-center">
+<h3 class="font-label-ui text-label-ui text-on-surface mb-xs">Next League</h3>
+<div class="font-headline-md text-headline-md text-primary mb-sm">Gold League</div>
+<div class="w-full h-base bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+<p class="text-xs text-on-surface-variant mt-xs">Top 5 advance</p>
+</div>
+</div>
+</aside>
+<!-- Leaderboard List -->
+<div class="flex-grow flex flex-col gap-base md:gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<!-- Promotion Zone -->
+<div class="bg-surface-container-low bg-opacity-50 border-b border-outline-variant">
+<div class="px-md py-xs font-label-ui text-xs text-secondary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                    PROMOTION ZONE
+                </div>
+<!-- Rank 1 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-secondary">1</div>
+<img class="w-10 h-10 rounded-full border-2 border-secondary object-cover mr-sm" data-alt="A professional headshot of a young adult with a subtle geometric background pattern, well-lit, corporate modern style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWbN-a9d0d_3X9XhAZSUxUdR1hImIZiXc0tgcGY4hrQ4n5qPa6Pjtt2XT7_3htlSr2kD0Zfm3McXJbKAUNglGMFHdXbzR-Bzs4FwObyAHJCM0Rm2GKpQr8gxEST8qYLAZA_WP0URZWkxVFsZfN-AWwz5AAeduT0Q5Nu15Sa0exI8sAOFSBpb9YOAWVibLLAAdjsHrqC58zx3nzw0qszI_aXE4Gn3ssHAKasdpIpZ7CC8jPl1djrSlL"/>
+<div class="flex-grow font-body-main font-bold text-on-surface">Alex Rivera</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">4,250</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<!-- Rank 2 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-on-surface-variant">2</div>
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold mr-sm border border-outline-variant">SJ</div>
+<div class="flex-grow font-body-main font-bold text-on-surface">Sam Johnson</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">4,120</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-on-surface-variant">3</div>
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover mr-sm" data-alt="A stylized geometric avatar illustration in dark navy and white, minimalist and sharp." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2oEblsaufXGh5nFdbaH6GcLZucpHUcZaFSQlbQrzEKR-oSUYiA3Qu_M9RZxl-05vCXGWEsJ4Jp1JNlbjXWomxrWeet6I2pNJCzVjGSubcNDVXxXN7gVxhY7EdDNZHhloyQ3lN_dfZ2eM3wUTC1pe5sYtaxeePaVOexfOZxHYT4NcyZ3ZpCVFK9qaJdIYBMVPiB6nocBNMBqBrVwD4E6XJrP18hqi3J7oy8uBMVz8jVkESn4O_jSeJ"/>
+<div class="flex-grow font-body-main font-bold text-on-surface">Jordan Lee</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">3,980</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<!-- Rank 4 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-on-surface-variant">4</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">MK</div>
+<div class="flex-grow font-body-main font-bold text-on-surface">Morgan Kim</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">3,750</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<!-- Rank 5 (Current User) -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant bg-secondary-container bg-opacity-20 border-l-4 border-l-secondary">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-secondary">5</div>
+<img class="w-10 h-10 rounded-full border-2 border-secondary object-cover mr-sm" data-alt="User profile picture, professional setting, bright and modern lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuquEsaMo3qlx0frmBU1U_FYyOcRfn_pdQeshySWxBa8uG-rYgZiAzrNTLOO1BQnqmfU5lD4j_vxpGoOM3aAeaBgnjzpnxZjTRH8ouTaD87KIhHWqeCrGcx3stEWsjpn83cFz_sR45PacHe2HWzyEM_bDy8lZJcYJbeX0IoOYO6JSHRVTR0JZnr05XHqALdvxwBjtSYOEYi-JbyovSfU2Ptro1NfC1K9T_t9GBz6h5-Hb4vQaxSmi8"/>
+<div class="flex-grow font-body-main font-bold text-on-surface flex items-center gap-xs">
+                        You
+                        <span class="bg-primary text-on-primary font-label-ui text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Current</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">3,600</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+</div>
+<!-- Safe Zone (Ranks 6-25) -->
+<div class="flex flex-col">
+<!-- Rank 6 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-outline">6</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">TC</div>
+<div class="flex-grow font-body-main font-bold text-on-surface">Taylor Chen</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">3,450</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+<!-- Skipping middle ranks for brevity in UI design mockup, simulating scroll -->
+<div class="flex items-center justify-center py-md text-outline-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</div>
+<!-- Rank 24 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-outline">24</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">RP</div>
+<div class="flex-grow font-body-main font-bold text-on-surface">Riley Patel</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">1,200</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+<!-- Rank 25 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-outline">25</div>
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover mr-sm" data-alt="A simple geometric portrait, minimal details, corporate modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwH5jUU49etVhH9OGv5X-zchgOcvmeMo0g_WQdc0llb8hU27dHCcC3c6TI85yO5BlHGuYlVIswyA4PGhfErOHZMgDCj6iVEgTDsIBLrFVPqvMKjZsJ6IPdt6eWKY9LaCqg75XqByYubHy5QbfiRyQP__3XYbgcJpafhVN3z0y2G69omrKpgxffBQhp9wZlIYAkNEmL-2rRf5MSXZe0U-u5qu3Vm7_Nb5v38OCzZAMbt4frIyli4UWN"/>
+<div class="flex-grow font-body-main font-bold text-on-surface">Drew Smith</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface">1,150</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+</div>
+<!-- Demotion Zone -->
+<div class="bg-error-container bg-opacity-20 border-t border-outline-variant">
+<div class="px-md py-xs font-label-ui text-xs text-error flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                    DEMOTION ZONE
+                </div>
+<!-- Rank 26 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-error">26</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">CJ</div>
+<div class="flex-grow font-body-main font-bold text-on-surface opacity-80">Casey Jones</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface opacity-80">980</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+<!-- Rank 27 -->
+<div class="flex items-center px-md py-sm border-b border-outline-variant hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-error">27</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">EW</div>
+<div class="flex-grow font-body-main font-bold text-on-surface opacity-80">Eden Wright</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface opacity-80">850</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+<!-- Rank 28 -->
+<div class="flex items-center px-md py-sm hover:bg-surface-container-high transition-colors">
+<div class="w-8 flex-shrink-0 font-data-tabular text-data-tabular tabular-nums-custom text-error">28</div>
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface flex items-center justify-center font-bold mr-sm border border-outline-variant">xx</div>
+<div class="flex-grow font-body-main font-bold text-on-surface opacity-80">InactiveUser99</div>
+<div class="flex items-center gap-xs">
+<span class="font-data-tabular text-data-tabular tabular-nums-custom text-on-surface opacity-80">0</span>
+<span class="material-symbols-outlined text-outline text-sm">bolt</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-[env(safe-area-inset-bottom)] h-20 bg-surface dark:bg-surface-dim border-t border-outline-variant dark:border-outline md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-ui text-label-ui text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">menu_book</span>
+<span class="font-label-ui text-label-ui text-[10px]">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-label-ui text-label-ui text-[10px]">Review</span>
+</a>
+<!-- Active Tab: Leagues -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed-dim rounded-xl px-4 py-1 scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+<span class="font-label-ui text-label-ui text-[10px]">Leagues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest scale-95 transition-transform duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-ui text-label-ui text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

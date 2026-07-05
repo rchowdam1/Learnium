@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile - Learnium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f8f9ff",
+                        "tertiary-container": "#3a2200",
+                        "on-secondary-fixed": "#102000",
+                        "error": "#ba1a1a",
+                        "outline": "#73777c",
+                        "inverse-surface": "#2d3136",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#354958",
+                        "tertiary": "#1e0f00",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "on-background": "#181c21",
+                        "surface-variant": "#e0e2ea",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary": "#001421",
+                        "outline-variant": "#c3c7cc",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container-high": "#e5e8f0",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#071e2b",
+                        "surface-container": "#ebeef5",
+                        "on-primary-container": "#7c91a2",
+                        "primary-container": "#142937",
+                        "secondary-fixed-dim": "#91db2a",
+                        "secondary": "#416900",
+                        "inverse-primary": "#b4c9dc",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-secondary-container": "#457000",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#acf847",
+                        "secondary-container": "#acf847",
+                        "on-surface": "#181c21",
+                        "surface-dim": "#d7dae1",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d0e5f8",
+                        "surface-tint": "#4c6171",
+                        "on-surface-variant": "#43474b",
+                        "surface": "#f8f9ff",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-container-low": "#f1f3fb",
+                        "on-tertiary-container": "#c77e00",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "md": "16px",
+                        "container-max": "1200px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "label-ui": ["Space Grotesk"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .progress-ring {
+            stroke-dasharray: 100 100;
+            stroke-dashoffset: 25; /* Represents 75% complete */
+            transition: stroke-dashoffset 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-main antialiased min-h-screen pb-[80px]">
+<!-- Top Navigation Container (Web) / Header Shell -->
+<header class="w-full sticky top-0 border-b border-outline-variant bg-background z-40 hidden md:flex">
+<div class="flex justify-between items-center px-gutter w-full max-w-container-max mx-auto h-[64px]">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-md text-headline-md text-primary">Learnium</span>
+</div>
+<nav class="flex gap-gutter">
+<a class="font-label-ui text-label-ui text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-DEFAULT" href="#">Home</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-DEFAULT" href="#">Learn</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-DEFAULT" href="#">Review</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-3 py-2 rounded-DEFAULT" href="#">Leagues</a>
+<a class="font-label-ui text-label-ui text-primary border-b-2 border-primary px-3 py-2" href="#">Profile</a>
+</nav>
+<button class="p-2 hover:bg-surface-variant/50 rounded-full transition-colors text-primary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Mobile Top Bar (Just Settings) -->
+<div class="md:hidden flex justify-end p-margin-mobile">
+<button class="p-2 bg-surface hover:bg-surface-variant/50 rounded-full border border-outline-variant transition-colors text-primary shadow-sm">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-lg grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Identity & Core Stats -->
+<div class="md:col-span-4 flex flex-col gap-lg">
+<!-- Identity Card -->
+<section class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center relative overflow-hidden">
+<!-- Subtle decorative background element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/20 rounded-bl-full -z-10"></div>
+<div class="relative mb-sm">
+<!-- Progress Ring SVG -->
+<svg class="w-[120px] h-[120px] transform -rotate-90 absolute -top-[10px] -left-[10px]" viewbox="0 0 36 36">
+<circle class="stroke-surface-container-high" cx="18" cy="18" fill="none" r="16" stroke-width="2"></circle>
+<circle class="stroke-secondary-container progress-ring" cx="18" cy="18" fill="none" r="16" stroke-dasharray="100" stroke-dashoffset="35" stroke-width="2"></circle>
+</svg>
+<img class="w-[100px] h-[100px] rounded-full border-2 border-background object-cover relative z-10 shadow-sm" data-alt="A detailed portrait of a professional individual looking confident. They are rendered in a modern, flat vector illustration style with sharp angles and clean lines, utilizing the Midnight Ink palette (deep navies, clean whites) with a subtle accent of vibrant lime. The background is a clean, abstract geometric shape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT6eMmsLb6gvFbDsmyt38guF6fXv3S_pryYlTAebMr_cgfdqRNlKMt9pciWpVWat7B_IQBiPSm9srKMAV6xXrY8NDTeTmw5pH7RZ6z5aqbinWAslnxfOD7udprshTWujERvCl-LFbxCYxAs-CmXCzazH4a257l9VXd9inXWhMWFvQA1LXomLfa_2u4p2qmVPrNwc4XiOOeowsQC3qBfvC4IDobpUwK41nJlFHJ3i-dMow41-3p9SNT"/>
+<div class="absolute -bottom-2 -right-2 bg-primary text-on-primary font-label-ui text-label-ui px-3 py-1 rounded-full border-2 border-background z-20 shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+                        Lvl 6
+                    </div>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary mt-sm">Alex Rivera</h1>
+<p class="font-body-main text-body-main text-on-surface-variant">Senior Analyst</p>
+<div class="w-full h-px bg-outline-variant my-md"></div>
+<!-- Quick Stats -->
+<div class="flex w-full justify-between px-md">
+<div class="flex flex-col items-center">
+<span class="font-label-ui text-label-ui text-on-surface-variant mb-1">Total XP</span>
+<span class="font-data-tabular text-data-tabular text-primary">12,450</span>
+</div>
+<div class="w-px h-full bg-outline-variant"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-ui text-label-ui text-on-surface-variant mb-1">Current Streak</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary-container text-[18px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-data-tabular text-data-tabular text-primary">12 Days</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Detailed Stats & Badges -->
+<div class="md:col-span-8 flex flex-col gap-lg">
+<!-- Stats Strip -->
+<section class="grid grid-cols-1 sm:grid-cols-3 gap-md">
+<div class="bg-surface border border-outline-variant rounded-lg p-md flex items-center gap-md hover:border-primary transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">dataset</span>
+</div>
+<div>
+<div class="font-data-tabular text-[24px] font-bold text-primary leading-none mb-1">14</div>
+<div class="font-label-ui text-label-ui text-on-surface-variant">Sets Completed</div>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg p-md flex items-center gap-md hover:border-primary transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">school</span>
+</div>
+<div>
+<div class="font-data-tabular text-[24px] font-bold text-primary leading-none mb-1">128</div>
+<div class="font-label-ui text-label-ui text-on-surface-variant">Lessons</div>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant rounded-lg p-md flex items-center gap-md hover:border-primary transition-colors">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[24px]">check_circle</span>
+</div>
+<div>
+<div class="font-data-tabular text-[24px] font-bold text-primary leading-none mb-1">94%</div>
+<div class="font-label-ui text-label-ui text-on-surface-variant">Review Accuracy</div>
+</div>
+</div>
+</section>
+<!-- Badges Section -->
+<section class="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col h-full">
+<div class="flex justify-between items-center mb-lg">
+<h2 class="font-headline-md text-[20px] text-primary">Achievements</h2>
+<a class="font-label-ui text-label-ui text-on-primary-container hover:text-primary transition-colors" href="#">View All</a>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-lg">
+<!-- Earned Badge 1 -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="relative mb-3 transform transition-transform group-hover:scale-105 duration-200">
+<img class="w-[80px] h-[80px] rounded-full border border-outline-variant shadow-sm object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLu7aobPMAhoblKVyNzPlmfp_firQX7OGGpltJsqYJoiSTfo4muPmS8nCnrguCJJ7S7WSgbHbT4n3Kyxgxyz8Dh76rjjF2JhwjZhditT0wLu0pGrOb6r9EWfr211sC2Ls7Uc6PqVFwtpBF19m3xtZJlNdj7i4grlzaV3a0koLcsnDh850O63Ih0yx3qlgySoDTLurEKUboLUORpC-32XT2oGxqbyQJ_Bm7h9-LdCo1Zz5VBS5U9TWbC65OA"/>
+</div>
+<span class="font-label-ui text-label-ui text-primary mb-1">First Lesson</span>
+<span class="font-body-main text-[12px] text-on-surface-variant">Jan 12</span>
+</div>
+<!-- Earned Badge 2 -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="relative mb-3 transform transition-transform group-hover:scale-105 duration-200">
+<!-- Simulating a different badge style -->
+<div class="w-[80px] h-[80px] rounded-full border border-outline-variant shadow-sm bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container text-[40px]">hexagon</span>
+</div>
+</div>
+<span class="font-label-ui text-label-ui text-primary mb-1">First Set</span>
+<span class="font-body-main text-[12px] text-on-surface-variant">Jan 15</span>
+</div>
+<!-- Earned Badge 3 -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="relative mb-3 transform transition-transform group-hover:scale-105 duration-200">
+<div class="w-[80px] h-[80px] rounded-full border-2 border-secondary-container shadow-sm bg-surface flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-secondary-container/10"></div>
+<span class="material-symbols-outlined text-secondary-container text-[36px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+</div>
+<span class="font-label-ui text-label-ui text-primary mb-1">7-Day Streak</span>
+<span class="font-body-main text-[12px] text-on-surface-variant">Jan 19</span>
+</div>
+<!-- Unearned Badge 1 (Muted) -->
+<div class="flex flex-col items-center text-center opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+<div class="w-[80px] h-[80px] rounded-full border border-outline-variant shadow-sm bg-surface-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[32px]">bolt</span>
+</div>
+<span class="font-label-ui text-label-ui text-on-surface-variant mb-1">30-Day Streak</span>
+<span class="font-body-main text-[12px] text-outline">Locked</span>
+</div>
+<!-- Unearned Badge 2 (Muted) -->
+<div class="flex flex-col items-center text-center opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+<div class="w-[80px] h-[80px] rounded-full border border-outline-variant shadow-sm bg-surface-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[32px]">route</span>
+</div>
+<span class="font-label-ui text-label-ui text-on-surface-variant mb-1">First Path</span>
+<span class="font-body-main text-[12px] text-outline">Locked</span>
+</div>
+<!-- Unearned Badge 3 (Muted) -->
+<div class="flex flex-col items-center text-center opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+<div class="w-[80px] h-[80px] rounded-full border border-outline-variant shadow-sm bg-surface-container flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[32px]">emoji_events</span>
+</div>
+<span class="font-label-ui text-label-ui text-on-surface-variant mb-1">League Top 3</span>
+<span class="font-body-main text-[12px] text-outline">Locked</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="fixed bottom-0 w-full flex justify-around items-center py-2 px-2 bg-surface dark:bg-surface-container-low border-t border-outline-variant z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-200">home</span>
+<span class="font-label-ui text-[10px] mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-200">school</span>
+<span class="font-label-ui text-[10px] mt-1">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-200">menu_book</span>
+<span class="font-label-ui text-[10px] mt-1">Review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-3 py-1 hover:bg-surface-container-high transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-200">workspace_premium</span>
+<span class="font-label-ui text-[10px] mt-1">Leagues</span>
+</a>
+<!-- Active Tab -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1 group" href="#">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform duration-200" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-ui text-[10px] mt-1 font-bold">Profile</span>
+</a>
+</nav>
+</body></html>

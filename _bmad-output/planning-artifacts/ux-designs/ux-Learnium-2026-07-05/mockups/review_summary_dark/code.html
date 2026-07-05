@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Review Session Summary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary": "#416900",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "primary-container": "#142937",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e0e2ea",
+                      "surface-container-low": "#f1f3fb",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#ffddb8",
+                      "surface": "#f8f9ff",
+                      "secondary-fixed-dim": "#91db2a",
+                      "surface-dim": "#d7dae1",
+                      "tertiary-container": "#3a2200",
+                      "on-secondary-container": "#457000",
+                      "background": "#f8f9ff",
+                      "surface-container-highest": "#e0e2ea",
+                      "inverse-on-surface": "#eef1f8",
+                      "outline": "#73777c",
+                      "secondary-fixed": "#acf847",
+                      "secondary-container": "#acf847",
+                      "primary-fixed-dim": "#b4c9dc",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#e5e8f0",
+                      "on-tertiary-container": "#c77e00",
+                      "outline-variant": "#c3c7cc",
+                      "primary": "#001421",
+                      "on-surface-variant": "#43474b",
+                      "on-surface": "#181c21",
+                      "surface-container": "#ebeef5",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed": "#2a1700",
+                      "on-secondary-fixed-variant": "#304f00",
+                      "on-secondary-fixed": "#102000",
+                      "inverse-primary": "#b4c9dc",
+                      "on-primary-container": "#7c91a2",
+                      "surface-bright": "#f8f9ff",
+                      "on-primary-fixed-variant": "#354958",
+                      "on-background": "#181c21",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#071e2b",
+                      "primary-fixed": "#d0e5f8",
+                      "surface-tint": "#4c6171",
+                      "tertiary": "#1e0f00",
+                      "inverse-surface": "#2d3136"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "base": "4px",
+                      "sm": "12px",
+                      "lg": "24px",
+                      "xxl": "48px",
+                      "xs": "8px",
+                      "md": "16px",
+                      "xl": "32px",
+                      "container-max": "1200px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-main": [
+                              "Inter"
+                      ],
+                      "label-ui": [
+                              "Space Grotesk"
+                      ],
+                      "display-lg-mobile": [
+                              "Bricolage Grotesque"
+                      ],
+                      "display-lg": [
+                              "Bricolage Grotesque"
+                      ],
+                      "data-tabular": [
+                              "Space Grotesk"
+                      ],
+                      "headline-md": [
+                              "Bricolage Grotesque"
+                      ]
+              },
+              "fontSize": {
+                      "body-main": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-ui": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "data-tabular": [
+                              "18px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-primary text-on-primary min-h-screen flex items-center justify-center font-body-main text-body-main selection:bg-secondary-fixed selection:text-primary overflow-hidden relative">
+<!-- Decorative background elements -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-container rounded-full blur-[120px] opacity-50 mix-blend-screen"></div>
+<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-tertiary-fixed-dim rounded-full blur-[100px] opacity-20 mix-blend-screen"></div>
+</div>
+<!-- Main Container -->
+<main class="w-full max-w-[600px] px-margin-mobile md:px-gutter relative z-10">
+<!-- Summary Card -->
+<div class="bg-surface-dim border border-outline rounded-xl p-lg md:p-xl shadow-[0_20px_40px_rgba(0,20,33,0.3)] backdrop-blur-sm relative overflow-hidden">
+<!-- Subtle glow effect inside card -->
+<div class="absolute -top-20 -right-20 w-40 h-40 bg-secondary-fixed rounded-full blur-[60px] opacity-20"></div>
+<div class="flex flex-col items-center text-center space-y-xl">
+<!-- Headline -->
+<div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary-fixed mb-xs">Session Complete</h1>
+<p class="font-body-main text-body-main text-surface-variant">You've successfully finished your review.</p>
+</div>
+<!-- XP Banner -->
+<div class="flex items-center gap-sm bg-primary-container border border-outline py-sm px-lg rounded-full">
+<span class="material-symbols-outlined text-secondary-fixed" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-data-tabular text-data-tabular text-on-primary">XP Earned: +25</span>
+</div>
+<!-- Streak Banner -->
+<div class="w-full bg-tertiary-container border border-tertiary-fixed-dim rounded-lg p-md flex items-center justify-between group cursor-pointer transition-colors hover:bg-[#4a2b00]">
+<div class="flex items-center gap-md">
+<!-- North Star Logo representation -->
+<div class="w-10 h-10 bg-tertiary-fixed-dim rounded-sm rotate-45 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined -rotate-45 text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="text-left">
+<h3 class="font-label-ui text-label-ui text-tertiary-fixed">STREAK SAVED</h3>
+<p class="font-data-tabular text-data-tabular text-on-primary mt-base">Day 12</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-tertiary-fixed opacity-50 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<!-- Primary Action -->
+<button class="w-full bg-on-primary text-primary font-label-ui text-label-ui py-md px-lg rounded-DEFAULT hover:bg-surface-variant transition-colors active:scale-[0.98]">
+                    Back to Dashboard
+                </button>
+</div>
+</div>
+</main>
+</body></html>

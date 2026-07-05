@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "tertiary-container": "#3a2200",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#102000",
+                      "on-primary-fixed-variant": "#354958",
+                      "surface-tint": "#4c6171",
+                      "primary-container": "#142937",
+                      "on-primary-container": "#7c91a2",
+                      "on-secondary-fixed-variant": "#304f00",
+                      "surface-container-low": "#f1f3fb",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary": "#ffffff",
+                      "background": "#f8f9ff",
+                      "outline": "#73777c",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#acf847",
+                      "on-primary-fixed": "#071e2b",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d7dae1",
+                      "surface-container-highest": "#e0e2ea",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "surface-container-high": "#e5e8f0",
+                      "surface-container": "#ebeef5",
+                      "secondary": "#416900",
+                      "on-surface": "#181c21",
+                      "on-tertiary-container": "#c77e00",
+                      "on-secondary-container": "#457000",
+                      "primary": "#001421",
+                      "on-surface-variant": "#43474b",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e0e2ea",
+                      "outline-variant": "#c3c7cc",
+                      "primary-fixed-dim": "#b4c9dc",
+                      "inverse-on-surface": "#eef1f8",
+                      "tertiary-fixed": "#ffddb8",
+                      "tertiary": "#1e0f00",
+                      "secondary-container": "#acf847",
+                      "on-tertiary": "#ffffff",
+                      "on-background": "#181c21",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#2a1700",
+                      "surface": "#f8f9ff",
+                      "primary-fixed": "#d0e5f8",
+                      "inverse-primary": "#b4c9dc",
+                      "inverse-surface": "#2d3136",
+                      "on-error": "#ffffff",
+                      "secondary-fixed-dim": "#91db2a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "md": "16px",
+                      "sm": "12px",
+                      "xl": "32px",
+                      "xs": "8px",
+                      "xxl": "48px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "gutter": "24px",
+                      "container-max": "1200px"
+              },
+              "fontFamily": {
+                      "data-tabular": [
+                              "Space Grotesk"
+                      ],
+                      "display-lg-mobile": [
+                              "Bricolage Grotesque"
+                      ],
+                      "display-lg": [
+                              "Bricolage Grotesque"
+                      ],
+                      "body-main": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Bricolage Grotesque"
+                      ],
+                      "label-ui": [
+                              "Space Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "data-tabular": [
+                              "18px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-main": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "label-ui": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-primary text-on-primary min-h-screen pb-24 font-body-main text-body-main selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-margin-mobile h-16 w-full z-50 bg-primary fixed top-0 border-b border-outline">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-primary">Learnium</h1>
+</div>
+<div class="flex items-center gap-sm">
+<div class="flex items-center gap-base font-label-ui text-label-ui text-on-primary">
+<span>5</span>
+<span class="text-tertiary-fixed-dim">🔥</span>
+</div>
+<div class="flex items-center gap-base font-label-ui text-label-ui text-on-primary">
+<span>1.2k</span>
+<span class="text-[#0ea5e9]">💎</span>
+</div>
+<div class="font-label-ui text-label-ui text-on-primary ml-xs">
+                Lvl.12
+            </div>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile md:px-xl max-w-container-max mx-auto space-y-xl">
+<!-- Profile Section -->
+<section class="flex flex-col items-center text-center space-y-sm">
+<div class="relative w-32 h-32 rounded-full border-2 border-outline p-1">
+<img class="w-full h-full rounded-full object-cover" data-alt="A striking portrait of a sophisticated professional looking confidently forward. Shot in high-key cinematic lighting against a stark black background. The image should convey modern intelligence and a sleek corporate aesthetic, utilizing a monochromatic palette with crisp white highlights and deep shadows. The overall mood is powerful and serious play." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBByC8x_beuzrk3zHjXDmNRCHGwYOVM7ebafWQafhsXv0bIH1MLaZW_1NPNRzR5SJVlRZpq_ZY87F-fkxSts9KIVqzxM7tFugER7eMNKYHjhL7l_WnupiXdpMBXDx_EiLgYBcDV6yJM28XFQF0-9wybRzt1JJPXNPfonJIdJfuj-eU4PNe-DgZQRi0FbRUZNWktV5nVYhkFRigjgPJVfW1bI9cSv84Rpqt6SpHWBv_bAqnUb-lTK4bW"/>
+<div class="absolute bottom-0 right-0 w-8 h-8 bg-tertiary-fixed-dim rounded-full flex items-center justify-center border-2 border-primary">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">edit</span>
+</div>
+</div>
+<div>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-primary">Alex Mercer</h2>
+<p class="font-label-ui text-label-ui text-outline-variant mt-base">Level 12 • Senior Developer</p>
+</div>
+</section>
+<!-- Stats Grid -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+<div class="bg-primary-container border border-outline rounded-lg p-md flex flex-col items-center justify-center space-y-xs hover:border-tertiary-fixed-dim transition-colors duration-200">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-xl" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-data-tabular text-data-tabular text-on-primary">5</span>
+</div>
+<span class="font-label-ui text-label-ui text-outline-variant uppercase">Streak</span>
+</div>
+<div class="bg-primary-container border border-outline rounded-lg p-md flex flex-col items-center justify-center space-y-xs hover:border-secondary-fixed transition-colors duration-200">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary-fixed text-xl" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<span class="font-data-tabular text-data-tabular text-on-primary">12k</span>
+</div>
+<span class="font-label-ui text-label-ui text-outline-variant uppercase">Total XP</span>
+</div>
+<div class="bg-primary-container border border-outline rounded-lg p-md flex flex-col items-center justify-center space-y-xs hover:border-on-primary transition-colors duration-200">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-on-primary text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-data-tabular text-data-tabular text-on-primary">8</span>
+</div>
+<span class="font-label-ui text-label-ui text-outline-variant uppercase">Courses</span>
+</div>
+<div class="bg-primary-container border border-outline rounded-lg p-md flex flex-col items-center justify-center space-y-xs hover:border-[#94a3b8] transition-colors duration-200">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-[#94a3b8] text-xl" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+<span class="font-data-tabular text-data-tabular text-on-primary">Silver</span>
+</div>
+<span class="font-label-ui text-label-ui text-outline-variant uppercase">League</span>
+</div>
+</section>
+<!-- Activity Map -->
+<section class="bg-primary-container border border-outline rounded-lg p-lg space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-primary">Activity</h3>
+<span class="font-label-ui text-label-ui text-outline-variant">Last 90 days</span>
+</div>
+<div class="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+<!-- Generate dummy grid columns to simulate a contribution graph -->
+<script>
+                    const days = 90;
+                    const container = document.currentScript.parentElement;
+                    const cols = Math.ceil(days / 7);
+                    
+                    for(let i=0; i<cols; i++) {
+                        const colDiv = document.createElement('div');
+                        colDiv.className = 'flex flex-col gap-1';
+                        
+                        for(let j=0; j<7; j++) {
+                            // Random activity level
+                            const activity = Math.random();
+                            let bgClass = 'bg-outline/20'; // empty
+                            if(activity > 0.8) bgClass = 'bg-secondary-fixed'; // high
+                            else if (activity > 0.5) bgClass = 'bg-secondary-fixed/60'; // med
+                            else if (activity > 0.3) bgClass = 'bg-secondary-fixed/30'; // low
+                            
+                            const cell = document.createElement('div');
+                            cell.className = `w-3 h-3 rounded-[2px] ${bgClass}`;
+                            colDiv.appendChild(cell);
+                        }
+                        container.insertBefore(colDiv, document.currentScript);
+                    }
+                </script>
+</div>
+<div class="flex justify-end items-center gap-xs font-label-ui text-label-ui text-outline-variant text-xs">
+<span>Less</span>
+<div class="w-3 h-3 rounded-[2px] bg-outline/20"></div>
+<div class="w-3 h-3 rounded-[2px] bg-secondary-fixed/30"></div>
+<div class="w-3 h-3 rounded-[2px] bg-secondary-fixed/60"></div>
+<div class="w-3 h-3 rounded-[2px] bg-secondary-fixed"></div>
+<span>More</span>
+</div>
+</section>
+<!-- Recent Badges / Achievements (Placeholder for Bento Grid style) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="bg-primary-container border border-outline rounded-lg p-md flex items-center justify-between">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-primary text-xl">Early Riser</h4>
+<p class="font-body-main text-body-main text-outline-variant text-sm mt-xs">Completed 5 lessons before 8 AM.</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-surface-tint/20 flex items-center justify-center text-surface-tint border border-surface-tint">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+</div>
+</div>
+<div class="bg-primary-container border border-outline rounded-lg p-md flex items-center justify-between">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-primary text-xl">Perfect Week</h4>
+<p class="font-body-main text-body-main text-outline-variant text-sm mt-xs">Hit daily goals 7 days in a row.</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-secondary-fixed/20 flex items-center justify-center text-secondary-fixed border border-secondary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-margin-mobile py-2 h-16 bg-primary border-t border-outline md:hidden">
+<a class="flex flex-col items-center justify-center text-outline-variant hover:bg-primary-container scale-95 active:scale-90 transition-transform duration-150 rounded-lg p-xs" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline-variant hover:bg-primary-container scale-95 active:scale-90 transition-transform duration-150 rounded-lg p-xs" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline-variant hover:bg-primary-container scale-95 active:scale-90 transition-transform duration-150 rounded-lg p-xs" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">League</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary-fixed-dim font-bold hover:bg-primary-container scale-95 active:scale-90 transition-transform duration-150 rounded-lg p-xs" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Profile</span>
+</a>
+</nav>
+<!-- Desktop SideNav (Hidden on Mobile) - Optional placeholder for completeness if needed based on "hidden md:flex" logic -->
+<nav class="hidden md:flex flex-col fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-primary border-r border-outline p-md gap-sm z-40">
+<a class="flex items-center gap-md text-outline-variant hover:bg-primary-container px-sm py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-ui text-label-ui">Home</span>
+</a>
+<a class="flex items-center gap-md text-outline-variant hover:bg-primary-container px-sm py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-ui text-label-ui">Explore</span>
+</a>
+<a class="flex items-center gap-md text-outline-variant hover:bg-primary-container px-sm py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-ui text-label-ui">League</span>
+</a>
+<a class="flex items-center gap-md text-secondary-fixed-dim bg-primary-container px-sm py-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-ui text-label-ui">Profile</span>
+</a>
+</nav>
+<!-- Adjust main content margin on desktop to account for sidenav -->
+<style>
+        @media (min-width: 768px) {
+            main {
+                margin-left: 16rem;
+                max-width: calc(100% - 16rem);
+            }
+        }
+    </style>
+</body></html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - Learnium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#181c21", // Adjusted for pure black/dark mode requirement
+                        "surface-container-high": "#2d3136",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-surface": "#ffffff",
+                        "on-secondary-container": "#457000",
+                        "surface-container-highest": "#43474b",
+                        "on-background": "#ffffff",
+                        "surface-container": "#1a1d21",
+                        "secondary-container": "#acf847",
+                        "on-secondary-fixed": "#102000",
+                        "on-surface-variant": "#c3c7cc",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "outline": "#43474b",
+                        "on-primary-fixed-variant": "#354958",
+                        "error": "#ffdad6",
+                        "surface-bright": "#2d3136",
+                        "on-primary": "#071e2b",
+                        "surface": "#000000", // Pure black requirement
+                        "on-tertiary": "#1e0f00",
+                        "surface-variant": "#2d3136",
+                        "surface-tint": "#b4c9dc",
+                        "surface-container-lowest": "#000000",
+                        "on-primary-fixed": "#071e2b",
+                        "secondary-fixed": "#acf847",
+                        "inverse-surface": "#f8f9ff",
+                        "on-tertiary-container": "#ffddb8",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "primary-fixed": "#d0e5f8",
+                        "tertiary": "#ffb95f",
+                        "on-error-container": "#ffdad6",
+                        "background": "#000000", // Pure black requirement
+                        "tertiary-fixed": "#ffddb8",
+                        "tertiary-container": "#3a2200",
+                        "secondary-fixed-dim": "#91db2a",
+                        "inverse-primary": "#001421",
+                        "on-tertiary-fixed": "#2a1700",
+                        "secondary": "#acf847", // Lime green requirement
+                        "primary": "#b4c9dc",
+                        "on-error": "#370001",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "on-primary-container": "#d0e5f8",
+                        "primary-container": "#142937",
+                        "on-secondary": "#102000",
+                        "outline-variant": "#43474b",
+                        "surface-dim": "#181c21"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "md": "16px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Bricolage Grotesque"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "body-main": ["Inter"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "label-ui": ["Space Grotesk"],
+                        "data-tabular": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom toggle switch styling for lime green active state */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #acf847;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #acf847;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen font-body-main text-body-main antialiased pt-[64px] pb-safe selection:bg-secondary selection:text-on-secondary">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface font-headline-md-mobile text-headline-md-mobile docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows fixed top-0 left-0 w-full z-50 flex items-center justify-between px-margin-mobile h-16">
+<div class="flex items-center gap-xs">
+<button aria-label="Go back" class="text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors active:scale-95 transition-transform duration-100 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="text-primary dark:text-inverse-primary">Settings</h1>
+</div>
+<div class="w-10"></div> <!-- Spacer for center alignment balance -->
+</header>
+<main class="px-margin-mobile py-lg flex flex-col gap-xl max-w-[600px] mx-auto">
+<!-- 1. Learning Goals -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-secondary uppercase tracking-wider">Learning Goals</h2>
+<div class="flex flex-col rounded-lg border border-outline bg-surface-container-low overflow-hidden">
+<!-- Daily Goal -->
+<div class="flex items-center justify-between p-md border-b border-outline">
+<div class="flex flex-col gap-base">
+<label class="font-label-ui text-label-ui text-on-surface" for="daily-goal">Daily Goal</label>
+<span class="text-[12px] text-on-surface-variant">Set your target learning pace</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface border border-outline text-on-surface font-label-ui text-label-ui py-2 pl-3 pr-8 rounded focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer" id="daily-goal">
+<option value="casual">Casual</option>
+<option selected="" value="regular">Regular</option>
+<option value="serious">Serious</option>
+<option value="insane">Insane</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[20px]" style="font-variation-settings: 'FILL' 0;">expand_more</span>
+</div>
+</div>
+<!-- Reminder Time -->
+<div class="flex items-center justify-between p-md">
+<div class="flex flex-col gap-base">
+<label class="font-label-ui text-label-ui text-on-surface" for="reminder-time">Reminder Time</label>
+<span class="text-[12px] text-on-surface-variant">When to nudge you</span>
+</div>
+<input class="bg-surface border border-outline text-on-surface font-data-tabular text-data-tabular py-2 px-3 rounded focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer dark:[color-scheme:dark]" id="reminder-time" type="time" value="19:00"/>
+</div>
+</div>
+</section>
+<!-- 2. Privacy & Leagues -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-secondary uppercase tracking-wider">Privacy &amp; Leagues</h2>
+<div class="flex flex-col rounded-lg border border-outline bg-surface-container-low overflow-hidden">
+<div class="flex items-center justify-between p-md">
+<div class="flex flex-col gap-base pr-4">
+<span class="font-label-ui text-label-ui text-on-surface">League Participation</span>
+<span class="text-[12px] text-on-surface-variant">Compete with others on the public leaderboard. Turning this off makes your profile private.</span>
+</div>
+<!-- Toggle Switch -->
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 opacity-0" id="league-toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer border border-outline relative before:absolute before:content-[''] before:w-5 before:h-5 before:bg-on-surface before:rounded-full before:top-[1px] before:left-[1px] before:transition-transform before:duration-300 peer-checked:bg-secondary peer-checked:before:translate-x-6 peer-checked:before:bg-surface" for="league-toggle"></label>
+<!-- Inline CSS replacement for tailwind toggle trick due to complexity constraints -->
+<div class="pointer-events-none w-12 h-6 rounded-full bg-surface-variant border border-outline absolute top-0 left-0 transition-colors duration-300" id="toggle-bg">
+<div class="w-5 h-5 bg-on-surface rounded-full absolute top-[1px] left-[1px] transition-transform duration-300 translate-x-6 bg-surface" id="toggle-knob"></div>
+</div>
+<script>
+                            const checkbox = document.getElementById('league-toggle');
+                            const bg = document.getElementById('toggle-bg');
+                            const knob = document.getElementById('toggle-knob');
+                            
+                            // Initialize
+                            if(checkbox.checked) {
+                                bg.classList.add('bg-secondary', 'border-secondary');
+                                bg.classList.remove('bg-surface-variant', 'border-outline');
+                                knob.classList.add('translate-x-6', 'bg-on-secondary-fixed');
+                                knob.classList.remove('bg-on-surface', 'translate-x-0');
+                            }
+                            
+                            checkbox.addEventListener('change', (e) => {
+                                if(e.target.checked) {
+                                    bg.classList.add('bg-secondary', 'border-secondary');
+                                    bg.classList.remove('bg-surface-variant', 'border-outline');
+                                    knob.classList.add('translate-x-6', 'bg-on-secondary-fixed');
+                                    knob.classList.remove('bg-on-surface', 'translate-x-0');
+                                } else {
+                                    bg.classList.remove('bg-secondary', 'border-secondary');
+                                    bg.classList.add('bg-surface-variant', 'border-outline');
+                                    knob.classList.remove('translate-x-6', 'bg-on-secondary-fixed');
+                                    knob.classList.add('bg-on-surface', 'translate-x-0');
+                                }
+                            });
+                         </script>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Appearance -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-secondary uppercase tracking-wider">Appearance</h2>
+<div class="flex flex-col rounded-lg border border-outline bg-surface-container-low overflow-hidden p-md">
+<span class="font-label-ui text-label-ui text-on-surface mb-sm block">Theme</span>
+<!-- Segmented Control -->
+<div class="flex bg-surface border border-outline rounded p-1 w-full relative">
+<input class="peer/light sr-only" id="theme-light" name="theme" type="radio" value="light"/>
+<label class="flex-1 text-center py-2 font-label-ui text-label-ui text-on-surface-variant cursor-pointer rounded z-10 transition-colors peer-checked/light:text-on-surface" for="theme-light">Light</label>
+<input checked="" class="peer/dark sr-only" id="theme-dark" name="theme" type="radio" value="dark"/>
+<label class="flex-1 text-center py-2 font-label-ui text-label-ui text-on-surface-variant cursor-pointer rounded z-10 transition-colors peer-checked/dark:text-on-surface" for="theme-dark">Dark</label>
+<input class="peer/system sr-only" id="theme-system" name="theme" type="radio" value="system"/>
+<label class="flex-1 text-center py-2 font-label-ui text-label-ui text-on-surface-variant cursor-pointer rounded z-10 transition-colors peer-checked/system:text-on-surface" for="theme-system">System</label>
+<!-- Active Background Indicator (Simplified for static HTML, normally needs JS for positioning or pure CSS flex tricks) -->
+<div class="absolute top-1 bottom-1 left-[33.33%] w-[33.33%] bg-surface-container-highest rounded border border-outline pointer-events-none transition-all duration-300"></div>
+</div>
+</div>
+</section>
+<!-- 4. Account -->
+<section class="flex flex-col gap-md">
+<h2 class="font-label-ui text-label-ui text-secondary uppercase tracking-wider">Account</h2>
+<div class="flex flex-col rounded-lg border border-outline bg-surface-container-low overflow-hidden">
+<div class="flex items-center justify-between p-md border-b border-outline">
+<span class="font-label-ui text-label-ui text-on-surface">Email</span>
+<span class="font-data-tabular text-data-tabular text-on-surface-variant text-[14px]">alex.rivera@example.com</span>
+</div>
+<a class="flex items-center justify-between p-md hover:bg-surface-container transition-colors group" href="#">
+<span class="font-label-ui text-label-ui text-primary">Manage Subscription</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform" style="font-variation-settings: 'FILL' 0;">open_in_new</span>
+</a>
+</div>
+</section>
+<!-- 5. Danger Zone -->
+<section class="flex flex-col gap-md mt-lg border-t border-outline-variant pt-lg">
+<h2 class="font-label-ui text-label-ui text-error uppercase tracking-wider">Danger Zone</h2>
+<div class="flex flex-col rounded-lg border border-outline bg-surface-container-low overflow-hidden">
+<button class="flex flex-col items-start p-md hover:bg-error-container/10 transition-colors group text-left w-full focus:outline-none focus:bg-error-container/20" type="button">
+<span class="font-label-ui text-label-ui text-error group-hover:underline">Delete Account</span>
+<span class="text-[12px] text-on-surface-variant mt-1">Permanently delete your data. We retain a record of this request for 30 days per GDPR.</span>
+</button>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Learn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#ebeef5",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3136",
+                        "on-primary-fixed": "#071e2b",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-container": "#3a2200",
+                        "secondary-container": "#acf847",
+                        "surface": "#f8f9ff",
+                        "inverse-primary": "#b4c9dc",
+                        "tertiary": "#1e0f00",
+                        "primary-container": "#142937",
+                        "surface-container-high": "#e5e8f0",
+                        "secondary": "#416900",
+                        "secondary-fixed-dim": "#91db2a",
+                        "outline": "#73777c",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-dim": "#d7dae1",
+                        "primary-fixed": "#d0e5f8",
+                        "on-primary-container": "#7c91a2",
+                        "surface-variant": "#e0e2ea",
+                        "outline-variant": "#c3c7cc",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#43474b",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eef1f8",
+                        "on-primary-fixed-variant": "#354958",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-background": "#181c21",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "primary": "#001421",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "surface-tint": "#4c6171",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#181c21",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#acf847",
+                        "on-secondary-fixed": "#102000",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-low": "#f1f3fb",
+                        "on-secondary-container": "#457000",
+                        "on-primary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "on-tertiary-container": "#c77e00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xl": "32px",
+                        "xs": "8px",
+                        "xxl": "48px",
+                        "base": "4px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-ui": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .symbol-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d7dae1;
+            border-radius: 9999px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-main min-h-screen flex flex-col pb-[80px] md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-primary w-full top-0 sticky border-b border-outline-variant dark:border-outline z-40">
+<div class="flex justify-between items-center px-margin-mobile py-sm md:px-lg w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-xs">
+<!-- Leading Avatar - Typically user profile in this context, but using generic avatar logic from JSON -->
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A minimalist digital avatar placeholder image in a modern light-mode style. The avatar should feature simple geometric shapes or a stylized silhouette in subtle shades of navy and grey, reflecting a professional and intellectual brand identity without depicting a specific recognizable face." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuLuT7COqHsY6Vux1f86M4I4-RuIfQXAk9Q8FCO-rihoJS8_GL8u6Xdx9qPIjotRt84P3gBKDVh4nG2Dj4c6wDkrYjI5W61t5uStsImuwoYARWRIRrlmJPWDoU6rTpW_Vt7h-c7SWSHUDVhUXQ9W7ScQ-cGq_BnZM9kMaPelpHYt7lMKt9CiKHO3X0cMyXhyA06T76aCPAo6T7-m_R8h6jzE0IFzj98VwvOpCv4uuGXWD8E3fILbPw"/>
+</div>
+<span class="font-headline-md text-headline-md mobile:font-headline-md-mobile mobile:text-headline-md-mobile tracking-tighter text-primary dark:text-surface-lowest">
+                    LEARNIUM
+                </span>
+</div>
+<!-- Desktop Navigation cluster (hidden on mobile, visible on md) -->
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150" href="#">Home</a>
+<a class="font-label-ui text-label-ui text-primary dark:text-surface-lowest hover:opacity-80 transition-opacity active:scale-95 duration-150" href="#">Learn</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150" href="#">Review</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150" href="#">Leagues</a>
+<a class="font-label-ui text-label-ui text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity active:scale-95 duration-150" href="#">Profile</a>
+</nav>
+<button class="text-secondary dark:text-secondary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-150 p-2">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-lg py-xl flex flex-col gap-xxl">
+<!-- Generate Course Section (Top Section) -->
+<section class="flex flex-col gap-lg bg-surface-container-lowest p-lg md:p-xl rounded-lg border border-outline-variant relative overflow-hidden group hover:border-primary transition-colors duration-300">
+<!-- Subtle accent glow -->
+<div class="absolute -top-1/2 -right-1/4 w-96 h-96 bg-secondary-fixed opacity-5 rounded-full blur-3xl pointer-events-none group-hover:opacity-10 transition-opacity duration-500"></div>
+<div class="flex flex-col gap-sm z-10">
+<label class="font-headline-md text-headline-md text-primary" for="course-generator">What do you want to learn today?</label>
+<p class="text-on-surface-variant font-body-main text-sm md:text-body-main max-w-2xl">
+                    Describe a topic, skill, or concept. Learnium will generate a structured learning path with key concepts, lessons, and quizzes.
+                </p>
+</div>
+<div class="flex flex-col md:flex-row gap-sm z-10">
+<div class="relative flex-grow">
+<input class="w-full h-14 pl-lg pr-4 bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-DEFAULT font-body-main text-on-surface transition-all duration-200" id="course-generator" placeholder="e.g. Quantum Computing, High-Stakes Negotiation..." type="text"/>
+</div>
+<button class="h-14 px-lg bg-primary text-on-primary font-label-ui text-label-ui rounded-DEFAULT hover:opacity-90 active:scale-95 transition-all duration-150 flex items-center justify-center gap-xs flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                    Generate Course
+                </button>
+</div>
+</section>
+<!-- Learning Paths Section -->
+<section class="flex flex-col gap-lg">
+<h2 class="font-headline-md text-headline-md text-on-background">Your Learning Paths</h2>
+<!-- Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Card 1: System Design -->
+<div class="bg-surface border border-outline-variant rounded-DEFAULT p-lg flex flex-col gap-md hover:border-primary hover:shadow-[0_8px_30px_rgb(0,20,33,0.05)] transition-all duration-300 group cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-xs">
+<span class="inline-block px-2 py-1 bg-surface-container-highest text-on-surface-variant font-label-ui text-[10px] uppercase tracking-widest rounded-sm w-fit border border-outline-variant">Infrastructure</span>
+<h3 class="font-headline-md text-[20px] text-primary group-hover:text-secondary transition-colors duration-200">System Design for Scale</h3>
+</div>
+<span class="font-data-tabular text-data-tabular text-secondary">60%</span>
+</div>
+<p class="text-on-surface-variant font-body-main flex-grow">
+                        Master load balancing and horizontal scaling.
+                    </p>
+<div class="flex flex-col gap-xs pt-sm border-t border-surface-variant">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-secondary-fixed w-[60%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-xs">
+<span class="font-label-ui text-[12px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">menu_book</span>
+                                12 lessons
+                            </span>
+<button class="font-label-ui text-label-ui text-primary hover:text-secondary transition-colors flex items-center gap-1">
+                                Continue
+                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2: Behavioral Economics -->
+<div class="bg-surface border border-outline-variant rounded-DEFAULT p-lg flex flex-col gap-md hover:border-primary hover:shadow-[0_8px_30px_rgb(0,20,33,0.05)] transition-all duration-300 group cursor-pointer relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-xs">
+<span class="inline-block px-2 py-1 bg-surface-container-highest text-on-surface-variant font-label-ui text-[10px] uppercase tracking-widest rounded-sm w-fit border border-outline-variant">Psychology</span>
+<h3 class="font-headline-md text-[20px] text-primary group-hover:text-secondary transition-colors duration-200">Behavioral Economics</h3>
+</div>
+<span class="font-data-tabular text-data-tabular text-secondary">25%</span>
+</div>
+<p class="text-on-surface-variant font-body-main flex-grow">
+                        Understanding cognitive biases and choice architecture.
+                    </p>
+<div class="flex flex-col gap-xs pt-sm border-t border-surface-variant">
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-secondary-fixed w-[25%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-xs">
+<div class="flex items-center gap-3">
+<span class="font-label-ui text-[12px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">menu_book</span>
+                                    8 lessons
+                                </span>
+<!-- AI Generated Note -->
+<span class="font-label-ui text-[10px] text-surface-tint flex items-center gap-1 bg-surface-container-high px-1.5 py-0.5 rounded-sm">
+<span class="material-symbols-outlined text-[12px]">info</span>
+                                    AI-generated — verify important facts
+                                </span>
+</div>
+<button class="font-label-ui text-label-ui text-primary hover:text-secondary transition-colors flex items-center gap-1">
+                                Continue
+                                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State / Suggestion Card (to maintain bento-ish feel if list is short) -->
+<div class="md:col-span-2 border border-dashed border-outline-variant rounded-DEFAULT p-lg flex flex-col items-center justify-center gap-sm text-center bg-surface-container-lowest/50 py-xl hover:bg-surface-bright transition-colors duration-200">
+<span class="material-symbols-outlined text-outline text-[32px]">library_add</span>
+<h4 class="font-headline-md text-[18px] text-on-surface">Looking for more?</h4>
+<p class="font-body-main text-on-surface-variant max-w-md">Use the generator above to create a new learning path tailored to your professional goals.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-base pb-4 pt-2 bg-surface dark:bg-primary border-t border-outline-variant dark:border-outline z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 font-label-ui text-label-ui w-16" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">home</span>
+<span class="text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed font-bold hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 font-label-ui text-label-ui w-16" href="#">
+<span class="material-symbols-outlined symbol-filled text-[24px] mb-1">school</span>
+<span class="text-[10px]">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 font-label-ui text-label-ui w-16" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">menu_book</span>
+<span class="text-[10px]">Review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 font-label-ui text-label-ui w-16" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">emoji_events</span>
+<span class="text-[10px]">Leagues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-surface-lowest active:scale-90 transition-transform duration-200 font-label-ui text-label-ui w-16" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">person</span>
+<span class="text-[10px]">Profile</span>
+</a>
+</nav>
+<!-- Simple interaction script for input focus state simulation -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('course-generator');
+            const parentSection = input.closest('section');
+            
+            input.addEventListener('focus', () => {
+                parentSection.classList.add('border-primary');
+                parentSection.classList.add('shadow-[0_8px_30px_rgb(0,20,33,0.05)]');
+            });
+            
+            input.addEventListener('blur', () => {
+                parentSection.classList.remove('border-primary');
+                parentSection.classList.remove('shadow-[0_8px_30px_rgb(0,20,33,0.05)]');
+            });
+        });
+    </script>
+</body></html>

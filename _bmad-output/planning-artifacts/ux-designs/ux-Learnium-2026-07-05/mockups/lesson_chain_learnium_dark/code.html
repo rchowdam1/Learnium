@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Design for Scale - Lesson Chain</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Bricolage+Grotesque:wght@800&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-surface-variant": "#43474b",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "background": "#000000", // Dark mode override
+                        "surface-variant": "#2d3136", // Dark mode override
+                        "primary": "#001421",
+                        "on-tertiary-container": "#c77e00",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e0e2ea",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#acf847",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "tertiary": "#1e0f00",
+                        "primary-fixed": "#d0e5f8",
+                        "surface-container-low": "#181c21", // Dark mode
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b4c9dc",
+                        "surface-container": "#2d3136", // Dark mode
+                        "surface-container-high": "#43474b", // Dark mode
+                        "primary-container": "#142937",
+                        "outline": "#73777c",
+                        "inverse-surface": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-primary-fixed": "#071e2b",
+                        "secondary-fixed-dim": "#91db2a",
+                        "on-background": "#ffffff", // Dark mode
+                        "error": "#ba1a1a",
+                        "surface": "#000000", // Dark mode
+                        "on-primary-fixed-variant": "#354958",
+                        "outline-variant": "#43474b", // Dark mode
+                        "secondary": "#84CC16", // Lime as requested
+                        "tertiary-container": "#3a2200",
+                        "on-surface": "#ffffff", // Dark mode
+                        "on-secondary-container": "#457000",
+                        "inverse-on-surface": "#eef1f8",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4c6171",
+                        "on-primary-container": "#7c91a2",
+                        "secondary-fixed": "#acf847",
+                        "on-secondary": "#000000",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-fixed": "#102000",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#181c21" // Dark mode
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "base": "4px",
+                        "container-max": "1200px",
+                        "sm": "12px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "xxl": "48px",
+                        "md": "16px",
+                        "xs": "8px",
+                        "margin-mobile": "16px"
+                    },
+                    fontFamily: {
+                        "label-ui": ["Space Grotesk", "sans-serif"],
+                        "data-tabular": ["Space Grotesk", "sans-serif"],
+                        "display-lg-mobile": ["Bricolage Grotesque", "sans-serif"],
+                        "display-lg": ["Bricolage Grotesque", "sans-serif"],
+                        "headline-md": ["Bricolage Grotesque", "sans-serif"],
+                        "body-main": ["Inter", "sans-serif"]
+                    },
+                    fontSize: {
+                        "label-ui": ["14px", { lineHeight: "1", letterSpacing: "0.02em", fontWeight: "700" }],
+                        "data-tabular": ["18px", { lineHeight: "1", fontWeight: "700" }],
+                        "display-lg-mobile": ["36px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "800" }],
+                        "headline-md": ["24px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "800" }],
+                        "body-main": ["16px", { lineHeight: "1.6", letterSpacing: "0", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .pulse-glow { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        .path-line {
+            position: absolute;
+            width: 8px;
+            z-index: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-10 bg-background/90 backdrop-blur-md pt-6 pb-4 px-4 border-b border-surface-variant flex flex-col gap-4">
+<h1 class="font-headline-md text-center text-on-surface">System Design for Scale</h1>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-ui text-outline">Lesson 3 of 8</span>
+<span class="font-data-tabular text-secondary">40% Complete</span>
+</div>
+<div class="h-3 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full w-[40%] transition-all duration-500"></div>
+</div>
+</div>
+</header>
+<!-- Main Content: Path -->
+<main class="flex-1 relative py-12 px-4 flex flex-col items-center gap-16 w-full max-w-md mx-auto">
+<!-- Lesson 1: Completed -->
+<div class="relative w-full flex justify-center group">
+<div class="path-line bg-secondary h-24 top-full"></div>
+<button class="relative z-10 w-20 h-20 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-lg transform transition-transform hover:scale-105 ml-[-40px]">
+<span class="material-symbols-outlined text-[40px]" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+<div class="absolute left-1/2 ml-4 top-1/2 -translate-y-1/2 whitespace-nowrap">
+<h3 class="font-label-ui text-on-surface">Fundamentals</h3>
+</div>
+</div>
+<!-- Lesson 2: Completed -->
+<div class="relative w-full flex justify-center group">
+<div class="path-line bg-secondary h-24 top-full"></div>
+<button class="relative z-10 w-20 h-20 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-lg transform transition-transform hover:scale-105 ml-[40px]">
+<span class="material-symbols-outlined text-[40px]" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+<div class="absolute right-1/2 mr-4 top-1/2 -translate-y-1/2 whitespace-nowrap text-right">
+<h3 class="font-label-ui text-on-surface">Horizontal Scaling</h3>
+</div>
+</div>
+<!-- Lesson 3: Active -->
+<div class="relative w-full flex justify-center group">
+<div class="path-line bg-surface-variant h-24 top-full"></div>
+<div class="relative z-10 w-24 h-24 ml-[-20px]">
+<!-- Progress Ring -->
+<svg class="absolute inset-0 w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle class="text-surface-variant" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-secondary transition-all duration-1000" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="283" stroke-dashoffset="140" stroke-width="8"></circle>
+</svg>
+<button class="absolute inset-2 bg-on-surface text-surface rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.2)] pulse-glow transform transition-transform hover:scale-105">
+<span class="material-symbols-outlined text-[40px]" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute left-1/2 ml-10 top-1/2 -translate-y-1/2 whitespace-nowrap">
+<h3 class="font-label-ui text-on-surface text-lg">Load Balancing</h3>
+</div>
+</div>
+<!-- Lesson 4: Locked -->
+<div class="relative w-full flex justify-center group">
+<div class="path-line bg-surface-variant h-24 top-full"></div>
+<button class="relative z-10 w-20 h-20 rounded-full bg-surface-variant text-outline flex items-center justify-center ml-[20px] cursor-not-allowed">
+<span class="material-symbols-outlined text-[32px]" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+</button>
+<div class="absolute right-1/2 mr-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-right">
+<h3 class="font-label-ui text-outline">Database Sharding</h3>
+</div>
+</div>
+<!-- Lesson 5: Locked -->
+<div class="relative w-full flex justify-center group mb-24">
+<button class="relative z-10 w-20 h-20 rounded-full bg-surface-variant text-outline flex items-center justify-center ml-[-10px] cursor-not-allowed">
+<span class="material-symbols-outlined text-[32px]" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+</button>
+<div class="absolute left-1/2 ml-6 top-1/2 -translate-y-1/2 whitespace-nowrap">
+<h3 class="font-label-ui text-outline">Caching</h3>
+</div>
+</div>
+</main>
+<!-- Floating Nova Mascot -->
+<div class="fixed bottom-24 right-4 z-40">
+<button class="flex items-center bg-primary-container text-on-surface px-4 py-3 rounded-full shadow-lg border border-surface-variant hover:bg-surface-variant transition-colors gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="smart_toy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-ui">Study Buddy</span>
+</button>
+</div>
+<!-- BottomNavBar (Shared Component) -->
+<div class="flex gap-2 border-t border-surface-variant bg-surface px-4 pb-4 pt-3 fixed bottom-0 w-full z-50">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-secondary" href="#">
+<div class="text-secondary flex h-8 items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="book" data-weight="fill" style="font-variation-settings: 'FILL' 1;">book</span>
+</div>
+<p class="text-secondary text-xs font-medium leading-normal tracking-[0.015em]">Learn</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-outline" href="#">
+<div class="text-outline flex h-8 items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="exercise" data-weight="regular">exercise</span>
+</div>
+<p class="text-outline text-xs font-medium leading-normal tracking-[0.015em]">Practice</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-outline" href="#">
+<div class="text-outline flex h-8 items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="trophy" data-weight="regular">trophy</span>
+</div>
+<p class="text-outline text-xs font-medium leading-normal tracking-[0.015em]">Leaderboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-outline" href="#">
+<div class="text-outline flex h-8 items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="storefront" data-weight="regular">storefront</span>
+</div>
+<p class="text-outline text-xs font-medium leading-normal tracking-[0.015em]">Store</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-outline" href="#">
+<div class="text-outline flex h-8 items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="person" data-weight="regular">person</span>
+</div>
+<p class="text-outline text-xs font-medium leading-normal tracking-[0.015em]">Profile</p>
+</a>
+</div>
+</body></html>

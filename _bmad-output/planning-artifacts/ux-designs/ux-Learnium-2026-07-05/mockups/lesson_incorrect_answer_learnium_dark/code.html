@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Database Sharding Strategies - Lesson</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Space+Grotesk:wght@700&amp;family=Bricolage+Grotesque:wght@800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d7dae1",
+                        "tertiary": "#1e0f00",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container-highest": "#e0e2ea",
+                        "secondary-fixed-dim": "#91db2a",
+                        "outline": "#73777c",
+                        "primary": "#001421",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#acf847",
+                        "outline-variant": "#c3c7cc",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#071e2b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#181c21",
+                        "surface-tint": "#4c6171",
+                        "on-tertiary-container": "#c77e00",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed": "#102000",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#d0e5f8",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "tertiary-container": "#3a2200",
+                        "on-secondary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container-low": "#f1f3fb",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-container": "#457000",
+                        "inverse-surface": "#2d3136",
+                        "inverse-on-surface": "#eef1f8",
+                        "secondary-container": "#acf847",
+                        "on-background": "#181c21",
+                        "inverse-primary": "#b4c9dc",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "surface-container": "#ebeef5",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "surface-container-high": "#e5e8f0",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#43474b",
+                        "surface-variant": "#e0e2ea",
+                        "primary-container": "#142937",
+                        "on-primary-fixed-variant": "#354958",
+                        "on-primary-container": "#7c91a2",
+                        "surface": "#f8f9ff",
+                        "secondary": "#416900"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xxl": "48px",
+                        "container-max": "1200px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "gutter": "24px",
+                        "xs": "8px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-ui": ["Space Grotesk"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"],
+                        "body-main": ["Inter"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "display-lg-mobile": ["Bricolage Grotesque"]
+                    },
+                    "fontSize": {
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .progress-bar-fill {
+            background: linear-gradient(90deg, theme('colors.primary'), theme('colors.secondary-container'));
+        }
+        .dark .progress-bar-fill {
+            background: linear-gradient(90deg, theme('colors.inverse-primary'), theme('colors.secondary-container'));
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background dark:bg-inverse-surface text-on-background dark:text-inverse-on-surface font-body-main antialiased selection:bg-secondary-container selection:text-on-secondary-container min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center h-16 px-margin-mobile w-full bg-surface dark:bg-inverse-surface transition-colors duration-300">
+<button aria-label="Go back" class="text-on-surface-variant dark:text-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<div class="font-headline-md text-headline-md text-primary dark:text-inverse-primary truncate px-4">
+            Lesson 3 of 8
+        </div>
+<button aria-hidden="true" class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full invisible">
+            Set Title
+        </button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-32 px-margin-mobile md:px-gutter max-w-container-max mx-auto w-full flex flex-col gap-lg">
+<!-- Progress Bar -->
+<div class="w-full max-w-2xl mx-auto mb-md">
+<div class="h-2 w-full bg-surface-container-highest dark:bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full progress-bar-fill w-[37.5%] rounded-full transition-all duration-500 ease-out"></div>
+</div>
+</div>
+<!-- Question Area -->
+<div class="w-full max-w-2xl mx-auto flex flex-col gap-md">
+<h1 class="font-headline-md text-headline-md text-primary dark:text-inverse-primary">
+                What is the primary benefit of horizontal sharding?
+            </h1>
+</div>
+<!-- Options Bento Grid -->
+<div class="w-full max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-md mt-md">
+<!-- Option 1: The user's incorrect choice -->
+<button class="group relative flex flex-col justify-between p-lg rounded-xl border border-error dark:border-error-container bg-error-container/20 dark:bg-[#3B1D1D] text-left transition-all duration-200 outline-none hover:opacity-90">
+<div class="flex items-start justify-between w-full mb-sm">
+<span class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant opacity-70">A</span>
+<span class="material-symbols-outlined text-error dark:text-error-container" style="font-variation-settings: 'FILL' 1;">cancel</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface dark:text-inverse-on-surface">
+                    It allows you to add more CPU and RAM to a single, powerful database server.
+                </p>
+</button>
+<!-- Option 2: Another incorrect option -->
+<button class="group relative flex flex-col justify-between p-lg rounded-xl border border-outline-variant dark:border-outline bg-surface dark:bg-[#34383D] text-left transition-all duration-200 outline-none opacity-50 cursor-not-allowed">
+<div class="flex items-start justify-between w-full mb-sm">
+<span class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant opacity-70">B</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface dark:text-inverse-on-surface">
+                    It encrypts data at rest automatically across multiple nodes.
+                </p>
+</button>
+<!-- Option 3: The correct option (subtly indicated) -->
+<button class="group relative flex flex-col justify-between p-lg rounded-xl border border-secondary-container dark:border-secondary-container bg-surface dark:bg-[#34383D] text-left transition-all duration-200 outline-none">
+<div class="flex items-start justify-between w-full mb-sm">
+<span class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant opacity-70">C</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface dark:text-inverse-on-surface">
+                    It distributes data across multiple machines to scale out capacity and throughput.
+                </p>
+</button>
+<!-- Option 4: Another incorrect option -->
+<button class="group relative flex flex-col justify-between p-lg rounded-xl border border-outline-variant dark:border-outline bg-surface dark:bg-[#34383D] text-left transition-all duration-200 outline-none opacity-50 cursor-not-allowed">
+<div class="flex items-start justify-between w-full mb-sm">
+<span class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant opacity-70">D</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface dark:text-inverse-on-surface">
+                    It reduces the overall storage requirements by compressing duplicate records.
+                </p>
+</button>
+</div>
+<!-- Nova Feedback Area (Error State) -->
+<div class="w-full max-w-2xl mx-auto mt-lg flex items-start gap-md p-md rounded-xl bg-error-container/10 border border-error/20 dark:border-error-container/30">
+<div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden bg-surface-container flex items-center justify-center border border-outline-variant dark:border-outline">
+<!-- Mascot Placeholder -->
+<div class="bg-cover bg-center w-full h-full" data-alt="A striking digital illustration of a sharp, geometric North Star mascot named Nova. The design features hairline strokes and high-contrast angles, avoiding any soft or bubbly characteristics. Rendered in a brutalist, corporate modern style with a dark mode aesthetic, using deep navy blues, crisp whites, and a vibrant lime accent glow. The mood is sharp, intellectual, and helpful." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDnJY0PwPZusgezwF-YsAv0NKvrhVuhB0cVI2DIyHRcbiWyM3rwLG8KNDxvBO4cv2aP7ZsizLdSC7sP_YobXXCeBBBvLIQ4mGt4U9zHGaNa22lpmlVFW0Q1wM3KBPT_g8n9gCyAiiXtCb6rhbPOOQApliFDENlDC3NXvuZv8YozyPRFb1gYES0EF5TorGd8r8jySzFLzhE1af5l8uQ-OcD-OlewXHcg_msnmk26gQ_st3qvp1nfC0jT')"></div>
+</div>
+<div class="flex-grow flex flex-col">
+<span class="font-label-ui text-label-ui text-on-surface-variant dark:text-surface-variant mb-base">Nova</span>
+<p class="font-body-main text-body-main text-on-surface dark:text-inverse-on-surface">
+                    Not quite. While vertical scaling adds more power to one machine, horizontal sharding distributes the load across many machines.
+                </p>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar (Contextual FAB Replacement for Transactional/Lesson Screen) -->
+<div class="fixed bottom-0 left-0 w-full p-margin-mobile md:p-lg bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-md border-t border-outline-variant dark:border-outline flex justify-center z-40">
+<div class="w-full max-w-2xl flex gap-md">
+<button class="flex-grow bg-transparent border border-error dark:border-error-container text-error dark:text-error-container font-label-ui text-label-ui py-sm px-lg rounded-full hover:bg-error-container/10 transition-colors active:scale-95 text-center flex items-center justify-center h-12">
+                Try again
+            </button>
+<button class="flex-grow bg-primary dark:bg-inverse-primary text-on-primary dark:text-primary font-label-ui text-label-ui py-sm px-lg rounded-full hover:opacity-90 transition-opacity active:scale-95 text-center flex items-center justify-center h-12">
+                Continue
+            </button>
+</div>
+</div>
+</body></html>

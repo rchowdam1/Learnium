@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Design for Scale - Learning Path</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#73777c",
+                    "inverse-on-surface": "#eef1f8",
+                    "surface-container-highest": "#e0e2ea",
+                    "on-secondary-container": "#457000",
+                    "background": "#f8f9ff",
+                    "tertiary-container": "#3a2200",
+                    "surface-dim": "#d7dae1",
+                    "secondary-fixed-dim": "#91db2a",
+                    "surface": "#f8f9ff",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4c9dc",
+                    "secondary-container": "#acf847",
+                    "secondary-fixed": "#acf847",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#142937",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#416900",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f1f3fb",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-variant": "#e0e2ea",
+                    "on-background": "#181c21",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#354958",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-container": "#7c91a2",
+                    "inverse-primary": "#b4c9dc",
+                    "inverse-surface": "#2d3136",
+                    "tertiary": "#1e0f00",
+                    "surface-tint": "#4c6171",
+                    "primary-fixed": "#d0e5f8",
+                    "on-primary-fixed": "#071e2b",
+                    "surface-container": "#ebeef5",
+                    "primary": "#001421",
+                    "on-surface": "#181c21",
+                    "on-surface-variant": "#43474b",
+                    "outline-variant": "#c3c7cc",
+                    "surface-container-high": "#e5e8f0",
+                    "on-tertiary-container": "#c77e00",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#102000",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-secondary-fixed-variant": "#304f00",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1200px",
+                    "xl": "32px",
+                    "margin-mobile": "16px",
+                    "sm": "12px",
+                    "lg": "24px",
+                    "xs": "8px",
+                    "md": "16px",
+                    "xxl": "48px",
+                    "base": "4px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-main": [
+                            "Inter", "sans-serif"
+                    ],
+                    "label-ui": [
+                            "Space Grotesk", "sans-serif"
+                    ],
+                    "data-tabular": [
+                            "Space Grotesk", "sans-serif"
+                    ],
+                    "display-lg-mobile": [
+                            "Bricolage Grotesque", "sans-serif"
+                    ],
+                    "display-lg": [
+                            "Bricolage Grotesque", "sans-serif"
+                    ],
+                    "headline-md": [
+                            "Bricolage Grotesque", "sans-serif"
+                    ]
+            },
+            "fontSize": {
+                    "body-main": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-ui": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "data-tabular": [
+                            "18px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "36px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(20, 41, 55, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(20, 41, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(20, 41, 55, 0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest font-body-main text-on-surface flex flex-col min-h-screen">
+<!-- Top Area -->
+<header class="sticky top-0 z-20 bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-variant px-margin-mobile py-sm">
+<div class="flex items-center justify-between mb-xs">
+<h1 class="font-headline-md text-headline-md text-primary">System Design for Scale</h1>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-ui text-label-ui text-on-surface-variant uppercase tracking-wider">Lesson 3 of 8</span>
+<span class="font-data-tabular text-data-tabular text-secondary-fixed-dim">40% Complete</span>
+</div>
+<div class="w-full bg-surface-variant h-2 rounded-full mt-sm overflow-hidden">
+<div class="bg-secondary-fixed-dim h-full rounded-full transition-all duration-1000" style="width: 40%;"></div>
+</div>
+</header>
+<!-- Main Content: Zig-Zag Path -->
+<main class="flex-1 relative overflow-x-hidden pb-[120px] pt-lg">
+<!-- SVG Connecting Lines -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0" style="min-height: 800px;">
+<!-- Completed Line (Node 1 to 2) -->
+<path d="M 50% 80 Q 20% 160 20% 240" fill="none" stroke="#91db2a" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<!-- Completed Line (Node 2 to 3) -->
+<path d="M 20% 240 Q 80% 320 80% 400" fill="none" stroke="#91db2a" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<!-- Incomplete Line (Node 3 to 4) -->
+<path d="M 80% 400 Q 20% 480 20% 560" fill="none" stroke="#e0e2ea" stroke-dasharray="12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<!-- Incomplete Line (Node 4 to 5) -->
+<path d="M 20% 560 Q 50% 640 50% 720" fill="none" stroke="#e0e2ea" stroke-dasharray="12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+</svg>
+<div class="relative z-10 flex flex-col items-center gap-[100px] py-xl max-w-[400px] mx-auto w-full px-margin-mobile">
+<!-- Lesson 1: Fundamentals (Completed) -->
+<div class="w-full flex justify-center translate-x-0 relative group cursor-pointer">
+<div class="absolute -top-8 bg-surface-container-high px-3 py-1 rounded-full text-xs font-label-ui text-on-surface opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm">Fundamentals</div>
+<button class="w-[80px] h-[80px] rounded-full bg-secondary-fixed-dim border-b-8 border-[#75b022] active:border-b-0 active:translate-y-2 flex items-center justify-center transition-all shadow-lg hover:brightness-110">
+<span class="material-symbols-outlined text-4xl text-on-secondary" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+</div>
+<!-- Lesson 2: Horizontal Scaling (Completed) -->
+<div class="w-full flex justify-start pl-8 relative group cursor-pointer">
+<div class="absolute -top-8 left-6 bg-surface-container-high px-3 py-1 rounded-full text-xs font-label-ui text-on-surface opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm">Horizontal Scaling</div>
+<button class="w-[80px] h-[80px] rounded-full bg-secondary-fixed-dim border-b-8 border-[#75b022] active:border-b-0 active:translate-y-2 flex items-center justify-center transition-all shadow-lg hover:brightness-110">
+<span class="material-symbols-outlined text-4xl text-on-secondary" style="font-variation-settings: 'FILL' 1;">check</span>
+</button>
+</div>
+<!-- Lesson 3: Load Balancing (Active) -->
+<div class="w-full flex justify-end pr-8 relative group cursor-pointer">
+<div class="absolute -top-10 right-2 bg-primary-container text-on-primary px-4 py-2 rounded-xl text-sm font-label-ui whitespace-nowrap shadow-md">Load Balancing</div>
+<!-- Progress Ring for Active -->
+<div class="relative w-[100px] h-[100px] flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full -rotate-90">
+<circle cx="50" cy="50" fill="none" r="46" stroke="#e0e2ea" stroke-width="8"></circle>
+<circle class="transition-all duration-1000" cx="50" cy="50" fill="none" r="46" stroke="#91db2a" stroke-dasharray="289" stroke-dashoffset="144" stroke-width="8"></circle>
+</svg>
+<button class="w-[80px] h-[80px] rounded-full bg-primary-container border-b-8 border-[#0c1922] active:border-b-0 active:translate-y-2 flex items-center justify-center transition-all pulse-glow hover:brightness-110 z-10">
+<span class="material-symbols-outlined text-4xl text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Lesson 4: Database Sharding (Locked) -->
+<div class="w-full flex justify-start pl-8 relative group cursor-not-allowed">
+<div class="absolute -top-8 left-6 bg-surface-container-high px-3 py-1 rounded-full text-xs font-label-ui text-on-surface opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm">Database Sharding</div>
+<button class="w-[80px] h-[80px] rounded-full bg-surface-variant border-b-8 border-outline-variant flex items-center justify-center transition-all opacity-80 cursor-not-allowed">
+<span class="material-symbols-outlined text-4xl text-outline" style="font-variation-settings: 'FILL' 1;">lock</span>
+</button>
+</div>
+<!-- Lesson 5: Caching (Locked) -->
+<div class="w-full flex justify-center translate-x-0 relative group cursor-not-allowed pb-xxl">
+<div class="absolute -top-8 bg-surface-container-high px-3 py-1 rounded-full text-xs font-label-ui text-on-surface opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm">Caching</div>
+<button class="w-[80px] h-[80px] rounded-full bg-surface-variant border-b-8 border-outline-variant flex items-center justify-center transition-all opacity-80 cursor-not-allowed">
+<span class="material-symbols-outlined text-4xl text-outline" style="font-variation-settings: 'FILL' 1;">lock</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Floating Study Buddy -->
+<div class="fixed bottom-[90px] right-margin-mobile z-30">
+<button class="flex items-center gap-xs bg-primary-container hover:bg-primary text-on-primary px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">robot_2</span>
+<span class="font-label-ui text-sm">Study Buddy</span>
+</button>
+</div>
+<!-- Shared Bottom Nav Bar -->
+<div class="fixed bottom-0 left-0 w-full z-40 bg-surface-container-lowest border-t border-surface-variant">
+<div class="flex gap-2 px-4 pb-3 pt-2 max-w-md mx-auto">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-primary" href="#">
+<div class="flex h-8 items-center justify-center text-secondary-fixed-dim bg-primary-container w-12 rounded-full" data-icon="auto_stories" data-size="24px" data-weight="fill">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+<p class="text-xs font-label-ui leading-normal tracking-[0.015em]">Learn</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<div class="flex h-8 items-center justify-center" data-icon="exercise" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">exercise</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Practice</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<div class="flex h-8 items-center justify-center" data-icon="emoji_events" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">emoji_events</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Leaderboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<div class="flex h-8 items-center justify-center" data-icon="person" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Profile</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<div class="flex h-8 items-center justify-center" data-icon="settings" data-size="24px" data-weight="regular">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+</a>
+</div>
+</div>
+</body></html>

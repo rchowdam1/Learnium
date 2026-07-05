@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Learnium - Home Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#73777c",
+                        "background": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "surface-container-low": "#f1f3fb",
+                        "on-secondary-fixed": "#102000",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#4c6171",
+                        "on-primary-fixed-variant": "#354958",
+                        "primary-container": "#142937",
+                        "on-primary-container": "#7c91a2",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "tertiary-container": "#3a2200",
+                        "on-tertiary-container": "#c77e00",
+                        "on-secondary-container": "#457000",
+                        "surface-container-high": "#e5e8f0",
+                        "surface-container": "#ebeef5",
+                        "secondary": "#416900",
+                        "on-surface": "#181c21",
+                        "surface-dim": "#d7dae1",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e2ea",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "secondary-fixed": "#acf847",
+                        "on-primary-fixed": "#071e2b",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "outline-variant": "#c3c7cc",
+                        "tertiary-fixed": "#ffddb8",
+                        "inverse-on-surface": "#eef1f8",
+                        "surface-variant": "#e0e2ea",
+                        "primary": "#001421",
+                        "on-surface-variant": "#43474b",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2d3136",
+                        "inverse-primary": "#b4c9dc",
+                        "secondary-fixed-dim": "#91db2a",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#d0e5f8",
+                        "on-background": "#181c21",
+                        "tertiary": "#1e0f00",
+                        "secondary-container": "#acf847",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "xs": "8px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "lg": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "data-tabular": ["Space Grotesk", "sans-serif"],
+                        "display-lg-mobile": ["Bricolage Grotesque", "sans-serif"],
+                        "display-lg": ["Bricolage Grotesque", "sans-serif"],
+                        "headline-md": ["Bricolage Grotesque", "sans-serif"],
+                        "body-main": ["Inter", "sans-serif"],
+                        "label-ui": ["Space Grotesk", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-main antialiased pt-safe">
+<!-- TopAppBar -->
+<header class="bg-surface-bright dark:bg-inverse-surface fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline flat no shadows">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-container-max mx-auto pt-safe">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary">Learnium</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-1 font-data-tabular text-data-tabular text-[#84CC16]">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span>1.2k</span>
+</div>
+<div class="flex items-center gap-1 font-data-tabular text-data-tabular text-[#F59E0B]">
+<span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+<span>12</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto mt-16 mb-24 max-w-container-max mx-auto w-full px-margin-mobile md:px-lg py-lg space-y-xl">
+<!-- Daily Goal Ring -->
+<section class="flex flex-col items-center justify-center py-lg bg-surface border border-outline-variant rounded-xl p-md md:p-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-surface-bright to-surface-container-low opacity-50 z-0 pointer-events-none"></div>
+<div class="relative z-10 w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 120 120">
+<circle class="text-surface-variant stroke-current" cx="60" cy="60" fill="transparent" r="54" stroke-width="8"></circle>
+<circle class="text-primary stroke-current progress-ring__circle" cx="60" cy="60" fill="transparent" r="54" stroke-dasharray="339.292" stroke-dashoffset="186.61" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center">
+<span class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary">45%</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant uppercase mt-1">Daily Goal</span>
+</div>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant text-center mt-md max-w-[280px] relative z-10">
+                You're on track. Complete 2 more modules to hit today's target.
+            </p>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md md:gap-gutter">
+<!-- Reviews Due Card -->
+<article class="bg-surface border border-outline-variant rounded-xl p-md md:p-lg flex flex-col justify-between hover:border-primary transition-colors h-full">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">rebase_edit</span>
+<h2 class="font-headline-md text-headline-md text-primary">Reviews due</h2>
+</div>
+<span class="bg-error-container text-on-error-container font-data-tabular text-data-tabular px-2 py-1 rounded-DEFAULT">24</span>
+</div>
+<p class="font-body-main text-body-main text-on-surface-variant mb-xl">
+                        Spaced repetition items are waiting. Keeping your memory fresh is critical for long-term retention.
+                    </p>
+</div>
+<button class="w-full bg-secondary-fixed text-on-secondary-fixed font-label-ui text-label-ui py-sm px-md rounded-DEFAULT hover:bg-secondary-fixed-dim transition-colors flex items-center justify-center gap-xs">
+                    Start review
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</article>
+<!-- Continue Learning Card -->
+<article class="bg-surface border border-outline-variant rounded-xl p-md md:p-lg flex flex-col justify-between hover:border-primary transition-colors h-full">
+<div>
+<div class="flex items-center gap-xs mb-md">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+<h2 class="font-headline-md text-headline-md text-primary">Continue learning</h2>
+</div>
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-sm mb-lg">
+<h3 class="font-label-ui text-label-ui text-primary mb-1">System Design for Scale</h3>
+<p class="font-body-main text-body-main text-on-surface-variant text-sm mb-sm truncate">Module 3: Database Sharding Strategies</p>
+<div class="w-full bg-surface-variant h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[68%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center mt-2">
+<span class="font-data-tabular text-data-tabular text-on-surface-variant text-xs">68%</span>
+<span class="font-label-ui text-label-ui text-on-surface-variant text-xs">Est. 12m remaining</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-ui text-label-ui py-sm px-md rounded-DEFAULT hover:bg-primary-container transition-colors flex items-center justify-center gap-xs">
+                    Resume
+                    <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+</button>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface-container-lowest dark:bg-surface-container-low fixed bottom-0 w-full z-50 border-t border-outline-variant dark:border-outline flat no shadows fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-safe px-2">
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl px-4 py-1 hover:text-primary dark:hover:text-inverse-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary dark:hover:text-inverse-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary dark:hover:text-inverse-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">rebase_edit</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary dark:hover:text-inverse-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Leagues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-4 py-1 hover:text-primary dark:hover:text-inverse-primary transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-ui text-label-ui mt-1 text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

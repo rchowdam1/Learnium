@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Learning Path</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#181c21",
+                      "background": "#f8f9ff",
+                      "on-background": "#181c21",
+                      "surface-variant": "#e0e2ea",
+                      "secondary-fixed": "#acf847",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "primary-container": "#142937",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#071e2b",
+                      "on-secondary-fixed-variant": "#304f00",
+                      "secondary-container": "#acf847",
+                      "surface-dim": "#d7dae1",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "on-secondary-container": "#457000",
+                      "primary-fixed": "#d0e5f8",
+                      "error": "#ba1a1a",
+                      "error-container": "#ffdad6",
+                      "tertiary-container": "#3a2200",
+                      "on-surface-variant": "#43474b",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#354958",
+                      "tertiary-fixed": "#ffddb8",
+                      "secondary-fixed-dim": "#91db2a",
+                      "surface": "#f8f9ff",
+                      "primary-fixed-dim": "#b4c9dc",
+                      "outline": "#73777c",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#102000",
+                      "surface-container-low": "#f1f3fb",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#b4c9dc",
+                      "on-primary-container": "#7c91a2",
+                      "surface-container-high": "#e5e8f0",
+                      "surface-container-highest": "#e0e2ea",
+                      "surface-container": "#ebeef5",
+                      "outline-variant": "#c3c7cc",
+                      "surface-tint": "#4c6171",
+                      "on-tertiary-fixed": "#2a1700",
+                      "on-tertiary-container": "#c77e00",
+                      "surface-bright": "#f8f9ff",
+                      "primary": "#001421",
+                      "on-secondary": "#ffffff",
+                      "inverse-surface": "#2d3136",
+                      "secondary": "#416900",
+                      "tertiary": "#1e0f00",
+                      "inverse-on-surface": "#eef1f8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "gutter": "24px",
+                      "sm": "12px",
+                      "xl": "32px",
+                      "xxl": "48px",
+                      "md": "16px",
+                      "xs": "8px",
+                      "lg": "24px",
+                      "container-max": "1200px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-main": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Bricolage Grotesque"
+                      ],
+                      "data-tabular": [
+                              "Space Grotesk"
+                      ],
+                      "label-ui": [
+                              "Space Grotesk"
+                      ],
+                      "display-lg-mobile": [
+                              "Bricolage Grotesque"
+                      ],
+                      "headline-md": [
+                              "Bricolage Grotesque"
+                      ]
+              },
+              "fontSize": {
+                      "body-main": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "data-tabular": [
+                              "18px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-ui": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .node-completed {
+            background-color: #84CC16;
+            color: #000000;
+        }
+        .node-active {
+            background-color: #ffffff;
+            color: #142937;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            border: 2px solid #84CC16;
+        }
+        .node-locked {
+            background-color: #374151;
+            color: #9CA3AF;
+        }
+        .line-completed {
+            background-color: #84CC16;
+        }
+        .line-locked {
+            background-color: #374151;
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-main antialiased pb-24">
+<!-- Top Navigation Area -->
+<header class="w-full sticky top-0 bg-black/90 backdrop-blur-md z-40 px-margin-mobile py-sm border-b border-[#374151]">
+<div class="flex justify-between items-center max-w-container-max mx-auto w-full">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary-fixed">star</span>
+<span class="font-headline-md text-headline-md text-white">Learnium</span>
+</div>
+<div class="flex gap-sm">
+<!-- Example of top nav links for web, hidden on mobile -->
+<nav class="hidden md:flex gap-lg items-center">
+<a class="font-label-ui text-label-ui text-surface-variant hover:text-white transition-colors" href="#">Home</a>
+<a class="font-label-ui text-label-ui text-secondary-fixed" href="#">Learn</a>
+<a class="font-label-ui text-label-ui text-surface-variant hover:text-white transition-colors" href="#">Review</a>
+<a class="font-label-ui text-label-ui text-surface-variant hover:text-white transition-colors" href="#">Leagues</a>
+<a class="font-label-ui text-label-ui text-surface-variant hover:text-white transition-colors" href="#">Profile</a>
+</nav>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile pt-xl md:pt-xxl flex flex-col gap-xl">
+<!-- Header Section -->
+<section class="flex flex-col gap-sm">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white">System Design for Scale</h1>
+<p class="font-body-main text-body-main text-surface-variant max-w-2xl">
+                Mastering distributed architectures, caching strategies, and database sharding for high-traffic applications.
+            </p>
+<!-- Progress Bar -->
+<div class="mt-sm flex flex-col gap-xs max-w-md">
+<div class="flex justify-between items-center">
+<span class="font-label-ui text-label-ui text-surface-variant uppercase">Overall Progress</span>
+<span class="font-data-tabular text-data-tabular text-secondary-fixed">40%</span>
+</div>
+<div class="w-full h-base bg-[#374151] rounded-full overflow-hidden">
+<div class="h-full line-completed rounded-full" style="width: 40%;"></div>
+</div>
+</div>
+</section>
+<!-- Vertical Roadmap -->
+<section class="relative mt-lg pb-xl">
+<!-- Continuous Line connecting nodes -->
+<div class="absolute left-6 md:left-[3.25rem] top-8 bottom-8 w-1 flex flex-col z-0">
+<div class="h-2/5 w-full line-completed"></div>
+<div class="h-1/5 w-full bg-gradient-to-b from-[#84CC16] to-[#374151]"></div>
+<div class="h-2/5 w-full line-locked"></div>
+</div>
+<!-- Nodes Container -->
+<div class="flex flex-col gap-xl relative z-10">
+<!-- Node 1: Completed -->
+<div class="flex items-center gap-md md:gap-lg group cursor-pointer hover:-translate-y-1 transition-transform duration-200">
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex-shrink-0 flex items-center justify-center node-completed shadow-lg">
+<span class="material-symbols-outlined text-2xl md:text-3xl" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-surface-variant uppercase mb-1">Module 1</span>
+<h3 class="font-headline-md text-headline-md text-white group-hover:text-secondary-fixed transition-colors">Fundamentals</h3>
+</div>
+</div>
+<!-- Node 2: Completed -->
+<div class="flex items-center gap-md md:gap-lg group cursor-pointer hover:-translate-y-1 transition-transform duration-200">
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex-shrink-0 flex items-center justify-center node-completed shadow-lg">
+<span class="material-symbols-outlined text-2xl md:text-3xl" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-surface-variant uppercase mb-1">Module 2</span>
+<h3 class="font-headline-md text-headline-md text-white group-hover:text-secondary-fixed transition-colors">Load Balancing</h3>
+</div>
+</div>
+<!-- Node 3: Active -->
+<div class="flex items-center gap-md md:gap-lg group cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-md -ml-md rounded-xl border border-[#374151] bg-[#111827]">
+<div class="relative flex-shrink-0">
+<svg class="w-16 h-16 md:w-20 md:h-20 -rotate-90 absolute -inset-2 md:-inset-2" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#374151" stroke-width="4"></circle>
+<circle cx="50" cy="50" fill="none" r="45" stroke="#84CC16" stroke-dasharray="283" stroke-dashoffset="113" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center node-active z-10 relative">
+<span class="material-symbols-outlined text-2xl md:text-3xl">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-secondary-fixed uppercase mb-1 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+                            Active Module
+                        </span>
+<h3 class="font-headline-md text-headline-md text-white">Database Sharding</h3>
+<p class="font-body-main text-body-main text-surface-variant mt-2 max-w-sm hidden md:block">
+                            Learn how to distribute data across multiple machines to handle large scale operations effectively.
+                        </p>
+</div>
+</div>
+<!-- Node 4: Locked -->
+<div class="flex items-center gap-md md:gap-lg opacity-70">
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex-shrink-0 flex items-center justify-center node-locked">
+<span class="material-symbols-outlined text-2xl md:text-3xl">lock</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-surface-variant uppercase mb-1">Module 4</span>
+<h3 class="font-headline-md text-headline-md text-surface-variant">Caching Layers</h3>
+</div>
+</div>
+<!-- Node 5: Locked -->
+<div class="flex items-center gap-md md:gap-lg opacity-70">
+<div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex-shrink-0 flex items-center justify-center node-locked">
+<span class="material-symbols-outlined text-2xl md:text-3xl">lock</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-ui text-label-ui text-surface-variant uppercase mb-1">Module 5</span>
+<h3 class="font-headline-md text-headline-md text-surface-variant">Microservices</h3>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 border-t border-[#374151] bg-[#111827]">
+<div class="fixed bottom-0 w-full flex justify-around items-center py-2 px-2 bg-surface dark:bg-surface-container-low">
+<a class="flex flex-col items-center justify-center text-[#9CA3AF] px-3 py-1 hover:bg-[#374151] rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-ui text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-ui text-[10px]">Learn</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#9CA3AF] px-3 py-1 hover:bg-[#374151] rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">menu_book</span>
+<span class="font-label-ui text-[10px]">Review</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#9CA3AF] px-3 py-1 hover:bg-[#374151] rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">workspace_premium</span>
+<span class="font-label-ui text-[10px]">Leagues</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#9CA3AF] px-3 py-1 hover:bg-[#374151] rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-ui text-[10px]">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

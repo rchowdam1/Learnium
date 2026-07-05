@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Learnium - Milestone Share Card</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&amp;family=Inter:wght@400..700&amp;family=Space+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-background": "#181c21",
+                    "primary-fixed-dim": "#b4c9dc",
+                    "primary": "#001421",
+                    "on-secondary-fixed-variant": "#304f00",
+                    "surface-tint": "#4c6171",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface": "#181c21",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#acf847",
+                    "on-secondary-fixed": "#102000",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-low": "#f1f3fb",
+                    "on-secondary-container": "#457000",
+                    "on-primary": "#ffffff",
+                    "background": "#f8f9ff",
+                    "on-tertiary-container": "#c77e00",
+                    "outline": "#73777c",
+                    "surface-container-highest": "#e0e2ea",
+                    "surface-dim": "#d7dae1",
+                    "primary-fixed": "#d0e5f8",
+                    "on-primary-container": "#7c91a2",
+                    "surface-variant": "#e0e2ea",
+                    "outline-variant": "#c3c7cc",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#43474b",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#eef1f8",
+                    "on-primary-fixed-variant": "#354958",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "tertiary-container": "#3a2200",
+                    "secondary-container": "#acf847",
+                    "surface": "#f8f9ff",
+                    "inverse-primary": "#b4c9dc",
+                    "tertiary": "#1e0f00",
+                    "primary-container": "#142937",
+                    "surface-container-high": "#e5e8f0",
+                    "secondary": "#416900",
+                    "secondary-fixed-dim": "#91db2a",
+                    "surface-container": "#ebeef5",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "inverse-surface": "#2d3136",
+                    "on-primary-fixed": "#071e2b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "margin-mobile": "16px",
+                    "lg": "24px",
+                    "container-max": "1200px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "sm": "12px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": [
+                            "Bricolage Grotesque"
+                    ],
+                    "display-lg": [
+                            "Bricolage Grotesque"
+                    ],
+                    "label-ui": [
+                            "Space Grotesk"
+                    ],
+                    "body-main": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Bricolage Grotesque"
+                    ],
+                    "data-tabular": [
+                            "Space Grotesk"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg-mobile": [
+                            "36px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.04em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "label-ui": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-main": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "data-tabular": [
+                            "18px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Ambient Shadow Custom Class */
+        .ambient-shadow {
+            box-shadow: 0 20px 40px -10px rgba(0, 20, 33, 0.15); /* Tinted with Brand Navy (primary) */
+        }
+        .starburst-bg {
+            background: radial-gradient(circle at center, rgba(172, 248, 71, 0.2) 0%, rgba(248, 249, 255, 0) 70%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center p-lg font-body-main antialiased selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- Share Card Container -->
+<div class="relative w-full max-w-sm bg-surface rounded-[24px] border border-outline-variant ambient-shadow overflow-hidden flex flex-col items-center p-xl gap-xl text-center">
+<!-- Subtle Grid Background Pattern (Brutalist Edge) -->
+<div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(#001421 1px, transparent 1px); background-size: 16px 16px;"></div>
+<!-- Header: Logo & Context -->
+<div class="flex flex-col items-center gap-xs z-10 w-full relative">
+<div class="flex items-center gap-base text-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-headline-md text-headline-md tracking-tight">Learnium</span>
+</div>
+<div class="bg-surface-variant text-on-surface-variant font-label-ui text-label-ui px-sm py-base rounded-full border border-outline-variant mt-sm">
+                Milestone Reached
+            </div>
+</div>
+<!-- Center: Badge & Mascot -->
+<div class="relative w-full flex items-center justify-center py-lg starburst-bg z-10">
+<!-- Geometric Star Mascot (Nova proxy) -->
+<div class="absolute -top-4 -right-2 text-secondary-fixed animate-pulse drop-shadow-md">
+<span class="material-symbols-outlined text-xxl" data-icon="sparkle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">spark</span>
+</div>
+<div class="absolute bottom-0 -left-4 text-tertiary-fixed-dim opacity-70">
+<span class="material-symbols-outlined text-xl" data-icon="auto_awesome" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<!-- Main Badge -->
+<div class="bg-primary text-on-primary rounded-[24px] border border-outline-variant w-48 h-48 flex flex-col items-center justify-center shadow-lg relative transform rotate-[-2deg] transition-transform hover:rotate-0 duration-300">
+<span class="font-label-ui text-label-ui text-primary-fixed-dim uppercase tracking-wider mb-2">Level</span>
+<span class="font-display-lg text-display-lg text-secondary-fixed leading-none">6</span>
+</div>
+</div>
+<!-- Typography: User Achievement -->
+<div class="z-10 w-full px-md">
+<h2 class="font-headline-md text-headline-md text-primary balance">
+                Priya reached Level 6 on Learnium
+            </h2>
+</div>
+<!-- Bottom Stats -->
+<div class="z-10 flex items-center justify-center gap-md w-full pt-md border-t border-outline-variant">
+<!-- Streak -->
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="local_fire_department" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">12-Day Streak</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<!-- XP -->
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-secondary-fixed" data-icon="bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">4,250 Total XP</span>
+</div>
+</div>
+</div>
+</body></html>

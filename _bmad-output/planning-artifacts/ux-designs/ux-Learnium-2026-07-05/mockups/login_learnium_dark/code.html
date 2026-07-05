@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - Learnium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&amp;family=Inter:wght@400&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#43474b",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b4c9dc",
+                        "inverse-on-surface": "#eef1f8",
+                        "secondary-fixed-dim": "#91db2a",
+                        "on-surface": "#181c21",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#3a2200",
+                        "inverse-primary": "#b4c9dc",
+                        "outline-variant": "#c3c7cc",
+                        "on-primary-fixed-variant": "#354958",
+                        "surface-container-highest": "#e0e2ea",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e2ea",
+                        "secondary-fixed": "#acf847",
+                        "outline": "#73777c",
+                        "surface-dim": "#d7dae1",
+                        "primary-container": "#142937",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#304f00",
+                        "on-primary-fixed": "#071e2b",
+                        "secondary": "#416900",
+                        "primary": "#001421",
+                        "primary-fixed": "#d0e5f8",
+                        "on-secondary-fixed": "#102000",
+                        "on-primary-container": "#7c91a2",
+                        "inverse-surface": "#2d3136",
+                        "surface-tint": "#4c6171",
+                        "surface-container": "#ebeef5",
+                        "on-tertiary-container": "#c77e00",
+                        "surface-container-low": "#f1f3fb",
+                        "on-secondary": "#ffffff",
+                        "background": "#000000", /* Pure black for this screen as requested */
+                        "on-secondary-container": "#457000",
+                        "tertiary-fixed": "#ffddb8",
+                        "secondary-container": "#acf847",
+                        "on-background": "#ffffff",
+                        "surface-container-high": "#e5e8f0",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface": "#111111", /* Dark surface for card */
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "tertiary": "#1e0f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xxl": "48px",
+                        "gutter": "24px",
+                        "xl": "32px",
+                        "sm": "12px",
+                        "container-max": "1200px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-main": ["Inter"],
+                        "label-ui": ["Space Grotesk"],
+                        "headline-md": ["Bricolage Grotesque"],
+                        "display-lg-mobile": ["Bricolage Grotesque"],
+                        "display-lg": ["Bricolage Grotesque"],
+                        "data-tabular": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-main": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-ui": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "data-tabular": ["18px", { "lineHeight": "1", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .input-hairline {
+                @apply border border-[#1C2530] bg-transparent focus:border-secondary-container focus:ring-0 focus:outline-none transition-colors duration-200;
+            }
+            .muted-text {
+                @apply text-[#8B98A5] hover:text-white transition-colors duration-200;
+            }
+            .inverted-btn {
+                @apply bg-white text-black hover:bg-gray-200 active:scale-95 transition-all duration-200;
+            }
+            .google-btn {
+                @apply bg-transparent border border-[#1C2530] text-white hover:bg-[#1C2530] active:scale-95 transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-secondary-container selection:text-black">
+<!-- Transactional Screen - No Global Nav Required -->
+<main class="flex-grow flex items-center justify-center p-margin-mobile">
+<div class="w-full max-w-md w-full bg-surface border border-[#1C2530] rounded-xl p-xl shadow-2xl relative overflow-hidden">
+<!-- Logo Section -->
+<div class="flex flex-col items-center justify-center mb-xl">
+<img alt="Learnium Logo" class="w-16 h-16 object-contain mb-md" src="https://lh3.googleusercontent.com/aida/AP1WRLtQkp1rw6D1TiQYd9kKBvMbev7SVmNprc5P_woFbRRJ0bKrsNejFem8m2FXrcokJ_So9ISrkkaK469DoqNjsgsnGMr0hF59Z8e63-LEAYIpik89rA3ETqECBh6Lr1zBTpUX4sHAbACbyRJR7S64nVU5zFhotxREyvRzz7BGmQogBEK1AzjgkpirjoWDfzv9w8zsjB-MpWRTXVg7gvwusoFZ_Kz4dkr_ZtcfACOEPH_7d76yLpFRI7yktTE"/>
+<h1 class="font-headline-md text-headline-md text-center tracking-tighter">Welcome back.</h1>
+<p class="font-body-main text-body-main text-[#8B98A5] mt-xs text-center">Adult learning, evolved.</p>
+</div>
+<form class="space-y-gutter flex flex-col w-full">
+<!-- Email Input -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-ui text-label-ui text-[#8B98A5]" for="email">Email</label>
+<input class="w-full px-md py-sm rounded input-hairline font-body-main text-body-main text-white placeholder-[#43474b]" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+<!-- Password Input -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center w-full">
+<label class="font-label-ui text-label-ui text-[#8B98A5]" for="password">Password</label>
+<a class="font-label-ui text-label-ui muted-text" href="#">Forgot password?</a>
+</div>
+<div class="relative w-full">
+<input class="w-full px-md py-sm rounded input-hairline font-body-main text-body-main text-white placeholder-[#43474b]" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 pr-sm flex items-center text-[#8B98A5] hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Log In Button -->
+<button class="w-full py-sm px-md rounded inverted-btn font-label-ui text-label-ui mt-md flex justify-center items-center gap-xs" type="submit">
+                    Log in
+                    <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<!-- Divider -->
+<div class="flex items-center w-full my-md">
+<div class="flex-grow border-t border-[#1C2530]"></div>
+<span class="px-sm font-label-ui text-label-ui text-[#8B98A5]">OR</span>
+<div class="flex-grow border-t border-[#1C2530]"></div>
+</div>
+<!-- Google Button -->
+<button class="w-full py-sm px-md rounded google-btn font-label-ui text-label-ui flex justify-center items-center gap-xs" type="button">
+<svg class="w-4 h-4 mr-2" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                    Continue with Google
+                </button>
+</form>
+<div class="mt-xl text-center w-full">
+<p class="font-body-main text-body-main text-[#8B98A5]">
+                    Don't have an account? <a class="font-label-ui text-label-ui text-white underline hover:text-secondary-container transition-colors duration-200" href="#">Create account</a>
+</p>
+</div>
+</div>
+</main>
+</body></html>
