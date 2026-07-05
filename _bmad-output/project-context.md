@@ -2,9 +2,10 @@
 project_name: 'Learnium'
 user_name: 'Arnav'
 date: '2026-07-05'
-sections_completed: ['technology_stack']
-# next: language_specific_rules
-existing_patterns_found: 12
+sections_completed: ['technology_stack', 'language_specific_rules', 'framework_specific_rules', 'testing_rules', 'code_quality_rules', 'workflow_rules', 'critical_dont_miss_rules']
+status: 'complete'
+rule_count: 25
+optimized_for_llm: true
 ---
 
 # Project Context for AI Agents
@@ -25,4 +26,67 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ## Critical Implementation Rules
 
-_Documented after discovery phase_
+### Language-Specific Rules
+
+- `strict: true` in `tsconfig.json` — do not add `any` or loosen strictness to silence errors
+- Use path alias `@/*` (maps to project root) instead of relative `../../` chains
+- Named exports only — no default exports in `lib/`, `actions/`, or API routes
+- Two Supabase client factories, do not conflate: `lib/supabase.ts` `createSupabaseClient()` (browser) vs `lib/server.ts` `createClient()` (server, async, cookie-based)
+- Never throw for expected failure paths. Pattern: destructure `{ data, error }` from every Supabase call, `if (error)` → `console.log` message + early return
+  - API routes return `NextResponse.json({ success: false, message }, { status })`
+  - Server actions in `actions/*.ts` return `false`
+- Success responses keep the same envelope: `{ success: true, ... }` (routes) or a truthy typed object (actions) — don't introduce thrown exceptions or a different response shape
+
+### Framework-Specific Rules
+
+- API routes live at `app/api/<kebab-case-action>/route.ts`, one per verb-style action (e.g. `get-buddies`, `mark-lesson-complete`) — not grouped as RESTful resources. Follow this naming for new endpoints.
+- `middleware.ts` `protectedPaths` array is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
+- Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy}`, not by feature — place new components in the matching role folder
+- Next.js ↔ Python RAG service boundary: communication only via `fetch("http://localhost:8000/api/...")`, no shared types — mirror any schema change (e.g. `OutputSchema`) manually in `rag/main.py`'s Pydantic models
+- New RAG endpoints should check the semantic cache (`rag/scache.py`, Redis LangCache) before calling the LLM, matching the pattern in `/api/chat`
+
+### Testing Rules
+
+- No automated tests exist yet (no Jest/Vitest/Playwright configured, no test files in `app/`, `lib/`, `actions/`, or `rag/`). Do not assume a test runner is configured — don't add `*.test.ts` files or invoke `npm test`/`pytest` unless a framework has been explicitly set up (see `bmad-tea` / `bmad-testarch-framework` skill to scaffold one)
+
+### Code Quality & Style Rules
+
+- ESLint: `eslint-config-next` (`next/core-web-vitals`, `next/typescript`) flat config, no custom overrides. No Prettier configured.
+- Naming: API route folders `kebab-case` (`get-buddy-data`), components `PascalCase.tsx`, functions/variables `camelCase`
+- Database tables/columns are `snake_case` (e.g. `study_bot_chats`, `is_user_message`) with no ORM/codegen — agents must manually translate `camelCase` ↔ `snake_case` at each Supabase call site
+- Comments are sparse, used only for non-obvious multi-step logic (e.g. DB insert ordering in `actions/dbops.ts`) — not JSDoc, not required per-function
+
+### Development Workflow Rules
+
+- Branch names are personal/feature-based (`arnav`, `semantic_cache`) — no `feat/`/`fix/` prefix convention
+- Commit messages: short, lowercase, descriptive (no Conventional Commits prefix)
+- PRs merged via GitHub — no PR template or required status checks
+- **No CI pipeline configured** (`.github/` only holds BMad agent definitions) — no automated lint/build gate on push or PR; no in-repo deployment config found
+
+### Critical Don't-Miss Rules
+
+- `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It's **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present/populated in a fresh clone.
+- `middleware.ts` gates `protectedPaths` via `url.pathname.startsWith(path)` — a **prefix match, not exact**. New routes with overlapping prefixes (e.g. `/dashboardX` vs `/dashboard`) can be unintentionally protected/unprotected. Be precise when adding paths.
+- RAG service URL is **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. Flag this on deploy-related work.
+- Known existing bug, don't propagate: `app/api/webhook/route.ts` types its param as `NextRequest` but only imports `NextResponse` — replicate the *pattern* (raw `.text()` body + `stripe-signature` header + `constructEvent`) for new Stripe webhooks, not the missing import.
+- Quota ordering in `/api/send-chat` is strict: check `chats_remaining` → call RAG → insert user message → insert assistant message → decrement quota via `decrement_chat_quota` RPC. Preserve check-before-spend, decrement-after-success ordering in similar flows.
+
+---
+
+## Usage Guidelines
+
+**For AI Agents:**
+
+- Read this file before implementing any code
+- Follow ALL rules exactly as documented
+- When in doubt, prefer the more restrictive option
+- Update this file if new patterns emerge
+
+**For Humans:**
+
+- Keep this file lean and focused on agent needs
+- Update when technology stack changes
+- Review quarterly for outdated rules
+- Remove rules that become obvious over time
+
+Last Updated: 2026-07-05

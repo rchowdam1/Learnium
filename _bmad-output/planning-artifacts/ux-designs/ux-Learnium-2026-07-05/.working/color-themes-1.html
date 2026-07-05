@@ -1,0 +1,588 @@
+<title>Learnium — Color Theme Explorations</title>
+<style>
+/* ============================================================
+   LEARNIUM COLOR THEME EXPLORATIONS
+   "Grown-up Duolingo": mature neutral base + energetic accents
+   ------------------------------------------------------------
+   THEME HEX REFERENCE (lift these values)
+
+   1. MIDNIGHT INK
+   -- LIGHT --
+     bg #F5F7F9 | surface #FFFFFF | border #D8E0E6
+     text #132A3A | muted #5A6B78
+     primary #132A3A | primary-fg #FFFFFF
+     accent(XP) #84CC16 | streak #F59E0B
+     success #16A34A | warning #D97706 | error #DC2626 | info #2563EB
+   -- DARK --
+     bg #0C1A24 | surface #132A3A | border #274050
+     text #EAF1F5 | muted #93A6B2
+     primary #B8F135 | primary-fg #0C1A24
+     accent(XP) #B8F135 | streak #F59E0B
+     success #84CC16 | warning #FBBF24 | error #F87171 | info #60A5FA
+
+   2. GRAPHITE ELECTRIC
+   -- LIGHT --
+     bg #F6F6F4 | surface #FFFFFF | border #E2E1DD
+     text #14151A | muted #6B6C74
+     primary #6366F1 | primary-fg #FFFFFF
+     accent(XP) #7C5CFC | streak #FF6B5B
+     success #16A34A | warning #D97706 | error #E11D48 | info #4F46E5
+   -- DARK --
+     bg #0B0C0E | surface #17181C | border #2A2C33
+     text #F4F4F6 | muted #9A9CA6
+     primary #7C5CFC | primary-fg #FFFFFF
+     accent(XP) #A78BFA | streak #FF6B5B
+     success #34D399 | warning #FBBF24 | error #FB7185 | info #818CF8
+
+   3. PINE SCHOLAR
+   -- LIGHT --
+     bg #F7F2E9 | surface #FFFDF8 | border #E3D9C6
+     text #133D3E | muted #5E6B60
+     primary #0F3D3E | primary-fg #FFFDF8
+     accent(XP) #FBBF24 | streak #F26D5B
+     success #0F766E | warning #C2761A | error #C0392B | info #1D6E8C
+   -- DARK --
+     bg #08211F | surface #103433 | border #1F4B47
+     text #F1E9D8 | muted #A6B2A4
+     primary #FBBF24 | primary-fg #08211F
+     accent(XP) #FBBF24 | streak #F26D5B
+     success #2DD4BF | warning #FCD34D | error #F87171 | info #67C7E0
+
+   4. SLATE CITRUS
+   -- LIGHT --
+     bg #F1F5F9 | surface #FFFFFF | border #CBD5E1
+     text #0F172A | muted #64748B
+     primary #2563EB | primary-fg #FFFFFF
+     accent(XP) #22C55E | streak #F59E0B
+     success #22C55E | warning #F59E0B | error #EF4444 | info #0EA5E9
+   -- DARK --
+     bg #0A0F1A | surface #172033 | border #2A3648
+     text #E8EEF6 | muted #94A3B8
+     primary #3B82F6 | primary-fg #0A0F1A
+     accent(XP) #4ADE80 | streak #FBBF24
+     success #4ADE80 | warning #FBBF24 | error #F87171 | info #38BDF8
+   ============================================================ */
+
+:root {
+  --stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--stack);
+  background: #0e0f12;
+  color: #e8e8ea;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.page-head {
+  padding: 40px 24px 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.page-head h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+}
+.page-head p { color: #9a9ba3; max-width: 720px; margin: 0; font-size: 15px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* theme section */
+.theme { margin-top: 48px; }
+.theme-divider { height: 1px; background: linear-gradient(90deg, transparent, #303138, transparent); margin: 56px 0 0; }
+.theme-head { margin-bottom: 18px; }
+.theme-head .num {
+  display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+  color: #71727b; text-transform: uppercase;
+}
+.theme-head h2 { font-size: clamp(22px, 3.5vw, 30px); font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 2px; }
+.theme-head .register { color: #9a9ba3; font-size: 14px; font-style: italic; margin: 0; }
+
+/* two panels per theme */
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 860px) { .panels { grid-template-columns: 1fr; } }
+
+/* a single mode panel */
+.panel {
+  border-radius: 16px;
+  padding: 22px;
+  border: 1px solid var(--p-border);
+  background: var(--p-bg);
+  color: var(--p-text);
+}
+.panel .mode-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--p-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.panel .mode-label .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p-primary); }
+
+/* token chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.chip {
+  display: flex; align-items: center; gap: 8px;
+  border-radius: 10px; padding: 6px 10px 6px 6px;
+  border: 1px solid var(--p-border);
+  background: var(--p-surface);
+  font-size: 11px; font-weight: 600;
+}
+.chip .sw { width: 20px; height: 20px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.28); flex: none; }
+.chip .lbl { line-height: 1.2; }
+.chip .lbl b { display: block; color: var(--p-text); font-weight: 700; }
+.chip .lbl span { color: var(--p-muted); font-weight: 500; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 10px; }
+
+/* ---- Learnium UI snippet ---- */
+.card {
+  background: var(--p-surface);
+  border: 1px solid var(--p-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+.card .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-primary); }
+.card h3 { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; margin: 6px 0 2px; color: var(--p-text); }
+.card .sub { font-size: 13px; color: var(--p-muted); margin: 0 0 16px; }
+
+.progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.progress-row .pct { font-size: 12px; font-weight: 700; color: var(--p-text); margin-left: auto; }
+.progress { height: 10px; border-radius: 999px; background: var(--p-track); overflow: hidden; }
+.progress > i { display: block; height: 100%; border-radius: 999px; background: var(--p-accent); }
+.progress-caption { font-size: 12px; color: var(--p-muted); margin: 8px 0 18px; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; }
+.pill.xp { background: var(--p-accent-soft); color: var(--p-accent-ink); }
+.pill.streak { background: var(--p-streak-soft); color: var(--p-streak-ink); }
+.pill.level { background: var(--p-surface-2); color: var(--p-muted); border: 1px solid var(--p-border); }
+
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; border: none; border-radius: 12px; padding: 13px 16px;
+  font-family: var(--stack); font-size: 15px; font-weight: 700; cursor: pointer;
+  background: var(--p-primary); color: var(--p-primary-fg);
+}
+.states { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+.state-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--p-muted); }
+.state-dot i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+
+/* ---------- THEME 1: MIDNIGHT INK ---------- */
+.t1-light {
+  --p-bg:#F5F7F9; --p-surface:#FFFFFF; --p-surface-2:#EEF2F5; --p-border:#D8E0E6;
+  --p-text:#132A3A; --p-muted:#5A6B78; --p-primary:#132A3A; --p-primary-fg:#FFFFFF;
+  --p-accent:#84CC16; --p-accent-soft:#E6F6C8; --p-accent-ink:#3F6212;
+  --p-streak-soft:#FEF0D3; --p-streak-ink:#B45309; --p-track:#E4EAEF;
+}
+.t1-dark {
+  --p-bg:#0C1A24; --p-surface:#132A3A; --p-surface-2:#1B3546; --p-border:#274050;
+  --p-text:#EAF1F5; --p-muted:#93A6B2; --p-primary:#B8F135; --p-primary-fg:#0C1A24;
+  --p-accent:#B8F135; --p-accent-soft:#26401A; --p-accent-ink:#CDF564;
+  --p-streak-soft:#3A2A10; --p-streak-ink:#FBBF24; --p-track:#1F3B4C;
+}
+/* ---------- THEME 2: GRAPHITE ELECTRIC ---------- */
+.t2-light {
+  --p-bg:#F6F6F4; --p-surface:#FFFFFF; --p-surface-2:#EFEFEC; --p-border:#E2E1DD;
+  --p-text:#14151A; --p-muted:#6B6C74; --p-primary:#6366F1; --p-primary-fg:#FFFFFF;
+  --p-accent:#7C5CFC; --p-accent-soft:#EAE6FE; --p-accent-ink:#5B33D6;
+  --p-streak-soft:#FFE4E0; --p-streak-ink:#D6402E; --p-track:#E8E8E4;
+}
+.t2-dark {
+  --p-bg:#0B0C0E; --p-surface:#17181C; --p-surface-2:#212227; --p-border:#2A2C33;
+  --p-text:#F4F4F6; --p-muted:#9A9CA6; --p-primary:#7C5CFC; --p-primary-fg:#FFFFFF;
+  --p-accent:#A78BFA; --p-accent-soft:#2A2350; --p-accent-ink:#C4B5FD;
+  --p-streak-soft:#3D211D; --p-streak-ink:#FF8C7E; --p-track:#24252B;
+}
+/* ---------- THEME 3: PINE SCHOLAR ---------- */
+.t3-light {
+  --p-bg:#F7F2E9; --p-surface:#FFFDF8; --p-surface-2:#F0E9D9; --p-border:#E3D9C6;
+  --p-text:#133D3E; --p-muted:#5E6B60; --p-primary:#0F3D3E; --p-primary-fg:#FFFDF8;
+  --p-accent:#B57F09; --p-accent-soft:#FBEFC9; --p-accent-ink:#8A5A06;
+  --p-streak-soft:#FBDDD6; --p-streak-ink:#C0432E; --p-track:#EAE1CF;
+}
+.t3-dark {
+  --p-bg:#08211F; --p-surface:#103433; --p-surface-2:#17423F; --p-border:#1F4B47;
+  --p-text:#F1E9D8; --p-muted:#A6B2A4; --p-primary:#FBBF24; --p-primary-fg:#08211F;
+  --p-accent:#FBBF24; --p-accent-soft:#3B3212; --p-accent-ink:#FCD34D;
+  --p-streak-soft:#3D2018; --p-streak-ink:#F79680; --p-track:#183E3B;
+}
+/* ---------- THEME 4: SLATE CITRUS ---------- */
+.t4-light {
+  --p-bg:#F1F5F9; --p-surface:#FFFFFF; --p-surface-2:#E7EDF3; --p-border:#CBD5E1;
+  --p-text:#0F172A; --p-muted:#64748B; --p-primary:#2563EB; --p-primary-fg:#FFFFFF;
+  --p-accent:#22C55E; --p-accent-soft:#DCF7E3; --p-accent-ink:#15803D;
+  --p-streak-soft:#FEF0D3; --p-streak-ink:#B45309; --p-track:#DCE4EC;
+}
+.t4-dark {
+  --p-bg:#0A0F1A; --p-surface:#172033; --p-surface-2:#1F2A40; --p-border:#2A3648;
+  --p-text:#E8EEF6; --p-muted:#94A3B8; --p-primary:#3B82F6; --p-primary-fg:#0A0F1A;
+  --p-accent:#4ADE80; --p-accent-soft:#123322; --p-accent-ink:#6EE7A0;
+  --p-streak-soft:#3A2E12; --p-streak-ink:#FBBF24; --p-track:#212D42;
+}
+</style>
+
+<div class="page-head">
+  <h1>Learnium — Color Themes</h1>
+  <p>Four distinct "grown-up Duolingo" directions. Mature, dark-capable neutral bases with energetic accents reserved for gamification moments. Each theme shown in light and dark, with semantic tokens and a real Learnium lesson card.</p>
+</div>
+
+<div class="wrap">
+
+<!-- =================== THEME 1 =================== -->
+<section class="theme">
+  <div class="theme-head">
+    <span class="num">Theme 01</span>
+    <h2>Midnight Ink</h2>
+    <p class="register">Confident, nocturnal, premium — deep navy anchored by a vivid lime charge.</p>
+  </div>
+  <div class="panels">
+    <!-- light -->
+    <div class="panel t1-light">
+      <div class="mode-label"><span class="dot"></span>Light</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#F5F7F9"></span><span class="lbl"><b>background</b><span>#F5F7F9</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>surface</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#D8E0E6"></span><span class="lbl"><b>border</b><span>#D8E0E6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#132A3A"></span><span class="lbl"><b>text</b><span>#132A3A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#5A6B78"></span><span class="lbl"><b>text-muted</b><span>#5A6B78</span></span></div>
+        <div class="chip"><span class="sw" style="background:#132A3A"></span><span class="lbl"><b>primary</b><span>#132A3A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>primary-fg</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#84CC16"></span><span class="lbl"><b>accent · XP</b><span>#84CC16</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F59E0B"></span><span class="lbl"><b>streak</b><span>#F59E0B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#16A34A"></span><span class="lbl"><b>success</b><span>#16A34A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#D97706"></span><span class="lbl"><b>warning</b><span>#D97706</span></span></div>
+        <div class="chip"><span class="sw" style="background:#DC2626"></span><span class="lbl"><b>error</b><span>#DC2626</span></span></div>
+        <div class="chip"><span class="sw" style="background:#2563EB"></span><span class="lbl"><b>info</b><span>#2563EB</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Data Science</span>
+        <h3>Intro to Machine Learning</h3>
+        <p class="sub">Lesson 3 of 8 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">38%</span></div>
+        <div class="progress"><i style="width:38%"></i></div>
+        <p class="progress-caption">Next up: Supervised vs. Unsupervised Learning</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 7 day streak</span>
+          <span class="pill level">Level 4</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#16A34A"></i>success</span>
+          <span class="state-dot"><i style="background:#D97706"></i>warning</span>
+          <span class="state-dot"><i style="background:#DC2626"></i>error</span>
+          <span class="state-dot"><i style="background:#2563EB"></i>info</span>
+        </div>
+      </div>
+    </div>
+    <!-- dark -->
+    <div class="panel t1-dark">
+      <div class="mode-label"><span class="dot"></span>Dark</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#0C1A24"></span><span class="lbl"><b>background</b><span>#0C1A24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#132A3A"></span><span class="lbl"><b>surface</b><span>#132A3A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#274050"></span><span class="lbl"><b>border</b><span>#274050</span></span></div>
+        <div class="chip"><span class="sw" style="background:#EAF1F5"></span><span class="lbl"><b>text</b><span>#EAF1F5</span></span></div>
+        <div class="chip"><span class="sw" style="background:#93A6B2"></span><span class="lbl"><b>text-muted</b><span>#93A6B2</span></span></div>
+        <div class="chip"><span class="sw" style="background:#B8F135"></span><span class="lbl"><b>primary</b><span>#B8F135</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0C1A24"></span><span class="lbl"><b>primary-fg</b><span>#0C1A24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#B8F135"></span><span class="lbl"><b>accent · XP</b><span>#B8F135</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F59E0B"></span><span class="lbl"><b>streak</b><span>#F59E0B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#84CC16"></span><span class="lbl"><b>success</b><span>#84CC16</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>warning</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F87171"></span><span class="lbl"><b>error</b><span>#F87171</span></span></div>
+        <div class="chip"><span class="sw" style="background:#60A5FA"></span><span class="lbl"><b>info</b><span>#60A5FA</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Data Science</span>
+        <h3>Intro to Machine Learning</h3>
+        <p class="sub">Lesson 3 of 8 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">38%</span></div>
+        <div class="progress"><i style="width:38%"></i></div>
+        <p class="progress-caption">Next up: Supervised vs. Unsupervised Learning</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 7 day streak</span>
+          <span class="pill level">Level 4</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#84CC16"></i>success</span>
+          <span class="state-dot"><i style="background:#FBBF24"></i>warning</span>
+          <span class="state-dot"><i style="background:#F87171"></i>error</span>
+          <span class="state-dot"><i style="background:#60A5FA"></i>info</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="theme-divider"></div>
+
+<!-- =================== THEME 2 =================== -->
+<section class="theme">
+  <div class="theme-head">
+    <span class="num">Theme 02</span>
+    <h2>Graphite Electric</h2>
+    <p class="register">Sleek premium SaaS — near-black graphite with an electric indigo current.</p>
+  </div>
+  <div class="panels">
+    <!-- light -->
+    <div class="panel t2-light">
+      <div class="mode-label"><span class="dot"></span>Light</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#F6F6F4"></span><span class="lbl"><b>background</b><span>#F6F6F4</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>surface</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#E2E1DD"></span><span class="lbl"><b>border</b><span>#E2E1DD</span></span></div>
+        <div class="chip"><span class="sw" style="background:#14151A"></span><span class="lbl"><b>text</b><span>#14151A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#6B6C74"></span><span class="lbl"><b>text-muted</b><span>#6B6C74</span></span></div>
+        <div class="chip"><span class="sw" style="background:#6366F1"></span><span class="lbl"><b>primary</b><span>#6366F1</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>primary-fg</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#7C5CFC"></span><span class="lbl"><b>accent · XP</b><span>#7C5CFC</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FF6B5B"></span><span class="lbl"><b>streak</b><span>#FF6B5B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#16A34A"></span><span class="lbl"><b>success</b><span>#16A34A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#D97706"></span><span class="lbl"><b>warning</b><span>#D97706</span></span></div>
+        <div class="chip"><span class="sw" style="background:#E11D48"></span><span class="lbl"><b>error</b><span>#E11D48</span></span></div>
+        <div class="chip"><span class="sw" style="background:#4F46E5"></span><span class="lbl"><b>info</b><span>#4F46E5</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Product</span>
+        <h3>Foundations of System Design</h3>
+        <p class="sub">Lesson 5 of 10 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">50%</span></div>
+        <div class="progress"><i style="width:50%"></i></div>
+        <p class="progress-caption">Next up: Caching Strategies &amp; Trade-offs</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 12 day streak</span>
+          <span class="pill level">Level 6</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#16A34A"></i>success</span>
+          <span class="state-dot"><i style="background:#D97706"></i>warning</span>
+          <span class="state-dot"><i style="background:#E11D48"></i>error</span>
+          <span class="state-dot"><i style="background:#4F46E5"></i>info</span>
+        </div>
+      </div>
+    </div>
+    <!-- dark -->
+    <div class="panel t2-dark">
+      <div class="mode-label"><span class="dot"></span>Dark</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#0B0C0E"></span><span class="lbl"><b>background</b><span>#0B0C0E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#17181C"></span><span class="lbl"><b>surface</b><span>#17181C</span></span></div>
+        <div class="chip"><span class="sw" style="background:#2A2C33"></span><span class="lbl"><b>border</b><span>#2A2C33</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F4F4F6"></span><span class="lbl"><b>text</b><span>#F4F4F6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#9A9CA6"></span><span class="lbl"><b>text-muted</b><span>#9A9CA6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#7C5CFC"></span><span class="lbl"><b>primary</b><span>#7C5CFC</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>primary-fg</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#A78BFA"></span><span class="lbl"><b>accent · XP</b><span>#A78BFA</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FF6B5B"></span><span class="lbl"><b>streak</b><span>#FF6B5B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#34D399"></span><span class="lbl"><b>success</b><span>#34D399</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>warning</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FB7185"></span><span class="lbl"><b>error</b><span>#FB7185</span></span></div>
+        <div class="chip"><span class="sw" style="background:#818CF8"></span><span class="lbl"><b>info</b><span>#818CF8</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Product</span>
+        <h3>Foundations of System Design</h3>
+        <p class="sub">Lesson 5 of 10 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">50%</span></div>
+        <div class="progress"><i style="width:50%"></i></div>
+        <p class="progress-caption">Next up: Caching Strategies &amp; Trade-offs</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 12 day streak</span>
+          <span class="pill level">Level 6</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#34D399"></i>success</span>
+          <span class="state-dot"><i style="background:#FBBF24"></i>warning</span>
+          <span class="state-dot"><i style="background:#FB7185"></i>error</span>
+          <span class="state-dot"><i style="background:#818CF8"></i>info</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="theme-divider"></div>
+
+<!-- =================== THEME 3 =================== -->
+<section class="theme">
+  <div class="theme-head">
+    <span class="num">Theme 03</span>
+    <h2>Pine Scholar</h2>
+    <p class="register">Warm, credible, scholarly — deep pine and parchment lit by gold and coral.</p>
+  </div>
+  <div class="panels">
+    <!-- light -->
+    <div class="panel t3-light">
+      <div class="mode-label"><span class="dot"></span>Light</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#F7F2E9"></span><span class="lbl"><b>background</b><span>#F7F2E9</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFDF8"></span><span class="lbl"><b>surface</b><span>#FFFDF8</span></span></div>
+        <div class="chip"><span class="sw" style="background:#E3D9C6"></span><span class="lbl"><b>border</b><span>#E3D9C6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#133D3E"></span><span class="lbl"><b>text</b><span>#133D3E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#5E6B60"></span><span class="lbl"><b>text-muted</b><span>#5E6B60</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0F3D3E"></span><span class="lbl"><b>primary</b><span>#0F3D3E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFDF8"></span><span class="lbl"><b>primary-fg</b><span>#FFFDF8</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>accent · XP</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F26D5B"></span><span class="lbl"><b>streak</b><span>#F26D5B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0F766E"></span><span class="lbl"><b>success</b><span>#0F766E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#C2761A"></span><span class="lbl"><b>warning</b><span>#C2761A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#C0392B"></span><span class="lbl"><b>error</b><span>#C0392B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#1D6E8C"></span><span class="lbl"><b>info</b><span>#1D6E8C</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Humanities</span>
+        <h3>The History of Philosophy</h3>
+        <p class="sub">Lesson 2 of 6 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">25%</span></div>
+        <div class="progress"><i style="width:25%"></i></div>
+        <p class="progress-caption">Next up: Socrates &amp; the Examined Life</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 4 day streak</span>
+          <span class="pill level">Level 3</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#0F766E"></i>success</span>
+          <span class="state-dot"><i style="background:#C2761A"></i>warning</span>
+          <span class="state-dot"><i style="background:#C0392B"></i>error</span>
+          <span class="state-dot"><i style="background:#1D6E8C"></i>info</span>
+        </div>
+      </div>
+    </div>
+    <!-- dark -->
+    <div class="panel t3-dark">
+      <div class="mode-label"><span class="dot"></span>Dark</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#08211F"></span><span class="lbl"><b>background</b><span>#08211F</span></span></div>
+        <div class="chip"><span class="sw" style="background:#103433"></span><span class="lbl"><b>surface</b><span>#103433</span></span></div>
+        <div class="chip"><span class="sw" style="background:#1F4B47"></span><span class="lbl"><b>border</b><span>#1F4B47</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F1E9D8"></span><span class="lbl"><b>text</b><span>#F1E9D8</span></span></div>
+        <div class="chip"><span class="sw" style="background:#A6B2A4"></span><span class="lbl"><b>text-muted</b><span>#A6B2A4</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>primary</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#08211F"></span><span class="lbl"><b>primary-fg</b><span>#08211F</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>accent · XP</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F26D5B"></span><span class="lbl"><b>streak</b><span>#F26D5B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#2DD4BF"></span><span class="lbl"><b>success</b><span>#2DD4BF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FCD34D"></span><span class="lbl"><b>warning</b><span>#FCD34D</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F87171"></span><span class="lbl"><b>error</b><span>#F87171</span></span></div>
+        <div class="chip"><span class="sw" style="background:#67C7E0"></span><span class="lbl"><b>info</b><span>#67C7E0</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Humanities</span>
+        <h3>The History of Philosophy</h3>
+        <p class="sub">Lesson 2 of 6 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">25%</span></div>
+        <div class="progress"><i style="width:25%"></i></div>
+        <p class="progress-caption">Next up: Socrates &amp; the Examined Life</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 4 day streak</span>
+          <span class="pill level">Level 3</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#2DD4BF"></i>success</span>
+          <span class="state-dot"><i style="background:#FCD34D"></i>warning</span>
+          <span class="state-dot"><i style="background:#F87171"></i>error</span>
+          <span class="state-dot"><i style="background:#67C7E0"></i>info</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="theme-divider"></div>
+
+<!-- =================== THEME 4 =================== -->
+<section class="theme">
+  <div class="theme-head">
+    <span class="num">Theme 04</span>
+    <h2>Slate Citrus</h2>
+    <p class="register">Balanced, friendly-but-grown-up — cool slate, confident blue, a citrus lift.</p>
+  </div>
+  <div class="panels">
+    <!-- light -->
+    <div class="panel t4-light">
+      <div class="mode-label"><span class="dot"></span>Light</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#F1F5F9"></span><span class="lbl"><b>background</b><span>#F1F5F9</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>surface</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#CBD5E1"></span><span class="lbl"><b>border</b><span>#CBD5E1</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0F172A"></span><span class="lbl"><b>text</b><span>#0F172A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#64748B"></span><span class="lbl"><b>text-muted</b><span>#64748B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#2563EB"></span><span class="lbl"><b>primary</b><span>#2563EB</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FFFFFF"></span><span class="lbl"><b>primary-fg</b><span>#FFFFFF</span></span></div>
+        <div class="chip"><span class="sw" style="background:#22C55E"></span><span class="lbl"><b>accent · XP</b><span>#22C55E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F59E0B"></span><span class="lbl"><b>streak</b><span>#F59E0B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#22C55E"></span><span class="lbl"><b>success</b><span>#22C55E</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F59E0B"></span><span class="lbl"><b>warning</b><span>#F59E0B</span></span></div>
+        <div class="chip"><span class="sw" style="background:#EF4444"></span><span class="lbl"><b>error</b><span>#EF4444</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0EA5E9"></span><span class="lbl"><b>info</b><span>#0EA5E9</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Finance</span>
+        <h3>Personal Finance Essentials</h3>
+        <p class="sub">Lesson 6 of 8 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">75%</span></div>
+        <div class="progress"><i style="width:75%"></i></div>
+        <p class="progress-caption">Next up: Building an Emergency Fund</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 21 day streak</span>
+          <span class="pill level">Level 8</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#22C55E"></i>success</span>
+          <span class="state-dot"><i style="background:#F59E0B"></i>warning</span>
+          <span class="state-dot"><i style="background:#EF4444"></i>error</span>
+          <span class="state-dot"><i style="background:#0EA5E9"></i>info</span>
+        </div>
+      </div>
+    </div>
+    <!-- dark -->
+    <div class="panel t4-dark">
+      <div class="mode-label"><span class="dot"></span>Dark</div>
+      <div class="chips">
+        <div class="chip"><span class="sw" style="background:#0A0F1A"></span><span class="lbl"><b>background</b><span>#0A0F1A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#172033"></span><span class="lbl"><b>surface</b><span>#172033</span></span></div>
+        <div class="chip"><span class="sw" style="background:#2A3648"></span><span class="lbl"><b>border</b><span>#2A3648</span></span></div>
+        <div class="chip"><span class="sw" style="background:#E8EEF6"></span><span class="lbl"><b>text</b><span>#E8EEF6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#94A3B8"></span><span class="lbl"><b>text-muted</b><span>#94A3B8</span></span></div>
+        <div class="chip"><span class="sw" style="background:#3B82F6"></span><span class="lbl"><b>primary</b><span>#3B82F6</span></span></div>
+        <div class="chip"><span class="sw" style="background:#0A0F1A"></span><span class="lbl"><b>primary-fg</b><span>#0A0F1A</span></span></div>
+        <div class="chip"><span class="sw" style="background:#4ADE80"></span><span class="lbl"><b>accent · XP</b><span>#4ADE80</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>streak</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#4ADE80"></span><span class="lbl"><b>success</b><span>#4ADE80</span></span></div>
+        <div class="chip"><span class="sw" style="background:#FBBF24"></span><span class="lbl"><b>warning</b><span>#FBBF24</span></span></div>
+        <div class="chip"><span class="sw" style="background:#F87171"></span><span class="lbl"><b>error</b><span>#F87171</span></span></div>
+        <div class="chip"><span class="sw" style="background:#38BDF8"></span><span class="lbl"><b>info</b><span>#38BDF8</span></span></div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Lesson Set · Finance</span>
+        <h3>Personal Finance Essentials</h3>
+        <p class="sub">Lesson 6 of 8 · ~5 min</p>
+        <div class="progress-row"><span style="font-size:12px;font-weight:600;color:var(--p-muted)">Progress</span><span class="pct">75%</span></div>
+        <div class="progress"><i style="width:75%"></i></div>
+        <p class="progress-caption">Next up: Building an Emergency Fund</p>
+        <div class="pills">
+          <span class="pill xp">＋50 XP</span>
+          <span class="pill streak">🔥 21 day streak</span>
+          <span class="pill level">Level 8</span>
+        </div>
+        <button class="btn">Continue lesson →</button>
+        <div class="states">
+          <span class="state-dot"><i style="background:#4ADE80"></i>success</span>
+          <span class="state-dot"><i style="background:#FBBF24"></i>warning</span>
+          <span class="state-dot"><i style="background:#F87171"></i>error</span>
+          <span class="state-dot"><i style="background:#38BDF8"></i>info</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>

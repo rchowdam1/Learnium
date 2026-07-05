@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learnium — Type Specimen</title>
+
+<!-- ============================================================
+     GOOGLE FONTS — URLs per pairing (lift these individually)
+     Pairing 1 "Geometric Bold":
+       https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&display=swap
+     Pairing 2 "Friendly Pro":
+       https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap
+     Pairing 3 "Editorial Expressive":
+       https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400&display=swap
+     Pairing 4 "Clean Neutral":
+       https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400&display=swap
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=Plus+Jakarta+Sans:wght@400;600;700&family=Bricolage+Grotesque:wght@700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ---- Locked "Midnight Ink / Pure" palette (LIGHT mode) ---- */
+  :root{
+    --bg:#FFFFFF;
+    --surface:#F7F8FA;
+    --border:#E6E9EE;
+    --text:#0B0F14;
+    --muted:#5A6672;
+    --brand:#142937;          /* navy (light) */
+    --brand-dark:#3E5C74;     /* navy (dark)  */
+    --lime:#84CC16;           /* XP accent    */
+    --amber:#F59E0B;          /* streak       */
+
+    /* dark sample block tokens */
+    --d-bg:#000000;
+    --d-surface:#0C1116;
+    --d-text:#F5F7FA;
+    --d-muted:#8B98A5;
+  }
+
+  /* font-family tokens per pairing */
+  .p1{ --head:"Space Grotesk",sans-serif; --body:"Inter",sans-serif; }
+  .p2{ --head:"Plus Jakarta Sans",sans-serif; --body:"Plus Jakarta Sans",sans-serif; }
+  .p3{ --head:"Bricolage Grotesque",sans-serif; --body:"Inter",sans-serif; }
+  .p4{ --head:"Sora",sans-serif; --body:"Inter",sans-serif; }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+
+  .wrap{ max-width:1120px; margin:0 auto; padding:40px 24px 80px; }
+
+  /* ---- page header ---- */
+  .page-head{ border-bottom:1px solid var(--border); padding-bottom:28px; margin-bottom:40px; }
+  .kicker{
+    font-family:"Space Grotesk",sans-serif;
+    font-weight:700; font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--brand);
+  }
+  .page-head h1{
+    font-family:"Space Grotesk",sans-serif; font-weight:700;
+    font-size:clamp(30px,5vw,52px); line-height:1.02; letter-spacing:-.02em;
+    margin:10px 0 8px;
+  }
+  .page-head p{ color:var(--muted); font-size:16px; max-width:60ch; margin:0; }
+  .legend{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+  .swatch{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);
+    background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:5px 11px 5px 6px; }
+  .dot{ width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,.08); }
+
+  /* ---- pairing card ---- */
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
+  @media (max-width:860px){ .grid{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--bg); border:1px solid var(--border); border-radius:18px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .card-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+    padding:20px 22px; background:var(--surface); border-bottom:1px solid var(--border);
+  }
+  .card-head .num{
+    font-family:var(--head); font-weight:700; font-size:26px; line-height:1;
+    color:var(--brand); font-variant-numeric:tabular-nums;
+  }
+  .card-title{ font-family:var(--head); font-weight:700; font-size:19px; letter-spacing:-.01em; margin:0 0 6px; }
+  .fontline{ font-family:"Inter",sans-serif; font-size:12px; color:var(--muted); line-height:1.5; }
+  .fontline b{ color:var(--text); font-weight:600; }
+  .register{
+    display:inline-block; margin-top:8px; font-size:11px; font-weight:600; letter-spacing:.04em;
+    color:var(--brand); background:rgba(20,41,55,.07); border-radius:6px; padding:3px 8px;
+  }
+
+  .card-body{ padding:24px 22px; display:flex; flex-direction:column; gap:18px; }
+
+  .display{
+    font-family:var(--head); font-weight:700; letter-spacing:-.025em; line-height:1.02;
+    font-size:clamp(26px,3.4vw,38px); margin:0; color:var(--text);
+  }
+  .h1{ font-family:var(--head); font-weight:700; font-size:24px; letter-spacing:-.015em; line-height:1.12; margin:0; }
+  .h2{ font-family:var(--head); font-weight:500; font-size:15px; letter-spacing:.02em; color:var(--muted); margin:2px 0 0; text-transform:uppercase; }
+  .p3 .h2{ font-weight:700; }
+  .body-p{ font-family:var(--body); font-weight:400; font-size:15.5px; line-height:1.6; color:var(--text); margin:0; max-width:52ch; }
+  .caption{ font-family:var(--body); font-weight:400; font-size:12.5px; color:var(--muted); margin:0; }
+
+  .divider{ height:1px; background:var(--border); border:0; margin:2px 0; }
+
+  /* gamification numerals */
+  .num-label{ font-family:"Inter",sans-serif; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+  .stats{ display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end; }
+  .stat .big{
+    font-family:var(--head); font-weight:700; line-height:.95; letter-spacing:-.02em;
+    font-size:clamp(34px,4.6vw,48px); font-variant-numeric:tabular-nums lining-nums;
+  }
+  .stat .lbl{ font-family:var(--body); font-size:12px; color:var(--muted); margin-top:4px; display:block; }
+  .stat.xp .big{ color:var(--brand); }
+  .stat.streak .big{ color:var(--amber); }
+  .stat.level .big{ color:var(--text); }
+
+  /* actions */
+  .actions{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--head); font-weight:700; font-size:15px; letter-spacing:.01em;
+    background:var(--brand); color:#FFFFFF; border:0; border-radius:12px;
+    padding:13px 22px; cursor:pointer;
+  }
+  .pill{
+    font-family:var(--head); font-weight:700; font-size:14px;
+    background:var(--lime); color:#14210A; border-radius:999px; padding:9px 16px;
+    font-variant-numeric:tabular-nums; display:inline-flex; align-items:center; gap:4px;
+  }
+
+  /* dark proof block */
+  .dark-block{
+    background:var(--d-bg); border-radius:14px; padding:20px 20px 22px; margin-top:2px;
+    border:1px solid #1b2129;
+  }
+  .dark-block .dh{
+    font-family:var(--head); font-weight:700; color:var(--d-text);
+    font-size:clamp(22px,3vw,30px); letter-spacing:-.02em; line-height:1.05; margin:0 0 6px;
+  }
+  .dark-block .dnum{
+    font-family:var(--head); font-weight:700; color:var(--lime);
+    font-size:34px; font-variant-numeric:tabular-nums lining-nums; line-height:1; margin:12px 0 0;
+  }
+  .dark-block .dcap{ font-family:var(--body); font-size:12px; color:var(--d-muted); margin:8px 0 0; }
+  .dark-block .dnum .amb{ color:var(--amber); }
+  .dark-tag{ font-family:"Inter",sans-serif; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--d-muted); margin:0 0 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="kicker">Learnium · Type Specimen 01</div>
+    <h1>Pick the voice of the headings.</h1>
+    <p>Four pairings for a bold, modern “grown-up Duolingo” — Linear × Duolingo × Brilliant. Rendered in the locked Midnight Ink / Pure light palette. Each card proves the full type scale on real Learnium content, big gamified numerals, and one black proof block.</p>
+    <div class="legend">
+      <span class="swatch"><span class="dot" style="background:#142937"></span>Brand navy #142937</span>
+      <span class="swatch"><span class="dot" style="background:#84CC16"></span>XP lime #84CC16</span>
+      <span class="swatch"><span class="dot" style="background:#F59E0B"></span>Streak amber #F59E0B</span>
+      <span class="swatch"><span class="dot" style="background:#0B0F14"></span>Ink text #0B0F14</span>
+      <span class="swatch"><span class="dot" style="background:#F7F8FA"></span>Surface #F7F8FA</span>
+    </div>
+  </header>
+
+  <div class="grid">
+
+    <!-- ========== PAIRING 1 : GEOMETRIC BOLD ========== -->
+    <section class="card p1">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Geometric Bold</h2>
+          <div class="fontline">Headings <b>Space Grotesk</b> 700 / 500<br>Body <b>Inter</b> 400 / 500</div>
+          <span class="register">Techy · crisp · modern</span>
+        </div>
+        <div class="num">01</div>
+      </div>
+      <div class="card-body">
+        <p class="display">Learn anything.<br>Actually finish it.</p>
+        <div>
+          <h3 class="h1">Intro to Machine Learning</h3>
+          <p class="h2">Lesson 3 of 8</p>
+        </div>
+        <p class="body-p">Spaced repetition resurfaces each concept right before you’d forget it, so five focused minutes a day beats cramming. Every lesson ends with a quick check that locks it in.</p>
+        <p class="caption">AI-generated — verify important facts</p>
+        <hr class="divider">
+        <div>
+          <p class="num-label">Gamification · tabular lining numerals</p>
+          <div class="stats">
+            <div class="stat xp"><span class="big">1,240</span><span class="lbl">XP earned</span></div>
+            <div class="stat streak"><span class="big">🔥 7</span><span class="lbl">day streak</span></div>
+            <div class="stat level"><span class="big">Lvl 5</span><span class="lbl">Machine Learning</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Continue Lesson</button>
+          <span class="pill">+50 XP</span>
+        </div>
+        <div class="dark-block">
+          <p class="dark-tag">Proof on #000000</p>
+          <p class="dh">Level up on black.</p>
+          <p class="dnum">1,240 XP · <span class="amb">🔥 7</span></p>
+          <p class="dcap">AI-generated — verify important facts</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PAIRING 2 : FRIENDLY PRO ========== -->
+    <section class="card p2">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Friendly Pro</h2>
+          <div class="fontline">Headings + Body <b>Plus Jakarta Sans</b> 700 / 600 / 400</div>
+          <span class="register">Warm · rounded-humanist · sweet spot</span>
+        </div>
+        <div class="num">02</div>
+      </div>
+      <div class="card-body">
+        <p class="display">Learn anything.<br>Actually finish it.</p>
+        <div>
+          <h3 class="h1">Intro to Machine Learning</h3>
+          <p class="h2">Lesson 3 of 8</p>
+        </div>
+        <p class="body-p">Spaced repetition resurfaces each concept right before you’d forget it, so five focused minutes a day beats cramming. Every lesson ends with a quick check that locks it in.</p>
+        <p class="caption">AI-generated — verify important facts</p>
+        <hr class="divider">
+        <div>
+          <p class="num-label">Gamification · tabular lining numerals</p>
+          <div class="stats">
+            <div class="stat xp"><span class="big">1,240</span><span class="lbl">XP earned</span></div>
+            <div class="stat streak"><span class="big">🔥 7</span><span class="lbl">day streak</span></div>
+            <div class="stat level"><span class="big">Lvl 5</span><span class="lbl">Machine Learning</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Continue Lesson</button>
+          <span class="pill">+50 XP</span>
+        </div>
+        <div class="dark-block">
+          <p class="dark-tag">Proof on #000000</p>
+          <p class="dh">Level up on black.</p>
+          <p class="dnum">1,240 XP · <span class="amb">🔥 7</span></p>
+          <p class="dcap">AI-generated — verify important facts</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PAIRING 3 : EDITORIAL EXPRESSIVE ========== -->
+    <section class="card p3">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Editorial Expressive</h2>
+          <div class="fontline">Headings <b>Bricolage Grotesque</b> 800 / 700<br>Body <b>Inter</b> 400</div>
+          <span class="register">Characterful · big-editorial · high personality</span>
+        </div>
+        <div class="num">03</div>
+      </div>
+      <div class="card-body">
+        <p class="display" style="font-weight:800">Learn anything.<br>Actually finish it.</p>
+        <div>
+          <h3 class="h1" style="font-weight:800">Intro to Machine Learning</h3>
+          <p class="h2">Lesson 3 of 8</p>
+        </div>
+        <p class="body-p">Spaced repetition resurfaces each concept right before you’d forget it, so five focused minutes a day beats cramming. Every lesson ends with a quick check that locks it in.</p>
+        <p class="caption">AI-generated — verify important facts</p>
+        <hr class="divider">
+        <div>
+          <p class="num-label">Gamification · tabular lining numerals</p>
+          <div class="stats">
+            <div class="stat xp"><span class="big" style="font-weight:800">1,240</span><span class="lbl">XP earned</span></div>
+            <div class="stat streak"><span class="big" style="font-weight:800">🔥 7</span><span class="lbl">day streak</span></div>
+            <div class="stat level"><span class="big" style="font-weight:800">Lvl 5</span><span class="lbl">Machine Learning</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Continue Lesson</button>
+          <span class="pill">+50 XP</span>
+        </div>
+        <div class="dark-block">
+          <p class="dark-tag">Proof on #000000</p>
+          <p class="dh" style="font-weight:800">Level up on black.</p>
+          <p class="dnum">1,240 XP · <span class="amb">🔥 7</span></p>
+          <p class="dcap">AI-generated — verify important facts</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PAIRING 4 : CLEAN NEUTRAL ========== -->
+    <section class="card p4">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">Clean Neutral</h2>
+          <div class="fontline">Headings <b>Sora</b> 700 / 600<br>Body <b>Inter</b> 400</div>
+          <span class="register">Quiet · premium · SaaS</span>
+        </div>
+        <div class="num">04</div>
+      </div>
+      <div class="card-body">
+        <p class="display">Learn anything.<br>Actually finish it.</p>
+        <div>
+          <h3 class="h1">Intro to Machine Learning</h3>
+          <p class="h2">Lesson 3 of 8</p>
+        </div>
+        <p class="body-p">Spaced repetition resurfaces each concept right before you’d forget it, so five focused minutes a day beats cramming. Every lesson ends with a quick check that locks it in.</p>
+        <p class="caption">AI-generated — verify important facts</p>
+        <hr class="divider">
+        <div>
+          <p class="num-label">Gamification · tabular lining numerals</p>
+          <div class="stats">
+            <div class="stat xp"><span class="big">1,240</span><span class="lbl">XP earned</span></div>
+            <div class="stat streak"><span class="big">🔥 7</span><span class="lbl">day streak</span></div>
+            <div class="stat level"><span class="big">Lvl 5</span><span class="lbl">Machine Learning</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn">Continue Lesson</button>
+          <span class="pill">+50 XP</span>
+        </div>
+        <div class="dark-block">
+          <p class="dark-tag">Proof on #000000</p>
+          <p class="dh">Level up on black.</p>
+          <p class="dnum">1,240 XP · <span class="amb">🔥 7</span></p>
+          <p class="dcap">AI-generated — verify important facts</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>
