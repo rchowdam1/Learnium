@@ -1,5 +1,5 @@
 # generated: 2026-07-05T20:35:28.6604107-05:00
-# last_updated: 2026-07-05T21:30:00-05:00
+# last_updated: 2026-07-05T22:56:00-05:00
 # project: Learnium
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: "2026-07-05T20:35:28.6604107-05:00"
-last_updated: "2026-07-05T21:30:00-05:00"
+last_updated: "2026-07-05T22:56:00-05:00"
 project: Learnium
 project_key: NOKEY
 tracking_system: file-system
@@ -49,7 +49,7 @@ story_location: "C:/Users/arnav/Desktop/Learnium/_bmad-output/implementation-art
 
 development_status:
   epic-1: in-progress
-  1-1-design-token-system-and-typography: in-progress
+  1-1-design-token-system-and-typography: done
   1-2-core-ui-component-library: backlog
   1-3-app-layout-shell-and-5-tab-navigation: backlog
   1-4-persistent-chrome-with-status-slots: backlog

@@ -49,3 +49,5 @@ logic.txt
 /rag/Dockerfile
 
 /lib/admin.ts
+.bmad-loop/runs/
+.bmad-loop/cache/

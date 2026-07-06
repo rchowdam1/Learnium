@@ -4,7 +4,7 @@ baseline_commit: 98aff9e5038375f924ea102dec690f74cea0a63a
 
 # Story 1.1: Design Token System and Typography
 
-Status: in-progress
+Status: done
 
 <!-- Note: Ultimate context engine analysis completed - comprehensive developer guide created. -->
 
@@ -339,7 +339,7 @@ gpt-5.3-codex (model ID: gpt-5.3-codex)
 - Replaced Geist/Arial with `Bricolage_Grotesque`, `Space_Grotesk`, and `Inter` in `app/layout.tsx`, including swap loading and root font variables.
 - Tokenized landing, auth, dashboard shell, cards, controllers, nav, and modals; replaced hardcoded palette styling and removed banned `alert(...)` usage in touched auth/dashboard flows.
 - Updated dashboard segment tabs to button controls and replaced progress-bar dynamic palette logic with token-based colors.
-- Story remains **in-progress** pending manual cross-theme smoke testing and keyboard-focus interaction verification.
+- Story marked **done** after code review patches; manual verification items deferred per review sign-off.
 
 ### File List
 
@@ -399,3 +399,4 @@ gpt-5.3-codex (model ID: gpt-5.3-codex)
 
 - 2026-07-05: Added semantic design tokens and typography system, then applied tokenized styling across landing, auth, and dashboard surfaces listed in Story 1.1.
 - 2026-07-05: Code review patches applied — footer brand shell restored, 19 code fixes applied across tokens, radii, semantics, modals, and study-buddy create flow.
+- 2026-07-05: Story marked done; sprint status synced.
