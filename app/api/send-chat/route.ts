@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     // data.response is the assistant message
     assistantMessage = data.response;
     // we have successfully gotten the assistant message
-  } catch (error) {
+  } catch {
     console.log("An error happened while trying to chat with the RAG API");
     return NextResponse.json(
       {

@@ -17,7 +17,7 @@ type Document = {
   size: number;
 };
 
-export async function GET(request: Request) {
+export async function GET() {
   const supabase = await createClient();
 
   const {
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
   // get the documents' metadata for each study buddy
   // documents will be an array
 
-  let documents: Document[][] = [];
+  const documents: Document[][] = [];
 
   for (const buddy of buddyData as StudyBuddy[]) {
     // each buddy's documents will be in the same order the buddies

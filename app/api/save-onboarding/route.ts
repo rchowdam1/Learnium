@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 
+const DAILY_GOAL_TIERS = new Set(["Casual", "Regular", "Serious"]);
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -19,20 +21,33 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { topic, daily_goal_tier } = body;
 
-    if (!topic || !daily_goal_tier) {
+    if (!topic && !daily_goal_tier) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Persist daily_goal_tier and onboarding_topic to profile table
+    if (daily_goal_tier && !DAILY_GOAL_TIERS.has(daily_goal_tier)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid daily goal tier" },
+        { status: 400 }
+      );
+    }
+
+    const updates: { onboarding_topic?: string; daily_goal_tier?: string } = {};
+    if (typeof topic === "string" && topic.trim()) {
+      updates.onboarding_topic = topic.trim();
+    }
+    if (daily_goal_tier) {
+      updates.daily_goal_tier = daily_goal_tier;
+    }
+
+    // Persist each onboarding step as it is completed so refreshes and network
+    // retries do not lose committed choices.
     const { error: updateError } = await supabase
       .from("profile")
-      .update({
-        daily_goal_tier,
-        onboarding_topic: topic,
-      })
+      .update(updates)
       .eq("id", user.id);
 
     if (updateError) {

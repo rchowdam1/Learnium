@@ -1,7 +1,6 @@
 "use client";
 import toast from "react-hot-toast";
 import LessonBubble from "./LessonBubble";
-import { useState } from "react";
 
 type LessonChainProps = {
   lessons: number; // the number of lessons in the chain

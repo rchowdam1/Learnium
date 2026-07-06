@@ -60,7 +60,7 @@ type APIResponse = {
   quizzes: QuizData[];
 };
 
-export default function SetPage({ params }: { params: { setId: string } }) {
+export default function SetPage() {
   const param = useParams();
 
   const setId = param.setId;
@@ -127,10 +127,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
               data.completedLessons === data.lessons.length
             ) {
               setCurrentLesson(0);
-            } else if (
-              data.completedLessons &&
-              currentLesson < data.completedLessons
-            ) {
+            } else if (data.completedLessons) {
               setCurrentLesson(data.completedLessons);
             }
 
@@ -157,7 +154,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
     };
 
     getSetData();
-  }, []);
+  }, [setId]);
 
   useEffect(() => {
     // check to see if the quiz is completed
@@ -172,7 +169,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
         setPreviousAnswers(quizzes[currentLesson].previousAnswers);
       }
     }
-  }, [currentLesson]);
+  }, [completedLessons, currentLesson, quizzes]);
 
   return (
     <div className="relative min-h-screen bg-gray-50 flex flex-col">
@@ -284,14 +281,14 @@ export default function SetPage({ params }: { params: { setId: string } }) {
             quizId={quizzes[currentLesson].quizId}
             open={quizOpen}
             onClose={() => setQuizOpen(false)}
-            questions={quizzes[currentLesson].questions.map((question, key) => {
+            questions={quizzes[currentLesson].questions.map((question) => {
               return question.question;
             })}
-            options={quizzes[currentLesson].questions.map((question, key) => {
+            options={quizzes[currentLesson].questions.map((question) => {
               return question.options;
             })}
             correctAnswers={quizzes[currentLesson].questions.map(
-              (question, key) => {
+              (question) => {
                 return question.correctAnswer;
               }
             )}
@@ -330,7 +327,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
                       toast.error("Could not complete set");
                     }
                   }
-                } catch (error) {
+                } catch {
                   toast.error("Could not complete set.");
                   console.log("Could not mark set as complete");
                 }

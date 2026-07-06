@@ -61,11 +61,11 @@ so that every screen feels like one polished product rather than disconnected pa
   - [x] Convert dashboard tab switches from clickable headings to real `<button>` controls if the file is being edited; maintain the current two-view behavior.
   - [x] Keep data fetching, local state, toast behavior, and card creation/deletion behavior unchanged except for removing `alert()` in touched paths.
 
-- [ ] Verification and regression checks (AC: 1, 2, 3, 4)
+- [x] Verification and regression checks (AC: 1, 2, 3, 4)
   - [x] Run a lint/type/build check appropriate to the existing repo. Suggested order: `npm run lint`; if `next lint` is unavailable in this Next version, run `npx eslint .`; then run `npm run build` if required environment variables are available.
-  - [ ] Manually smoke test `/`, `/login`, `/signup`, and `/dashboard` in light and dark OS preferences.
+  - [x] Manually smoke test `/`, `/login`, `/signup`, and `/dashboard` in light and dark OS preferences.
   - [x] Confirm no changed file contains new inline hex palette values. Existing external assets and source docs are not part of this check.
-  - [ ] Confirm no changed interactive element loses keyboard operability or visible focus.
+  - [x] Confirm no changed interactive element loses keyboard operability or visible focus.
 
 ## Dev Notes
 

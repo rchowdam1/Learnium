@@ -17,18 +17,18 @@ export default function Home() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
-        <nav className="mx-auto flex max-w-[72rem] items-center justify-between px-6 py-4">
+        <nav aria-label="Public" className="mx-auto flex max-w-[72rem] flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand">
               <span className="text-label text-cta-text font-bold">L</span>
             </div>
             <span className="text-heading text-xl text-primary font-bold">Learnium</span>
           </div>
-          <div className="flex items-center space-x-6">
-            <Link href="#features" className="focus-ring text-label text-sm text-muted hover:text-primary transition-colors duration-150">
+          <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:justify-end">
+            <Link href="#features" className="focus-ring inline-flex min-h-11 items-center rounded-xl px-2 text-label text-sm text-muted hover:text-primary transition-colors duration-150">
               Features
             </Link>
-            <Link href="#how-it-works" className="focus-ring text-label text-sm text-muted hover:text-primary transition-colors duration-150">
+            <Link href="#how-it-works" className="focus-ring inline-flex min-h-11 items-center rounded-xl px-2 text-label text-sm text-muted hover:text-primary transition-colors duration-150">
               How It Works
             </Link>
             <Button variant="secondary" href="/login">

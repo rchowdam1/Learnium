@@ -11,7 +11,9 @@ interface StatusChromeProps {
 export function StatusChrome({ className = "" }: StatusChromeProps) {
   const [xp, setXp] = useState<number | null>(null);
   const [streak, setStreak] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
   const [dailyGoalTier, setDailyGoalTier] = useState<string | null>(null);
+  const [dailyGoalXp, setDailyGoalXp] = useState<number | null>(null);
   const [quota, setQuota] = useState<number | null>(null);
 
   useEffect(() => {
@@ -30,7 +32,9 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
             // Support optional chaining / fallbacks
             setXp(profileData.xp ?? null);
             setStreak(profileData.streak ?? null);
+            setLevel(profileData.level ?? null);
             setDailyGoalTier(profileData.daily_goal_tier ?? null);
+            setDailyGoalXp(profileData.daily_goal_xp ?? profileData.today_xp ?? null);
           }
 
           // Fetch sets remaining from subscription status or profile fallback
@@ -46,18 +50,24 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
   }, []);
 
   const xpDisplay = xp !== null ? `${xp} XP` : "0 XP";
-  const streakDisplay = streak !== null ? `${streak} streak` : "— streak";
-  const goalDisplay = dailyGoalTier ? `Goal: ${dailyGoalTier}` : "Goal: —";
+  const streakDisplay = streak !== null ? `${streak}` : "—";
+  const levelDisplay = level !== null ? `Lv ${level}` : "Lv —";
+  const goalTarget = dailyGoalTier === "Serious" ? 50 : dailyGoalTier === "Regular" ? 20 : dailyGoalTier === "Casual" ? 10 : null;
+  const goalCurrent = dailyGoalXp ?? 0;
+  const goalDisplay = goalTarget ? `${goalCurrent}/${goalTarget} XP` : "Goal: —";
   const quotaDisplay = quota !== null ? `Sets: ${quota} left` : "Sets: —";
 
   // ARIA Labels
   const xpAria = xp !== null ? `${xp} Experience Points` : "0 Experience Points";
   const streakAria = streak !== null ? `${streak} day streak` : "No active streak";
-  const goalAria = dailyGoalTier ? `Daily goal tier: ${dailyGoalTier}` : "Daily goal not set";
+  const levelAria = level !== null ? `Level ${level}` : "Level not available";
+  const goalAria = goalTarget
+    ? `Daily goal progress: ${goalCurrent} of ${goalTarget} Experience Points for ${dailyGoalTier}`
+    : "Daily goal not set";
   const quotaAria = quota !== null ? `${quota} sets remaining` : "No quota remaining";
 
   return (
-    <div className={`flex items-center gap-3.5 ${className}`}>
+    <div className={`flex items-center gap-2.5 ${className}`}>
       {/* XP Pill */}
       <Pill
         variant="xp"
@@ -67,19 +77,23 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
         {xpDisplay}
       </Pill>
 
+      <Pill variant="level" aria-label={levelAria} title={levelAria}>
+        {levelDisplay}
+      </Pill>
+
       {/* Streak Flame */}
       <div
-        className="flex items-center gap-1 text-streak font-semibold text-sm select-none"
+        className="flex items-center gap-1 text-sm select-none"
         aria-label={streakAria}
         title={streakAria}
       >
         <Flame className="h-4.5 w-4.5 text-streak" aria-hidden="true" />
-        <span>{streakDisplay}</span>
+        <span className="text-numeral font-bold text-primary">{streakDisplay}</span>
       </div>
 
       {/* Daily Goal Progress */}
       <span
-        className="bg-accent-progress text-white px-2.5 py-0.5 text-xs rounded-full font-semibold select-none"
+        className="rounded-full border border-accent-progress bg-accent-progress-track px-2.5 py-0.5 text-xs font-semibold text-primary select-none"
         aria-label={goalAria}
         title={goalAria}
       >

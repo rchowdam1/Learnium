@@ -4,7 +4,7 @@ baseline_commit: TODO-set-by-dev
 
 # Story 1.7: Onboarding Flow Routing
 
-Status: review
+Status: done
 
 ## Story
 

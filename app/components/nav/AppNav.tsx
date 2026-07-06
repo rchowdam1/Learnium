@@ -88,7 +88,7 @@ export function AppNav() {
                 >
                   <Icon
                     className={`h-5 w-5 ${active ? "text-brand" : "text-muted"}`}
-                    fill={active ? "currentColor" : "none"}
+                    aria-hidden="true"
                   />
                   <span>{label}</span>
                 </Link>
@@ -131,7 +131,7 @@ export function AppNav() {
             >
               <Icon
                 className={`h-5 w-5 ${active ? "text-brand" : "text-muted"}`}
-                fill={active ? "currentColor" : "none"}
+                aria-hidden="true"
               />
               <span className="text-label text-[10px] sm:text-xs">{label}</span>
             </Link>

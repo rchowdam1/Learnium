@@ -95,16 +95,45 @@ export default function OnboardingPage() {
   const handleTierSelect = (selectedTier: string) => {
     setDailyGoalTier(selectedTier);
     saveStateToLocalStorage(topic, selectedTier, step);
+    void persistOnboardingStep({ topic, daily_goal_tier: selectedTier });
   };
 
-  const handleNextStep = () => {
+  const persistOnboardingStep = async (payload: {
+    topic?: string;
+    daily_goal_tier?: string;
+  }) => {
+    const response = await fetch("/api/save-onboarding", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Failed to save onboarding data.");
+    }
+  };
+
+  const handleNextStep = async () => {
     if (step === 1) {
       if (!topic.trim()) {
         toast.error("Please enter or select a topic of interest.");
         return;
       }
-      setStep(2);
-      saveStateToLocalStorage(topic, dailyGoalTier, 2);
+      setIsSubmitting(true);
+      try {
+        await persistOnboardingStep({ topic: topic.trim() });
+        setStep(2);
+        saveStateToLocalStorage(topic, dailyGoalTier, 2);
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Could not save that topic. Your input is still here."
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 

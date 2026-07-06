@@ -16,14 +16,8 @@ type Categories = {
   Miscellaneous?: number;
 };
 
-type SetData = {
-  id: number;
-  created_at: string;
-  profile_id: string;
-  title: string;
-  description: string;
-  category: string;
-  is_flagged: boolean;
+type SetRow = {
+  category: keyof Categories;
   completed: boolean;
 };
 
@@ -68,12 +62,10 @@ export async function GET() {
   }
 
   // username, email, requests remaining
-  let username = profileData.username;
-  let email = user?.email;
+  const username = profileData.username;
+  const email = user?.email;
   //let requestsRemaining = profileData.sets_remaining;
-  let isSubscribed = profileData.is_subscribed;
-  let requestsRemaining;
-
+  const isSubscribed = profileData.is_subscribed;
   // if today is >= profileData.sets_refresh_at, then reset requests and update the value
   const today = new Date().toISOString().split("T")[0];
   const setsRefreshAt = profileData.sets_refresh_at
@@ -100,7 +92,7 @@ export async function GET() {
     // result.success == true
   }
 
-  requestsRemaining = profileData.sets_remaining;
+  const requestsRemaining = profileData.sets_remaining;
 
   // get the sets
   const { data: setData, error: setError } = await supabase
@@ -114,8 +106,8 @@ export async function GET() {
   }
 
   // Sets created and sets completed
-  let setsCreated = setData.length;
-  let setsCompleted = setData.filter((set) => set.completed).length;
+  const setsCreated = setData.length;
+  const setsCompleted = (setData as SetRow[]).filter((set) => set.completed).length;
 
   // completed lessons
   let completedLessons = 0;
@@ -177,8 +169,8 @@ export async function GET() {
     }
   }
 
-  let overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
-  let averageQuizScore = ((totalQuizScore / numQuizzesCompleted) * 100).toFixed(
+  const overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
+  const averageQuizScore = ((totalQuizScore / numQuizzesCompleted) * 100).toFixed(
     2,
   );
 
@@ -186,7 +178,7 @@ export async function GET() {
   const categoryCounts: Categories = {};
   const topCategories: string[] = []; // max length will be 3
 
-  setData.forEach((set) => {
+  (setData as SetRow[]).forEach((set) => {
     categoryCounts[set.category] = (categoryCounts[set.category] || 0) + 1;
   });
 
@@ -202,17 +194,17 @@ export async function GET() {
   console.log("requests remaining: ", requestsRemaining);
   return NextResponse.json({
     success: true,
-    username: username,
-    email: email,
-    requestsRemaining: requestsRemaining,
-    setsCreated: setsCreated,
-    setsCompleted: setsCompleted,
-    isSubscribed: isSubscribed,
-    completedLessons: completedLessons,
-    overallProgress: overallProgress,
-    averageQuizScore: averageQuizScore,
-    topCategories: topCategories,
-    setData: setData,
+    username,
+    email,
+    requestsRemaining,
+    setsCreated,
+    setsCompleted,
+    isSubscribed,
+    completedLessons,
+    overallProgress,
+    averageQuizScore,
+    topCategories,
+    setData,
     xp: profileData.xp,
     streak: profileData.streak,
     level: profileData.level,

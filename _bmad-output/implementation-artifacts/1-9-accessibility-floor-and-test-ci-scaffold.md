@@ -4,7 +4,7 @@ baseline_commit: TODO-set-by-dev
 
 # Story 1.9: Accessibility Floor and Test/CI Scaffold
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -26,57 +26,57 @@ so that I can navigate and learn without barriers.
 
 ## Tasks / Subtasks
 
-- [ ] Clickable div audit (AC: 1)
-  - [ ] Search `app/` for `onClick` on `<div>` elements that should be `<button>`.
-  - [ ] Replace any found clickable divs with `<button>` elements.
-  - [ ] Ensure all interactive elements use semantic HTML.
+- [x] Clickable div audit (AC: 1)
+  - [x] Search `app/` for `onClick` on `<div>` elements that should be `<button>`.
+  - [x] Replace any found clickable divs with `<button>` elements.
+  - [x] Ensure all interactive elements use semantic HTML.
 
-- [ ] Landmark audit (AC: 1)
-  - [ ] Verify each page has exactly one `<main>` landmark.
-  - [ ] Verify navigation has `aria-label` (already done in Story 1.3).
-  - [ ] Verify skip-to-content links exist on landing and app pages.
+- [x] Landmark audit (AC: 1)
+  - [x] Verify each page has exactly one `<main>` landmark.
+  - [x] Verify navigation has `aria-label` (already done in Story 1.3).
+  - [x] Verify skip-to-content links exist on landing and app pages.
 
-- [ ] Focus ring verification (AC: 2)
-  - [ ] Check `focus-ring` class is applied to all interactive elements.
-  - [ ] Verify fixed bottom bar (mobile) doesn't obscure focused elements.
-  - [ ] Verify sticky top bar (desktop) doesn't obscure focused elements.
-  - [ ] Check `scroll-padding` is set to account for fixed chrome height.
+- [x] Focus ring verification (AC: 2)
+  - [x] Check `focus-ring` class is applied to all interactive elements.
+  - [x] Verify fixed bottom bar (mobile) doesn't obscure focused elements.
+  - [x] Verify sticky top bar (desktop) doesn't obscure focused elements.
+  - [x] Check `scroll-padding` is set to account for fixed chrome height.
 
-- [ ] Reduced motion (AC: 3)
-  - [ ] Add `prefers-reduced-motion` media query to `globals.css`.
-  - [ ] Disable transitions/animations when reduced motion is preferred.
-  - [ ] Ensure state changes remain perceivable without animation.
+- [x] Reduced motion (AC: 3)
+  - [x] Add `prefers-reduced-motion` media query to `globals.css`.
+  - [x] Disable transitions/animations when reduced motion is preferred.
+  - [x] Ensure state changes remain perceivable without animation.
 
-- [ ] Configure Vitest (AC: 4, 5)
-  - [ ] Install vitest, @testing-library/react, @testing-library/jest-dom, jsdom.
-  - [ ] Create `vitest.config.ts` with jsdom environment.
-  - [ ] Create smoke test: `tests/smoke/landing.test.tsx` — renders landing page.
-  - [ ] Create smoke test: `tests/smoke/auth.test.tsx` — renders login/signup pages.
-  - [ ] Create smoke test: `tests/smoke/routing.test.tsx` — protected route redirect.
-  - [ ] Add `"test": "vitest run"` to `package.json` scripts.
+- [x] Configure Vitest (AC: 4, 5)
+  - [x] Install vitest, @testing-library/react, @testing-library/jest-dom, jsdom.
+  - [x] Create `vitest.config.ts` with jsdom environment.
+  - [x] Create smoke test: `tests/smoke/landing.test.tsx` — renders landing page.
+  - [x] Create smoke test: `tests/smoke/auth.test.tsx` — renders login/signup pages.
+  - [x] Create smoke test: `tests/smoke/routing.test.tsx` — protected route redirect.
+  - [x] Add `"test": "vitest run"` to `package.json` scripts.
 
-- [ ] Configure Playwright (AC: 4, 5)
-  - [ ] Install @playwright/test.
-  - [ ] Create `playwright.config.ts`.
-  - [ ] Create E2E smoke: `tests/e2e/landing.spec.ts` — loads landing page.
-  - [ ] Create E2E smoke: `tests/e2e/auth.spec.ts` — loads login/signup.
-  - [ ] Add `"test:e2e": "playwright test"` to `package.json` scripts.
+- [x] Configure Playwright (AC: 4, 5)
+  - [x] Install @playwright/test.
+  - [x] Create `playwright.config.ts`.
+  - [x] Create E2E smoke: `tests/e2e/landing.spec.ts` — loads landing page.
+  - [x] Create E2E smoke: `tests/e2e/auth.spec.ts` — loads login/signup.
+  - [x] Add `"test:e2e": "playwright test"` to `package.json` scripts.
 
-- [ ] GitHub Actions CI (AC: 4, 5)
-  - [ ] Create `.github/workflows/ci.yml`.
-  - [ ] Steps: checkout → setup node → install deps → lint → build → unit tests → e2e tests.
-  - [ ] Document required env vars in workflow.
-  - [ ] Use `NEXT_PUBLIC_SITE_URL` and Supabase env vars as repo secrets.
+- [x] GitHub Actions CI (AC: 4, 5)
+  - [x] Create `.github/workflows/ci.yml`.
+  - [x] Steps: checkout -> setup node -> install deps -> lint -> build -> unit tests -> e2e tests.
+  - [x] Document required env vars in workflow.
+  - [x] Use `NEXT_PUBLIC_SITE_URL` and Supabase env vars as repo secrets.
 
-- [ ] Documentation (AC: 5)
-  - [ ] Update README with test commands and setup instructions.
-  - [ ] Document required environment variables.
+- [x] Documentation (AC: 5)
+  - [x] Update README with test commands and setup instructions.
+  - [x] Document required environment variables.
 
-- [ ] Verification
-  - [ ] `npm run lint` passes
-  - [ ] `npm run build` passes
-  - [ ] `npx vitest run` passes
-  - [ ] `npx playwright test` passes (or skip if browser not available)
+- [x] Verification
+  - [x] `npm run lint` passes
+  - [x] `npm run build` passes
+  - [x] `npx vitest run` passes
+  - [x] `npx playwright test` passes (or skip if browser not available)
 
 ## Dev Notes
 

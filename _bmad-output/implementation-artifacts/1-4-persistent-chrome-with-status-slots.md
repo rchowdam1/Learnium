@@ -4,7 +4,7 @@ baseline_commit: a3a84055adb9a09e9eea3d7c9a9a8991612796cd
 
 # Story 1.4: Persistent Chrome with Status Slots
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

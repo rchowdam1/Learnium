@@ -39,6 +39,24 @@ type StudyBuddyCards = {
   }[];
 };
 
+type SetApiItem = {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  numLessons: number;
+  completedLessons?: number;
+  completed: boolean;
+  date: string;
+};
+
+type BuddyApiItem = {
+  id: number;
+  bot_name: string;
+  category: string;
+  description: string;
+};
+
 export default function Dashboard() {
   const router = useRouter();
   // state for skeleton loading
@@ -119,6 +137,7 @@ export default function Dashboard() {
           title: title,
           description: description,
           category: category,
+          documents: [],
         },
       ];
     });
@@ -147,7 +166,7 @@ export default function Dashboard() {
         const data = await response.json();
         if (data.data) {
           //console.log(data.data, "fetched sets");
-          const sets = data.data;
+          const sets = data.data as SetApiItem[];
 
           setSetCards(
             sets
@@ -183,10 +202,10 @@ export default function Dashboard() {
 
         if (data.success) {
           if (data.data) {
-            const buddies = data.data.buddyData;
+            const buddies = data.data.buddyData as BuddyApiItem[];
             const documents = data.data.documentData;
             setStudyBuddySets(
-              buddies.map((buddy, index) => {
+              buddies.map((buddy, index: number) => {
                 return {
                   id: buddy.id,
                   title: buddy.bot_name,
@@ -247,7 +266,7 @@ export default function Dashboard() {
     loadSets();
     loadBuddies();
     getProfInfo();
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -30,6 +30,10 @@ export default function SignInWithGoogle({
       className="w-full max-w-sm mt-1"
       onSubmit={handleSubmit}
     >
+      <input type="hidden" name="mode" value={login ? "login" : "signup"} />
+      {!login && ageGateChecked && (
+        <input type="hidden" name="age_confirmed" value="1" />
+      )}
       <Button
         type="submit"
         variant="secondary"

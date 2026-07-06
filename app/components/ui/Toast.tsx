@@ -36,7 +36,7 @@ export function Toaster() {
           },
           iconTheme: {
             primary: "var(--error)",
-            secondary: "#ffffff",
+            secondary: "var(--cta-text)",
           },
         },
         blank: {

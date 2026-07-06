@@ -46,13 +46,25 @@ export const Button = React.forwardRef<HTMLButtonElement & HTMLAnchorElement, Bu
     // Render as a link if 'href' is provided or 'as' is 'a'
     if (href || as === "a") {
       const linkProps = props as unknown as React.ComponentPropsWithoutRef<typeof Link>;
+      if (disabled) {
+        return (
+          <span
+            className={`${baseClasses} pointer-events-none opacity-50`}
+            aria-disabled="true"
+            role="link"
+            tabIndex={-1}
+          >
+            {children}
+          </span>
+        );
+      }
+
       return (
         <Link
-          href={href || "#"}
-          className={`${baseClasses} ${disabled ? "pointer-events-none opacity-50" : ""}`}
-          aria-disabled={disabled}
-          ref={ref as React.Ref<HTMLAnchorElement>}
           {...linkProps}
+          href={href || "#"}
+          className={baseClasses}
+          ref={ref as React.Ref<HTMLAnchorElement>}
         >
           {children}
         </Link>

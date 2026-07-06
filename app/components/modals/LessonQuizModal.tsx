@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import next from "next";
 
 type OptionProps = {
   option: OptionData;
@@ -65,10 +64,8 @@ type QuestionProps = {
   onSelectAnswer: (selected: string) => void;
   currentQues: number;
   totalQues: number;
-  disabled: boolean;
   next: () => void;
   prev: () => void;
-  setAnswer: (answer: string) => void;
   displayCorrectAnswers: boolean;
   previousAnswer?: string;
 };
@@ -81,7 +78,6 @@ const Question = ({
   onSelectAnswer,
   next,
   prev,
-  disabled,
   currentQues,
   totalQues,
   displayCorrectAnswers,
@@ -165,7 +161,6 @@ export default function LessonQuizModal({
   options,
   correctAnswers,
   onComplete,
-  lessonCompleted,
   quizSubmitted,
   previousAnswers,
   fetchedQuizScore,
@@ -173,7 +168,7 @@ export default function LessonQuizModal({
   displayCompletedSetModal,
 }: LessonQuizModalProps) {
   const [currentAnswers, setCurrentAnswers] = useState<string[]>(
-    questions.map((question, key) => {
+    questions.map(() => {
       return "";
     })
   );
@@ -201,9 +196,6 @@ export default function LessonQuizModal({
   // current question
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
 
-  const correctColors: string[] = ["#cef0c2", "green-400"];
-  const incorrectColors: string[] = ["#f0c2c6", "red-400"];
-
   // state to decide whether to display the correct answers
   const [displayCorrectAnswers, setDisplayCorrectAnswers] =
     useState<boolean>(false);
@@ -212,8 +204,8 @@ export default function LessonQuizModal({
   const [quizScore, setQuizScore] = useState<number>();
 
   const onQuizClose = (): void => {
-    setCurrentAnswers(
-      questions.map((_) => {
+            setCurrentAnswers(
+      questions.map(() => {
         return "";
       })
     );
@@ -272,7 +264,7 @@ export default function LessonQuizModal({
               setCurrentQuestion(currentQuestion - 1);
             }
           }}
-          displayCorrectAnswers={quizSubmitted}
+          displayCorrectAnswers={displayCorrectAnswers || quizSubmitted}
           previousAnswer={
             previousAnswers ? previousAnswers[currentQuestion] : ""
           } // if the previous answers are provided, then use them
@@ -349,7 +341,7 @@ export default function LessonQuizModal({
                     //onClose();
                   }
                 }
-              } catch (error) {
+              } catch {
                 console.error("Could not complete set");
               }
             }}

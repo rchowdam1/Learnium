@@ -10,7 +10,8 @@ export default function CreateSetController({
     title: string,
     description: string,
     category: string,
-    numLessons?: number
+    numLessons?: number,
+    setId?: number
   ) => void;
 }) {
   const [createModalOpen, setCreateModalOpen] = useState(false);

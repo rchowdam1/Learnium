@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 
+const DAILY_GOAL_TIERS = new Set(["Casual", "Regular", "Serious"]);
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -22,6 +24,13 @@ export async function POST(request: Request) {
     if (!daily_goal_tier) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (!DAILY_GOAL_TIERS.has(daily_goal_tier)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid daily goal tier" },
         { status: 400 }
       );
     }

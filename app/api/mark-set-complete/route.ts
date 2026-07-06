@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   console.log(body);
 
-  const { data: updateSetData, error: updateSetError } = await supabase
+  const { error: updateSetError } = await supabase
     .from("sets")
     .update({
       completed: true,

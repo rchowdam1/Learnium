@@ -22,7 +22,8 @@ type CreateModalProps = {
     title: string,
     description: string,
     category: string,
-    numLessons?: number
+    numLessons?: number,
+    setId?: number
   ) => void;
 };
 
@@ -232,19 +233,26 @@ export default function CreateSetModal({
   };
 
   return (
-    <div
-      onMouseDown={handleClose}
-      className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
-        open ? "visible opacity-100" : "invisible opacity-0"
-      }`}
-      style={{ backgroundColor: "var(--overlay)" }}
-    >
+    <>
+      <button
+        type="button"
+        aria-label="Close create set modal"
+        onClick={handleClose}
+        className={`fixed inset-0 z-40 transition-all duration-200 ${
+          open ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+        style={{ backgroundColor: "var(--overlay)" }}
+      />
+      <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className={`z-50 rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+        className={`pointer-events-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
         } `}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-set-title"
       >
         <div
           className="flex flex-col justify-center items-center"
@@ -252,13 +260,15 @@ export default function CreateSetModal({
           onMouseDown={(e) => e.stopPropagation()}
         >
           <button
+            type="button"
+            aria-label="Close create set modal"
             className="focus-ring absolute right-2 top-2 rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
             onClick={handleClose}
             disabled={isLoading}
           >
             <X />
           </button>
-          <span className="text-heading">Create New Learning Set</span>
+          <span id="create-set-title" className="text-heading">Create New Learning Set</span>
           <span className="text-body text-sm text-muted">
             AI will generate bite-sized lessons based on your
             <br />
@@ -362,6 +372,7 @@ export default function CreateSetModal({
           </form>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

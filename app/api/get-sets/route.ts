@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 
-export async function GET(request: Request) {
+export async function GET() {
   const supabase = await createClient();
 
   const {
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
    */
 
   const response = await Promise.all(
-    setData.map(async (set, key) => {
+    setData.map(async (set) => {
       // returns the # of lessons associated with the set
       const { data: lessonData, error: lessonError } = await supabase
         .from("lessons")
@@ -71,7 +71,6 @@ export async function GET(request: Request) {
       });
 
       return {
-        key: { key },
         id: set.id,
         title: set.title,
         description: set.description,

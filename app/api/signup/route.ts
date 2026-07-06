@@ -10,13 +10,21 @@ export async function POST(request: Request) {
 
   const email = reqData.email;
   const password = reqData.password;
+  const ageConfirmed = reqData.ageConfirmed === true;
+
+  if (!ageConfirmed) {
+    return NextResponse.json(
+      { success: false, error: "Age confirmation is required" },
+      { status: 403 }
+    );
+  }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const userData = {
     email: email,
     password: password,
     options: {
-      emailRedirectTo: `${siteUrl}/dashboard`,
+      emailRedirectTo: `${siteUrl}/onboarding`,
     },
   };
 
@@ -32,7 +40,7 @@ export async function POST(request: Request) {
   const username = reqData.username;
 
   // 6/19 profile creation when a new user signs up
-  createProfile(userId!, username);
+  await createProfile(userId!, username);
 
   return NextResponse.json({ success: true }, { status: 200 });
 }

@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python C:\\Users\\arnav\\Desktop\\Learnium\\.bmad-loop\\bmad_loop_hook.py SessionStart"
+            "command": "uv run --no-project python .bmad-loop/bmad_loop_hook.py SessionStart"
           }
         ]
       }
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python C:\\Users\\arnav\\Desktop\\Learnium\\.bmad-loop\\bmad_loop_hook.py Stop"
+            "command": "uv run --no-project python .bmad-loop/bmad_loop_hook.py Stop"
           }
         ]
       }

@@ -22,7 +22,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Tailwind CSS v4 (`@tailwindcss/postcss`)
 - Separate Python/FastAPI microservice in `rag/` (not built by Next.js): LangChain, Chroma vector store, OpenRouter via OpenAI-compatible SDK/client configuration, Redis LangCache (`langcache` pkg) for semantic response caching
 - zod 3.25.62 (LLM output schema validation), franc 6.2.0 (language detection), axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
-- **No test framework configured** (no Jest/Vitest/Playwright) — known gap, not yet a project convention
+- **Test framework configured**: Vitest smoke tests, Playwright E2E smoke tests, and GitHub Actions CI are present.
 
 ## Critical Implementation Rules
 
@@ -48,7 +48,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ### Testing Rules
 
-- No automated tests exist yet (no Jest/Vitest/Playwright configured, no test files in `app/`, `lib/`, `actions/`, or `rag/`). Do not assume a test runner is configured — don't add `*.test.ts` files or invoke `npm test`/`pytest` unless a framework has been explicitly set up (see `bmad-tea` / `bmad-testarch-framework` skill to scaffold one)
+- Automated frontend smoke tests exist under `tests/smoke` and `tests/e2e`. Use `npm run lint`, `npx tsc --noEmit`, `npm test -- --run`, `npm run build`, and `npm run test:e2e` for the current quality gate.
 
 ### Code Quality & Style Rules
 
@@ -62,14 +62,14 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Branch names are personal/feature-based (`arnav`, `semantic_cache`) — no `feat/`/`fix/` prefix convention
 - Commit messages: short, lowercase, descriptive (no Conventional Commits prefix)
 - PRs merged via GitHub — no PR template or required status checks
-- **No CI pipeline configured** (`.github/` only holds BMad agent definitions) — no automated lint/build gate on push or PR; no in-repo deployment config found
+- CI is configured in `.github/workflows/ci.yml` for pull requests and pushes to `main`/`master`: install, lint, build, unit tests, and E2E smoke tests.
 
 ### Critical Don't-Miss Rules
 
 - `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It's **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present/populated in a fresh clone.
 - `middleware.ts` gates `protectedPaths` via `url.pathname.startsWith(path)` — a **prefix match, not exact**. New routes with overlapping prefixes (e.g. `/dashboardX` vs `/dashboard`) can be unintentionally protected/unprotected. Be precise when adding paths.
 - RAG service URL is currently **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. OpenRouter migration work should move this to `RAG_SERVICE_URL` while moving model/provider config to OpenRouter env vars.
-- Known existing bug, don't propagate: `app/api/webhook/route.ts` types its param as `NextRequest` but only imports `NextResponse` — replicate the *pattern* (raw `.text()` body + `stripe-signature` header + `constructEvent`) for new Stripe webhooks, not the missing import.
+- Stripe webhook route imports `NextRequest` and validates the `stripe-signature` header before `constructEvent`; preserve the raw `.text()` body pattern for new Stripe webhook work.
 - Quota ordering in `/api/send-chat` is strict: check `chats_remaining` → call RAG → insert user message → insert assistant message → decrement quota via `decrement_chat_quota` RPC. Preserve check-before-spend, decrement-after-success ordering in similar flows.
 
 ---

@@ -11,7 +11,10 @@ export async function DELETE() {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" });
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 }
+    );
   }
 
   const userId = user.id;

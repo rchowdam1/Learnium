@@ -4,7 +4,7 @@ baseline_commit: TODO-set-by-dev
 
 # Story 1.5: Landing Page Refresh
 
-Status: completed
+Status: done
 
 ## Story
 

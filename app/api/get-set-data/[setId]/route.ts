@@ -38,7 +38,7 @@ type Quiz = {
 };
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ setId: string }> }
 ) {
   const supabase = await createClient();
@@ -97,7 +97,7 @@ export async function GET(
 
   // fetch the paragraphs for each lesson
   const paragraphs = await Promise.all(
-    lessonData.map(async (lesson, key) => {
+    lessonData.map(async (lesson) => {
       const { data: paragraphData, error: paragraphError } = await supabase
         .from("paragraphs")
         .select("*")
@@ -128,7 +128,7 @@ export async function GET(
   // the quizzes associated with their ids
   // the index of the quiz will indicate which lesson it belongs to
   const quizzes: Quiz[] = await Promise.all(
-    lessonData.map(async (lesson, key) => {
+    lessonData.map(async (lesson) => {
       const { data: quizData, error: quizError } = await supabase
         .from("quizzes")
         .select("*")
@@ -138,17 +138,22 @@ export async function GET(
 
       if (quizError) {
         console.log("Could not retrieve quiz data");
-        return {};
+        return {
+          quizId: 0,
+          questions: [],
+          lessonId: lesson.id,
+        };
       }
 
-      const quiz: Quiz = {};
-
-      quiz.lessonId = lesson.id;
-      quiz.quizId = quizData.id;
+      const quiz: Quiz = {
+        lessonId: lesson.id,
+        quizId: quizData.id,
+        questions: [],
+      };
 
       if (quizData) {
         // to store the previous answers if quiz has been completed
-        let previousAnswers: string[] = [];
+        const previousAnswers: string[] = [];
 
         // also get the quiz score
         if (quizData.completed) {
@@ -162,7 +167,7 @@ export async function GET(
 
         if (questionError) {
           console.log("Could not retrieve question data");
-          return {};
+          return quiz;
         }
 
         if (questionData) {

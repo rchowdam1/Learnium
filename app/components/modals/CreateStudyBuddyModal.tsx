@@ -177,19 +177,26 @@ export default function CreateStudyBuddyModal({
   };
 
   return (
-    <div
-      className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
-        open ? "visible opacity-100" : "invisible opacity-0"
-      }`}
-      style={{ backgroundColor: "var(--overlay)" }}
-      onMouseDown={handleClose}
-    >
+    <>
+      <button
+        type="button"
+        aria-label="Close create study buddy modal"
+        className={`fixed inset-0 z-40 transition-all duration-200 ${
+          open ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+        style={{ backgroundColor: "var(--overlay)" }}
+        onClick={handleClose}
+      />
+      <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className={`z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+        className={`pointer-events-auto max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
         } `}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-study-buddy-title"
       >
         <div
           className="flex flex-col justify-center items-center"
@@ -197,12 +204,14 @@ export default function CreateStudyBuddyModal({
           onMouseDown={(e) => e.stopPropagation()}
         >
           <button
+            type="button"
+            aria-label="Close create study buddy modal"
             className="focus-ring absolute right-2 top-2 cursor-pointer rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
             onClick={handleClose}
           >
             <X />
           </button>
-          <span className="text-heading">Create New Study Buddy</span>
+          <span id="create-study-buddy-title" className="text-heading">Create New Study Buddy</span>
           <span className="text-body text-sm text-muted">
             Upload study materials and chat with an AI
             <br />
@@ -297,6 +306,7 @@ export default function CreateStudyBuddyModal({
           </form>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

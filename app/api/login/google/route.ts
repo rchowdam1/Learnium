@@ -1,10 +1,17 @@
 import { createClient } from "@/lib/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const mode = request.nextUrl.searchParams.get("mode");
+  const ageConfirmed = request.nextUrl.searchParams.get("age_confirmed") === "1";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+  if (mode !== "login" && !ageConfirmed) {
+    return NextResponse.redirect(`${siteUrl}/signup?age=required`);
+  }
+
   const supabase = await createClient();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {

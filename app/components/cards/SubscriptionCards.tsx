@@ -1,5 +1,5 @@
 "use client";
-import { Check, Settings } from "lucide-react";
+import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 

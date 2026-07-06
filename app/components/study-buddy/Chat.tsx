@@ -40,7 +40,7 @@ function ChatMessage({
 
 export default function Chat({ buddyId }: { buddyId: string }) {
   // resume here 1/13 figure out why chats aren't loading
-  const chatWindowRef = useRef(null);
+  const chatWindowRef = useRef<HTMLDivElement | null>(null);
 
   const [messages, setMessages] = useState<Message[] | undefined>(undefined);
   const [title, setTitle] = useState<string>("");
@@ -74,13 +74,13 @@ export default function Chat({ buddyId }: { buddyId: string }) {
     };
 
     getBuddyData();
-  }, []);
+  }, [buddyId]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const onSendMessage = async (e) => {
+  const onSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Executed");
 
@@ -89,8 +89,9 @@ export default function Chat({ buddyId }: { buddyId: string }) {
     if (!messageToSend.trim()) return; // Safety Check for empty messages
 
     setMessages((prevMessages) => {
+      const safeMessages = prevMessages ?? [];
       return [
-        ...prevMessages,
+        ...safeMessages,
         {
           is_user_message: true,
           message: messageToSend,
@@ -105,8 +106,6 @@ export default function Chat({ buddyId }: { buddyId: string }) {
 
     // Send the query to RAG
     setCurrentMessage("");
-
-    let assistantMessage: string = "";
 
     /**
      * First, check if the user has chats remaining for the day. If not, show a toast error and return.
@@ -144,13 +143,13 @@ export default function Chat({ buddyId }: { buddyId: string }) {
               "You have no chats remaining for the day. Please try again tomorrow!",
             );
             setMessages((prevMessages) => {
-              //prevMessages?.pop(); // remove the loading message
-              prevMessages[prevMessages.length - 1] = {
+              const safeMessages = [...(prevMessages ?? [])];
+              safeMessages[safeMessages.length - 1] = {
                 is_user_message: false,
                 message:
                   "You have no chats remaining for the day. Please try again tomorrow!",
               };
-              return [...prevMessages];
+              return safeMessages;
             });
             return;
           }
@@ -164,28 +163,27 @@ export default function Chat({ buddyId }: { buddyId: string }) {
         } else {
           const assistantMessage = data.assistantMessage;
           setMessages((prevMessages) => {
-            //prevMessages?.pop(); // remove the loading message
-            prevMessages[prevMessages.length - 1] = {
+            const safeMessages = [...(prevMessages ?? [])];
+            safeMessages[safeMessages.length - 1] = {
               is_user_message: false,
               message: assistantMessage,
             };
-            return [...prevMessages];
+            return safeMessages;
           });
         }
       }
     } catch (error) {
-      toast.error(error as string);
+      toast.error(error instanceof Error ? error.message : "Could not send message");
       setMessages((prevMessages) => {
-        //prevMessages?.pop(); // remove the loading message
-        prevMessage[prevMessages.length - 1] = {
+        const safeMessages = [...(prevMessages ?? [])];
+        safeMessages[safeMessages.length - 1] = {
           is_user_message: false,
           message: "Sorry, an error occurred while trying to get a response.",
         };
-        return [...prevMessages];
+        return safeMessages;
       });
     }
 
-    e.target.value = "";
     setCurrentMessage("");
   };
 
@@ -257,7 +255,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
       </div>
 
       {/**Text input Segment */}
-      <div className="px-2 py-2 flex">
+      <form className="px-2 py-2 flex" onSubmit={onSendMessage}>
         {/**Text area */}
         <div className="basis-5/6">
           <textarea
@@ -272,18 +270,18 @@ export default function Chat({ buddyId }: { buddyId: string }) {
         {/**Send Button */}
         <div className="basis-1/6 flex items-center justify-center">
           <button
+            type="submit"
             disabled={!currentMessage}
             className={`px-6 py-3 ${
               !currentMessage
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-black cursor-pointer"
             } text-white rounded-md`}
-            onClick={onSendMessage}
           >
             <SendHorizontal className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

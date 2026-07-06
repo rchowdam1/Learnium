@@ -4,7 +4,7 @@ baseline_commit: TODO-set-by-dev
 
 # Story 1.8: Settings Page and Route Protection
 
-Status: ready-for-review
+Status: done
 
 ## Story
 

@@ -126,7 +126,7 @@ export async function updateSetResetDate() {
   }
 
   // set the 'sets_refresh_at' to the day after the current day
-  let date = new Date(new Date().toISOString().split("T")[0]); // current day in YYYY-MM-DD format
+  const date = new Date(new Date().toISOString().split("T")[0]); // current day in YYYY-MM-DD format
   date.setDate(date.getDate() + 1); // next day in YYYY-MM-DD format
 
   const { error: setRequestUpdateError } = await supabase

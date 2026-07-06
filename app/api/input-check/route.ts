@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { franc } from "franc";
 import OpenAI from "openai";
-import { zodTextFormat, zodResponseFormat } from "openai/helpers/zod";
+import { zodTextFormat } from "openai/helpers/zod";
 import { zOutputSchema } from "@/app/schema/OutputSchema";
-import { z } from "zod";
 import { createClient } from "@/lib/server";
 import { createSet } from "@/actions/dbops";
 import {
@@ -11,13 +9,10 @@ import {
   resetSets,
   updateSetResetDate,
 } from "@/actions/ProfileUpdates";
-import { profile } from "console";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "dummy_key",
 });
-
-type OutputSchema = z.infer<typeof zOutputSchema>;
 
 export async function POST(request: Request) {
   const data = await request.json();
@@ -207,7 +202,6 @@ export async function POST(request: Request) {
     );
   }
 
-  let numLessons = 0;
   // create the sets
   if (parsedResponse) {
     const title = data.title;

@@ -91,6 +91,7 @@ export default function SignupPage() {
           username: trimmedUsername,
           email,
           password: trimmedPassword,
+          ageConfirmed,
         }),
       });
 

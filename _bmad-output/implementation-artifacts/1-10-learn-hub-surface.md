@@ -4,7 +4,7 @@ baseline_commit: TODO-set-by-dev
 
 # Story 1.10: Learn Hub Surface
 
-Status: peer-review
+Status: done
 
 ## Story
 
