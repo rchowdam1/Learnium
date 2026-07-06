@@ -6,12 +6,15 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 import { Loader2 } from "lucide-react";
+import { Input } from "@/app/components/ui/Input";
+import { Button } from "@/app/components/ui/Button";
 import SignInWithGoogle from "../components/misc/SignInWithGoogle";
 
 export default function LoginPage() {
   const router = useRouter();
+
   // state for input errors
-  const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // state for gathering input
   const [email, setEmail] = useState<string>("");
@@ -23,8 +26,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
 
-    // login
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -38,77 +41,114 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        setError(true);
+        setErrorMessage("Incorrect email or password. Please try again.");
         setLoading(false);
         return;
       }
 
-      // successful login, should redirect
-      setError(false);
-      toast.success("Logged In");
-      router.replace("/dashboard");
+      toast.success("Logged in successfully!");
+
+      // Check onboarding status
+      let hasDailyGoalTier = false;
+      try {
+        const profileRes = await fetch("/api/get-profile-data");
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          if (profileData.success) {
+            hasDailyGoalTier = !!profileData.daily_goal_tier;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check onboarding status:", err);
+      }
+
+      if (!hasDailyGoalTier) {
+        router.replace("/onboarding");
+        return;
+      }
+
+      // Check for a safe redirect path in search params
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const isSafeRedirect = (url: string | null) => {
+        if (!url) return false;
+        // Path must start with exactly one '/' and not be an absolute url or double slash (//)
+        return url.startsWith("/") && !url.startsWith("//");
+      };
+
+      const redirectTarget = isSafeRedirect(next) ? next! : "/dashboard";
+      router.replace(redirectTarget);
     } catch {
-      toast.error("Login failed. Please try again.");
+      toast.error("Login failed. Please check your connection and try again.");
       setLoading(false);
-      return;
     }
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background py-5">
-      <div className="text-display text-4xl text-primary">Learnium</div>
-      <span className="text-body my-2 text-xl text-muted">Welcome Back!</span>
-      <div className="flex w-[30rem] flex-col items-center justify-center space-y-2 rounded-2xl border border-border bg-surface-raised py-8 text-primary">
-        <span className="text-heading text-2xl">Log In</span>
-        <form
-          className="flex w-full max-w-sm flex-col space-y-4"
-          onSubmit={handleSubmit}
-        >
-          <label className="text-label">Email</label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <label className="text-label">Password</label>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
-            required
-            onChange={(e) => setPassword(e.target.value)}
-          />
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Skip to Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-xl focus:bg-surface-raised focus:px-4 focus:py-2 focus:text-primary focus:border focus:border-border focus:shadow-sm focus-ring"
+      >
+        Skip to content
+      </a>
 
-          {error && (
-            <span className="text-body text-sm text-error">
-              Incorrect Email or Password. Please Try Again
-            </span>
-          )}
-
-          <Link href="/signup" className="text-center">
-            <span className="text-label cursor-pointer text-brand hover:underline">
-              Don&apos;t have an account? Create One
-            </span>
-          </Link>
-
-          <button
-            type="submit"
-            className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
-            disabled={loading}
+      <main
+        id="main-content"
+        className="flex-grow flex flex-col items-center justify-center py-5 px-4 focus:outline-none"
+        tabIndex={-1}
+      >
+        <div className="text-display text-4xl text-primary mb-2">Learnium</div>
+        <span className="text-body text-xl text-muted mb-6">Welcome Back!</span>
+        <div className="flex w-full max-w-[30rem] flex-col items-center justify-center space-y-6 rounded-2xl border border-border bg-surface-raised px-6 py-8 text-primary shadow-sm">
+          <span className="text-heading text-2xl font-semibold">Log In</span>
+          <form
+            className="flex w-full max-w-sm flex-col space-y-4"
+            onSubmit={handleSubmit}
           >
-            {loading && (
-              <>
-                <Loader2 className="animate-spin w-4 h-4" />
-                <span>Logging in...</span>
-              </>
-            )}
-            {!loading && "Log In"}
-          </button>
-        </form>
-        <SignInWithGoogle login={true} />
-      </div>
+            <Input
+              type="email"
+              label="Email"
+              placeholder="Enter your email"
+              required
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errorMessage) setErrorMessage("");
+              }}
+            />
+            <Input
+              type="password"
+              label="Password"
+              placeholder="Enter your password"
+              required
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errorMessage) setErrorMessage("");
+              }}
+              error={errorMessage || undefined}
+            />
+
+            <Link href="/signup" className="text-center py-1">
+              <span className="text-label cursor-pointer text-brand hover:underline text-sm font-medium">
+                Don&apos;t have an account? Create One
+              </span>
+            </Link>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 className="animate-spin w-4 h-4" />}
+              {loading ? "Logging in..." : "Log In"}
+            </Button>
+          </form>
+          <SignInWithGoogle login={true} />
+        </div>
+      </main>
     </div>
   );
 }

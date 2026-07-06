@@ -18,6 +18,23 @@ export async function GET(request: NextRequest) {
       token_hash,
     });
     if (!error) {
+      // check if user has completed onboarding
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profile")
+            .select("daily_goal_tier")
+            .eq("id", user.id)
+            .single();
+          if (profile && !profile.daily_goal_tier) {
+            redirect("/onboarding");
+          }
+        }
+      } catch (err) {
+        console.error("Error during email confirmation onboarding check:", err);
+      }
+
       // redirect user to specified redirect URL or root of app
       redirect(next);
     }

@@ -11,11 +11,12 @@ export async function POST(request: Request) {
   const email = reqData.email;
   const password = reqData.password;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const userData = {
     email: email,
     password: password,
     options: {
-      emailRedirectTo: "http://localhost:3000/dashboard",
+      emailRedirectTo: `${siteUrl}/dashboard`,
     },
   };
 

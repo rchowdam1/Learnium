@@ -33,7 +33,7 @@ export async function GET(request: Request) {
       // check if email exists
       const { data: profile } = await supabase
         .from("profile")
-        .select("id")
+        .select("id, daily_goal_tier")
         .eq("id", user?.id)
         .single();
 
@@ -58,6 +58,12 @@ export async function GET(request: Request) {
         if (insertError) {
           console.log("Failed to create profile for user:", insertError);
         }
+
+        // since it is a new profile, they need onboarding
+        next = "/onboarding";
+      } else if (!profile.daily_goal_tier) {
+        // profile exists but onboarding not complete
+        next = "/onboarding";
       }
     }
 
@@ -77,9 +83,9 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`https://${forwardedHost}${next}`);
       } else {
         /*console.log(
-          "Executing here in the Oauth callback, redirecting to /dashboard"
+          "Executing here in the Oauth callback, redirecting to {origin}{next}"
         );*/
-        return NextResponse.redirect(`${origin}/dashboard`);
+        return NextResponse.redirect(`${origin}${next}`);
       }
     }
   }
