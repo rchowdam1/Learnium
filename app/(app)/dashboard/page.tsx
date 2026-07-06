@@ -1,14 +1,14 @@
 "use client";
 
-import AuthNav from "../components/nav/AuthNav";
-import StatCard from "../components/cards/StatCards";
-import SetCard from "../components/cards/SetCards";
-import StudyBuddyCard from "../components/cards/StudyBuddyCards";
-import CreateSetController from "../components/controllers/CreateSetController";
+import StatCard from "@/app/components/cards/StatCards";
+import SetCard from "@/app/components/cards/SetCards";
+import StudyBuddyCard from "@/app/components/cards/StudyBuddyCards";
+import CreateSetController from "@/app/components/controllers/CreateSetController";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
+import CreateStudyBuddyController from "@/app/components/controllers/CreateStudyBuddyController";
 
 type StatCards = {
   title: string;
@@ -40,6 +40,7 @@ type StudyBuddyCards = {
 };
 
 export default function Dashboard() {
+  const router = useRouter();
   // state for skeleton loading
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -216,6 +217,10 @@ export default function Dashboard() {
         const data = await response.json();
 
         if (data.success) {
+          if (!data.daily_goal_tier) {
+            router.replace("/onboarding");
+            return;
+          }
           setProfileData([
             {
               title: "Total Sets",
@@ -246,9 +251,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <AuthNav />
-
-      <main className="mx-auto max-w-[72rem] px-4 pt-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[72rem] px-4 pt-6 sm:px-6 lg:px-8">
         {/*Stat Cards*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
           {profileData.length === 0 &&
@@ -384,7 +387,7 @@ export default function Dashboard() {
 
         <br />
         <br />
-      </main>
+      </div>
     </div>
   );
 }

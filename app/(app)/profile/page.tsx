@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import AuthNav from "../components/nav/AuthNav";
-import Progress from "../components/misc/Progress";
+import Progress from "@/app/components/misc/Progress";
 
 import {
-  CircleUser,
   Settings,
   Undo2,
   Trophy,
@@ -165,7 +163,7 @@ export default function ProfilePage() {
             toast.error("Could not fetch profile data");
           }
         }
-      } catch (error) {
+      } catch {
         setLoading(false);
         toast.error("Couln't fetch profile data");
       }
@@ -184,9 +182,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AuthNav />
-
-      <main className="max-w-7xl mx-auto pt-20 text-center relative">
+      <div className="max-w-7xl mx-auto pt-8 text-center relative">
         <span className="text-5xl font-bold">My Profile</span>
 
         {/*Back Home Page*/}
@@ -388,7 +384,7 @@ export default function ProfilePage() {
                       })
                   ) : (
                     <span className="mt-3 font-semibold text-xl">
-                      You haven't completed any sets
+                      You haven&apos;t completed any sets
                     </span>
                   )}
                 </div>
@@ -396,7 +392,7 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }
