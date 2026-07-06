@@ -14,7 +14,7 @@ import {
 import { profile } from "console";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || "dummy_key",
 });
 
 type OutputSchema = z.infer<typeof zOutputSchema>;

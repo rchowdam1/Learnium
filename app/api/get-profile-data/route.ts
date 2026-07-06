@@ -213,5 +213,10 @@ export async function GET() {
     averageQuizScore: averageQuizScore,
     topCategories: topCategories,
     setData: setData,
+    xp: profileData.xp,
+    streak: profileData.streak,
+    level: profileData.level,
+    daily_goal_tier: profileData.daily_goal_tier,
+    created_at: user?.created_at,
   });
 }

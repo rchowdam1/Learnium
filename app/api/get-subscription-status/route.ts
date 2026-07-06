@@ -32,6 +32,8 @@ export async function GET() {
       message: "Found user data",
       email,
       isSubscribed: profileData.is_subscribed,
+      setsRemaining: profileData.sets_remaining,
+      requestsRemaining: profileData.sets_remaining,
     },
     { status: 200 }
   );
