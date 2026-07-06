@@ -47,7 +47,7 @@ export default function AuthNav() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 z-50 w-full border-b border-border bg-background">
+    <nav aria-label="Authenticated navigation" className="fixed top-0 left-0 z-50 w-full border-b border-border bg-background">
       <div className="mx-4 flex h-16 items-center justify-between sm:mx-[4.5rem] lg:mx-18">
         <div className="flex items-center space-x-3">
           <BookOpen className="h-8 w-8 text-brand" />

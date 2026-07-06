@@ -1,7 +1,6 @@
 "use client";
 
 import AuthNav from "@/app/components/nav/AuthNav";
-import LessonBubble from "@/app/components/lessons/LessonBubble";
 import LessonChain from "@/app/components/lessons/LessonChain";
 import LessonQuizModal from "@/app/components/modals/LessonQuizModal";
 import SetCompleteModal from "@/app/components/modals/SetCompleteModal";
@@ -12,7 +11,6 @@ import { useParams } from "next/navigation";
 
 import {
   Undo2,
-  CircleCheckBig,
   BrainCog,
   SquareChevronRight,
 } from "lucide-react";
@@ -177,17 +175,26 @@ export default function SetPage({ params }: { params: { setId: string } }) {
   }, [currentLesson]);
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
+    <div className="relative min-h-screen bg-gray-50 flex flex-col">
+      {/* Skip to Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-xl focus:bg-surface-raised focus:px-4 focus:py-2 focus:text-primary focus:border focus:border-border focus:shadow-sm focus-ring"
+      >
+        Skip to content
+      </a>
+
       <AuthNav />
       {/*Back Home Page*/}
-      <Link href="/dashboard">
-        <div className="absolute top-26 left-10 flex justify-center gap-2 items-center rounded-2xl px-2 py-1 hover:bg-gray-200 transition-colors duration-350 cursor-pointer">
-          <Undo2 />
-          <span>Return to home</span>
-        </div>
+      <Link
+        href="/dashboard"
+        className="focus-ring absolute top-26 left-10 flex justify-center gap-2 items-center rounded-2xl px-2 py-1 hover:bg-gray-200 transition-colors duration-350 cursor-pointer text-primary"
+      >
+        <Undo2 />
+        <span>Return to home</span>
       </Link>
 
-      <main className="flex flex-col justify-center lg:flex-row items-center mr-50">
+      <main id="main-content" className="flex-grow flex flex-col justify-center lg:flex-row items-center mr-50 focus:outline-none" tabIndex={-1}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-40">
           <div className="bg-white shadow-md rounded-lg  w-fit py-16 px-16 overflow-auto h-130 relative lg:right-45 flex flex-col justify-center items-center space-y-5">
             {!lessons &&

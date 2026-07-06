@@ -150,6 +150,14 @@ body {
   background: var(--background);
   color: var(--text-primary);
   font-family: var(--font-inter), sans-serif;
+  scroll-padding-top: 4rem; /* Account for sticky desktop top bar */
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-padding-top: 0;
+    scroll-padding-bottom: 6.5rem; /* Account for mobile fixed bottom bar + mobile status bar */
+  }
 }
 
 * {

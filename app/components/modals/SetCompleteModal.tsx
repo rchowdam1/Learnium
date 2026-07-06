@@ -1,5 +1,4 @@
 import { X, PartyPopper } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type SetCompleteModalProps = {
@@ -23,13 +22,17 @@ export default function SetCompleteModal({
       <div
         className={`flex flex-col items-center bg-white rounded-md z-60 shadow p-6 text-center relative transition-all scale-100 opacity-100`}
       >
-        <X
+        <button
+          type="button"
           onClick={onClose}
-          className="absolute top-2 right-2 w-7 h-7 text-gray-500 cursor-pointer hover:text-gray-200 transition-colors duration-150"
-        />
+          aria-label="Close modal"
+          className="focus-ring absolute top-2 right-2 p-1 rounded-xl text-gray-500 hover:text-gray-200 transition-colors duration-150 cursor-pointer"
+        >
+          <X className="w-6 h-6" />
+        </button>
         <PartyPopper className="w-10 h-10 text-[#9e975c]" />
         <span className="text-2xl font-semibold">Congratulations!</span>
-        <p>You just finished "{setTitle}"!</p>
+        <p>You just finished &ldquo;{setTitle}&rdquo;!</p>
         <p>You can keep track of your completed sets in your profile.</p>
 
         <button

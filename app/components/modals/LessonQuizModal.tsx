@@ -24,8 +24,9 @@ const Option = ({
 }: OptionProps) => {
   console.log(previousAnswer, "previous answer in option");
   return (
-    <div
-      className={`w-120 rounded-lg px-5 py-5 border border-gray-300 relative transition-all duration-200 shadow-sm text-left
+    <button
+      type="button"
+      className={`focus-ring w-120 rounded-lg px-5 py-5 border border-gray-300 relative transition-all duration-200 shadow-sm text-left
     ${displayCorrectAnswer ? "" : "cursor-pointer"}
     ${displayCorrectAnswer && !selected && correct ? "bg-green-400" : ""}
     ${
@@ -51,8 +52,8 @@ const Option = ({
         }
       }}
     >
-      <span className="text-left text-gray-600">{option.option}</span>
-    </div>
+      <span className="text-left text-gray-600 block">{option.option}</span>
+    </button>
   );
 };
 
@@ -109,18 +110,26 @@ const Question = ({
 
       {/*Next and Previous Question Arrows*/}
       <div className="flex justify-center items-center mt-2">
-        <div className="flex justiy-center items-center gap-5 mt-2">
-          <ArrowLeft
-            className="h-6 w-6 rounded-md hover:border hover:border-gray-50 cursor-pointer"
+        <div className="flex justify-center items-center gap-5 mt-2">
+          <button
+            type="button"
             onClick={prev}
-          />
+            aria-label="Previous question"
+            className="focus-ring p-1 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
           <span>
             {currentQues}/{totalQues}
           </span>
-          <ArrowRight
-            className="h-6 w-6 rounded-md hover:border hover:border-gray-50 cursor-pointer"
+          <button
+            type="button"
             onClick={next}
-          />
+            aria-label="Next question"
+            className="focus-ring p-1 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+          >
+            <ArrowRight className="h-6 w-6" />
+          </button>
         </div>
       </div>
     </div>

@@ -12,22 +12,24 @@ export default function LessonBubble({
   clickedLesson: () => void; // function to handle click events on the bubble
 }) {
   return (
-    <div
-      className={`relative h-2 w-40 ${
+    <button
+      type="button"
+      className={`focus-ring relative h-2 w-40 ${
         active ? "bg-blue-500" : complete ? "bg-green-500" : "bg-gray-200"
-      } shadow-lg cursor-pointer transition-colors duration-300`}
+      } shadow-lg cursor-pointer transition-colors duration-300 border-0 p-0 block`}
       onClick={clickedLesson}
+      aria-label={`Lesson ${number}`}
     >
       {/*Vertical Line*/}
       {!last && (
-        <div
+        <span
           className={`absolute w-2 h-19 ${
             complete ? "bg-green-500" : "bg-gray-200"
           } left-9 shadow-lg`}
-        ></div>
+        ></span>
       )}
       {/* Circle centered on the line */}
-      <div
+      <span
         className={`absolute left-0 top-1/2 -translate-y-1/2 ${
           active ? "bg-blue-500" : complete ? "bg-green-500" : "bg-gray-200"
         } w-20 h-20 rounded-full flex items-center justify-center shadow-lg`}
@@ -39,7 +41,7 @@ export default function LessonBubble({
         >
           {number}
         </span>
-      </div>
-    </div>
+      </span>
+    </button>
   );
 }
