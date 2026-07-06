@@ -1,5 +1,5 @@
 # generated: 2026-07-05T20:35:28.6604107-05:00
-# last_updated: 2026-07-05T22:56:00-05:00
+# last_updated: 2026-07-06T00:00:00-05:00
 # project: Learnium
 # project_key: NOKEY
 # tracking_system: file-system
@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: "2026-07-05T20:35:28.6604107-05:00"
-last_updated: "2026-07-05T22:56:00-05:00"
+last_updated: "2026-07-06T12:55:00-05:00"
 project: Learnium
 project_key: NOKEY
 tracking_system: file-system
@@ -50,15 +50,15 @@ story_location: "C:/Users/arnav/Desktop/Learnium/_bmad-output/implementation-art
 development_status:
   epic-1: in-progress
   1-1-design-token-system-and-typography: done
-  1-2-core-ui-component-library: backlog
-  1-3-app-layout-shell-and-5-tab-navigation: backlog
-  1-4-persistent-chrome-with-status-slots: backlog
-  1-5-landing-page-refresh: backlog
-  1-6-auth-pages-refresh: backlog
-  1-7-onboarding-flow-routing: backlog
-  1-8-settings-page-and-route-protection: backlog
-  1-9-accessibility-floor-and-test-ci-scaffold: backlog
-  1-10-learn-hub-surface: backlog
+  1-2-core-ui-component-library: done
+  1-3-app-layout-shell-and-5-tab-navigation: done
+  1-4-persistent-chrome-with-status-slots: done
+  1-5-landing-page-refresh: done
+  1-6-auth-pages-refresh: done
+  1-7-onboarding-flow-routing: done
+  1-8-settings-page-and-route-protection: done
+  1-9-accessibility-floor-and-test-ci-scaffold: done
+  1-10-learn-hub-surface: done
   epic-1-retrospective: optional
   epic-2: backlog
   2-1-fix-set-generation-quota-ordering: backlog
