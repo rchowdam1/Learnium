@@ -57,21 +57,36 @@ export async function updateSession(request: NextRequest) {
     "/sets",
     "/profile",
     "/subscriptions",
+    "/buddy",
+    "/learn",
+    "/review",
+    "/leagues",
+    "/paths",
+    "/settings",
+    "/onboarding",
   ];
 
   //console.log(url.pathname);
 
-  let trespass: boolean = false;
+  let trespass = false;
 
+  // Prefix matching warning: Using `startsWith` checks can lead to accidental over-matching
+  // (e.g., `/settings-profile` starting with `/settings`).
+  // To prevent this and preserve exact sub-resource matching (like `/settings/account`),
+  // we check if the pathname is an exact match OR is immediately followed by a slash.
   protectedPaths.forEach((path) => {
-    if (url.pathname.startsWith(path)) {
+    if (url.pathname === path || url.pathname.startsWith(path + "/")) {
       trespass = true;
     }
   });
 
   if (trespass && !user) {
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    // Preserve the return URL where safe (relative paths only, starting with a single slash)
+    const nextPath = url.pathname + url.search;
+    loginUrl.searchParams.set("next", nextPath);
+    return NextResponse.redirect(loginUrl);
   }
 
   return supabaseResponse;
