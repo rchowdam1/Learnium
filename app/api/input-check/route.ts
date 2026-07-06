@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
 import { zOutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
 import { createSet } from "@/actions/dbops";
@@ -11,52 +10,47 @@ import {
 } from "@/actions/ProfileUpdates";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "dummy_key",
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY || "dummy_key",
+  defaultHeaders: {
+    "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    "X-Title": "Learnium",
+  },
 });
+
+// Default to a free model; override via env for production
+const MODEL = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.2-3b-instruct:free";
 
 export async function POST(request: Request) {
   const data = await request.json();
 
   // heuristic regex checks
-
   const description = data.description.trim();
 
   // check if description contains any vowels
   if (!/[aeiou]{1,}/i.test(description)) {
     return NextResponse.json(
-      {
-        error: "Description doesn't contain a vowel",
-      },
-      {
-        status: 200,
-      },
+      { error: "Description doesn't contain a vowel" },
+      { status: 200 },
     );
   }
 
   // check if description contains too many consonants
   if (/[^aeiou]{7,}/i.test(description)) {
     return NextResponse.json(
-      {
-        error: "Description contains 7 or more consective consonants",
-      },
-      {
-        status: 200,
-      },
+      { error: "Description contains 7 or more consective consonants" },
+      { status: 200 },
     );
   }
 
   if (/(.{3,})\1{1,}/i.test(description)) {
     return NextResponse.json(
-      {
-        error: "Description contains repeating words",
-      },
-      {
-        status: 200,
-      },
+      { error: "Description contains repeating words" },
+      { status: 200 },
     );
   }
 
-  // check if user has remaning set requests
+  // check if user has remaining set requests
   const supabase = await createClient();
 
   const {
@@ -73,34 +67,29 @@ export async function POST(request: Request) {
     console.log("Could not retrieve profile");
     return NextResponse.json(
       { error: "Could not retrieve profile" },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   }
 
-  // if 'sets_refresh_at' is null (such as when the user makes a set for the first time), set the value the next today
+  // if 'sets_refresh_at' is null, set to today
   if (profileData.sets_refresh_at === null) {
-    const result = await updateSetResetDate(); // 'sets_remaining' is still 1
+    const result = await updateSetResetDate();
     if (result.success === false) {
       console.log("Could not update the set reset date");
     }
   }
 
-  // if 'sets_remaining' == 0 and 'sets_refresh_at' <= today, then call resetSets()
+  // check if sets need resetting
   const today = new Date().toISOString().split("T")[0];
-
   const setsRefreshAt = profileData.sets_refresh_at
     ? profileData.sets_refresh_at.split("T")[0]
     : null;
-  console.log("The set refresh date is", setsRefreshAt);
 
   if (
     profileData.sets_remaining === 0 &&
     setsRefreshAt &&
     setsRefreshAt <= today
   ) {
-    // if it's past the refresh date, reset the set requests
     let result = await updateSetResetDate();
     if (result.success === false) {
       return NextResponse.json(
@@ -108,134 +97,130 @@ export async function POST(request: Request) {
         { status: 200 },
       );
     }
-
-    // result.success == true
     result = await resetSets();
-
     if (result.success === false) {
       return NextResponse.json(
         { error: "Could not reset the remaining set requests" },
         { status: 200 },
       );
     }
-
-    // result.success == true
   }
 
-  // at this point before the LLM API call has been made, we need to update the remaining requests of the user accordingly
+  // Decrement quota before LLM call
   const result = await decrementRequests();
   if (result.success === false) {
-    // check if user does not have any requests remaining
-
     if (result.message === "User does not have any set requests remaining") {
       return NextResponse.json({ error: result.message }, { status: 200 });
     }
-
     return NextResponse.json(
-      {
-        error: "An error occurred while trying to decrease 'sets_remaining'",
-      },
-      {
-        status: 200,
-      },
-    );
-  }
-
-  // temporary code, used for debugging
-  if (result.success === true) {
-    console.log(
-      "Should have successfully decremented the user's remaining set requests",
-    );
-    // ok so this worked for the ocean set but not for the aws set
-    // next, try to reset the set requests for rithiknchowdam and if it does not work then debug
-  }
-
-  // system prompt
-  const systemPrompt: string = `You are a very knowledgeable teacher and specialize in providing microlearning sets
-  that usually consist of 3-5 lessons and a quiz for each lesson. Each lesson consists of 3-5 paragraphs and a title related to the paragraphs.
-  The title of the lesson is shared with the quiz, and the quiz consists of 3-5 questions with 4 options each.
-  Feel free to generate as many lessons as you see fit, as long as it's within the range of 3-5 lessons.
-  You will be given a description of the topic from the user, and you will generate a set of lessons based on that. If the
-  description given by the user is not plausible, or contains illegal or unethical content, do not generate
-  any lessons and set "flagged" as true. If "flagged" is true, then set all of the properties as empty strings. As you're generating the lessons, make sure that
-  the lessons are related to the description and are easily digestible by the user`;
-
-  const response = await openai.responses.parse({
-    model: "gpt-4o",
-    input: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: `The description given is "${data.description}". Generate the microlearning set`,
-      },
-    ],
-    text: {
-      format: zodTextFormat(zOutputSchema, "output_schema"),
-    },
-  });
-
-  const parsedResponse = response.output_parsed;
-  console.log(
-    parsedResponse,
-    /*`| this response used ${response.usage?.total_tokens}, with ${response.usage?.prompt_tokens} prompt tokens and ${response.usage?.completion_tokens} completion tokens`*/
-  );
-
-  if (parsedResponse && parsedResponse.flagged) {
-    // add to the flagged table
-
-    const { error } = await supabase.from("flagged").insert({
-      profile_id: user?.id,
-      profile_email: user?.email,
-      query: data.description,
-    });
-
-    if (error) {
-      console.log("Flagged Response, but couldn't add it to db");
-    }
-
-    return NextResponse.json(
-      { error: "Could not process your request" },
+      { error: "An error occurred while trying to decrease 'sets_remaining'" },
       { status: 200 },
     );
   }
 
-  // create the sets
-  if (parsedResponse) {
+  // System prompt
+  const systemPrompt = `You are a knowledgeable teacher specializing in microlearning sets.
+Generate a set of 3-5 lessons with quizzes based on the user's topic description.
+Each lesson must have a title and 3-5 paragraphs (non-empty strings).
+Each quiz shares its title with the corresponding lesson and contains 3-5 questions.
+Each question has 4 options and one correct answer (the answer string must match exactly one option).
+If the topic is unsafe, illegal, unethical, or nonsensical, set "flagged" to true and leave all arrays empty.
+Return ONLY valid JSON matching this schema — no extra text, no markdown fences.`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: `The description given is "${data.description}". Generate the microlearning set as JSON.`,
+        },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 4096,
+    });
+
+    const content = completion.choices?.[0]?.message?.content;
+    if (!content) {
+      console.error("Empty response from model");
+      return NextResponse.json(
+        { error: "Failed to generate content — empty response" },
+        { status: 500 },
+      );
+    }
+
+    // Parse JSON response
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(content);
+    } catch {
+      console.error("Failed to parse model JSON:", content.slice(0, 200));
+      return NextResponse.json(
+        { error: "Failed to parse generated content" },
+        { status: 500 },
+      );
+    }
+
+    // Validate against Zod schema
+    const validation = zOutputSchema.safeParse(parsed);
+    if (!validation.success) {
+      console.error("Schema validation failed:", validation.error.issues);
+      return NextResponse.json(
+        { error: "Generated content failed quality validation" },
+        { status: 500 },
+      );
+    }
+
+    const parsedResponse = validation.data;
+
+    if (parsedResponse.flagged) {
+      const { error } = await supabase.from("flagged").insert({
+        profile_id: user?.id,
+        profile_email: user?.email,
+        query: data.description,
+      });
+      if (error) {
+        console.log("Flagged Response, but couldn't add it to db");
+      }
+      return NextResponse.json(
+        { error: "Could not process your request" },
+        { status: 200 },
+      );
+    }
+
+    // Create the set in database
     const title = data.title;
-    const description = data.description;
     const category = data.category;
-    const result = await createSet(
+    const createResult = await createSet(
       parsedResponse,
       title,
       description,
       category,
     );
 
-    if (result === false) {
+    if (createResult === false) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Set creation in the database was unsuccessful",
-        },
+        { success: false, message: "Set creation in the database was unsuccessful" },
         { status: 400 },
       );
     }
 
+    console.log(
+      `Set generated with model ${MODEL}: ${completion.usage?.total_tokens} tokens used`,
+    );
+
     return NextResponse.json({
       parsedResponse,
-      setId: result.id,
+      setId: createResult.id,
     });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("OpenRouter API error:", message);
+    return NextResponse.json(
+      { error: "AI provider error — please try again" },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json(
-    {
-      parsedResponse,
-    },
-    {
-      status: 200,
-    },
-  );
 }

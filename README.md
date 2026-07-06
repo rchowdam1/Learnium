@@ -18,7 +18,8 @@ The application uses the following environment variables:
 - `SUPABASE_URL`: The URL of your Supabase database instance.
 - `SUPABASE_API_KEY`: The Supabase public/anonymous API key.
 - `STRIPE_SECRET_KEY`: Stripe API key for payments.
-- `OPENAI_API_KEY`: OpenAI API key for course/lesson generation.
+- `OPENROUTER_API_KEY`: OpenRouter API key for AI course/lesson generation (required).
+- `OPENROUTER_MODEL`: OpenRouter model ID (default: `meta-llama/llama-3.2-3b-instruct:free`).
 
 ## Testing
 

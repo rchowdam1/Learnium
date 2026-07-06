@@ -20,6 +20,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres
 - Stripe 18.4.0 — subscriptions/billing
 - Tailwind CSS v4 (`@tailwindcss/postcss`)
+- OpenRouter via OpenAI-compatible SDK (`openai` npm package) — base URL `https://openrouter.ai/api/v1`, free model default `meta-llama/llama-3.2-3b-instruct:free`, configurable via `OPENROUTER_MODEL` env var
 - Separate Python/FastAPI microservice in `rag/` (not built by Next.js): LangChain, Chroma vector store, OpenRouter via OpenAI-compatible SDK/client configuration, Redis LangCache (`langcache` pkg) for semantic response caching
 - zod 3.25.62 (LLM output schema validation), franc 6.2.0 (language detection), axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
 - **Test framework configured**: Vitest smoke tests, Playwright E2E smoke tests, and GitHub Actions CI are present.
@@ -68,9 +69,10 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 - `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It's **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present/populated in a fresh clone.
 - `middleware.ts` gates `protectedPaths` via `url.pathname.startsWith(path)` — a **prefix match, not exact**. New routes with overlapping prefixes (e.g. `/dashboardX` vs `/dashboard`) can be unintentionally protected/unprotected. Be precise when adding paths.
-- RAG service URL is currently **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. OpenRouter migration work should move this to `RAG_SERVICE_URL` while moving model/provider config to OpenRouter env vars.
+- **LLM provider is OpenRouter** via the OpenAI-compatible SDK (`openai` npm package). The base URL is `https://openrouter.ai/api/v1`. API key is `OPENROUTER_API_KEY`. The model is configured via `OPENROUTER_MODEL` env var (defaults to free `meta-llama/llama-3.2-3b-instruct:free`). All LLM calls use Chat Completions API (`chat.completions.create`) with `response_format: { type: "json_object" }` — do NOT use the Responses API as OpenRouter doesn't support it. Always include `HTTP-Referer` and `X-Title` headers for OpenRouter attribution.
+- RAG service URL is **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. Move to `RAG_SERVICE_URL` env var.
 - Stripe webhook route imports `NextRequest` and validates the `stripe-signature` header before `constructEvent`; preserve the raw `.text()` body pattern for new Stripe webhook work.
-- Quota ordering in `/api/send-chat` is strict: check `chats_remaining` → call RAG → insert user message → insert assistant message → decrement quota via `decrement_chat_quota` RPC. Preserve check-before-spend, decrement-after-success ordering in similar flows.
+- Quota ordering is strict: check quota → call LLM → validate output → persist → decrement quota. Preserve check-before-spend, decrement-after-success ordering.
 
 ---
 
