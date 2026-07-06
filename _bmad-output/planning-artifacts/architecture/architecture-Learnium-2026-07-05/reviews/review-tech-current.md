@@ -17,8 +17,8 @@ The main caveat is wording: several rows say "pinned locally" even though `packa
 ### Medium: "Pinned locally" overstates several JavaScript package constraints
 
 Evidence:
-- Spine stack rows say "pinned locally" for Supabase SSR, Supabase JS, Stripe Node, Tailwind CSS, and OpenAI JS at `ARCHITECTURE-SPINE.md:157-161`.
-- `package.json` uses exact versions only for `next` and `eslint-config-next`; React, Supabase, Stripe, Tailwind, OpenAI, and most others use caret ranges.
+- Spine stack rows say "pinned locally" for Supabase SSR, Supabase JS, Stripe Node, Tailwind CSS, and the OpenAI-compatible JS client at `ARCHITECTURE-SPINE.md:157-161`.
+- `package.json` uses exact versions only for `next` and `eslint-config-next`; React, Supabase, Stripe, Tailwind, the OpenAI-compatible client, and most others use caret ranges.
 - `npm ls ... --depth=0` returned an empty tree, so there is no installed `node_modules` state to verify at runtime in this workspace.
 
 Impact:
@@ -45,7 +45,7 @@ Recommendation:
 ### Low: Python RAG dependency and integration caveats are correctly deferred
 
 Evidence:
-- Spine Python RAG row names FastAPI, LangChain, Chroma, OpenAI, Pydantic, and Redis LangCache pattern at `ARCHITECTURE-SPINE.md:162`.
+- Spine Python RAG row names FastAPI, LangChain, Chroma, OpenRouter/OpenAI-compatible clients, Pydantic, and Redis LangCache pattern at `ARCHITECTURE-SPINE.md:162`.
 - `rag/requirements.txt` is unpinned and omits `langcache`, while `rag/scache.py:2` imports it.
 - Current PyPI baselines checked: `langcache` 0.13.0, `langchain-chroma` 1.1.0, `chromadb` 1.5.9, Python `openai` 2.44.0.
 - LangChain's current Chroma docs install/use the dedicated `langchain-chroma` integration package; current code imports `Chroma` from `langchain_community.vectorstores`.
@@ -79,7 +79,7 @@ Recommendation:
 - Supabase SSR/JS: `@supabase/ssr` browser/server split matches current Supabase SSR guidance. Env convention correctly says browser-exposed values should use `NEXT_PUBLIC_*`.
 - Tailwind/PostCSS: current repo uses `@tailwindcss/postcss` and `@import "tailwindcss"`, matching Tailwind v4 PostCSS guidance.
 - Stripe: stack version lag and webhook authority are identified; implementation details are deferred.
-- RAG: LangChain/OpenAI/Chroma/LangCache risks are not asserted as production-ready; they are deferred.
+- RAG: LangChain/OpenRouter compatibility/Chroma/LangCache risks are not asserted as production-ready; they are deferred.
 - Vercel: suitable for the Next.js app; FastAPI is plausible on Vercel Python runtime, but production RAG persistence/topology is correctly deferred.
 
 ## Sources Checked

@@ -9,13 +9,16 @@ export default function Progress({
 }) {
   return (
     <div
-      className={`h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-[${width}px]`}
+      className="h-2.5 rounded-full bg-accent-progress-track"
       style={{ width: `${width}px` }}
     >
       <div
-        className={`bg-${color ?? "blue"}-600 h-2.5 rounded-full`}
-        style={{ width: `${percentage}%`, backgroundColor: color ?? "#2563eb" }}
-      ></div>
+        className={`h-2.5 rounded-full ${color ? "" : "bg-accent-progress"}`}
+        style={{
+          width: `${percentage}%`,
+          ...(color ? { backgroundColor: color } : {}),
+        }}
+      />
     </div>
   );
 }

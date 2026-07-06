@@ -1,0 +1,2061 @@
+﻿diff --git a/app/components/cards/SetCards.tsx b/app/components/cards/SetCards.tsx
+index b95cbb8..57a2d8c 100644
+--- a/app/components/cards/SetCards.tsx
++++ b/app/components/cards/SetCards.tsx
+@@ -1,9 +1,8 @@
+ "use client";
+ 
+-import { BookOpen, EllipsisVertical, Play } from "lucide-react";
++import { BookOpen, Play } from "lucide-react";
+ import Progress from "../misc/Progress";
+ import SetDropdown from "../modals/SetDropdown";
+-import { useRouter } from "next/navigation";
+ import Link from "next/link";
+ 
+ type SetCardProps = {
+@@ -30,8 +29,6 @@ export default function SetCard({
+   // convert date to readable format
+   const readDate: Date = new Date(date);
+ 
+-  const router = useRouter();
+-
+   const options: Intl.DateTimeFormatOptions = {
+     year: "numeric",
+     month: "long",
+@@ -46,48 +43,28 @@ export default function SetCard({
+     onDeleteSet(id);
+   };
+ 
+-  const goToSet = async () => {
+-    /*try {
+-      const response = await fetch(`/api/get-set-data/${id}`);
+-
+-      if (response.ok) {
+-        const data = await response.json();
+-
+-        console.log(data, "data received from get-set-data");
+-      }
+-    } catch (error) {
+-      console.log("Error fetching set data");
+-    }*/
+-    router.replace(`/sets/${id}`);
+-  };
+-
+   return (
+-    <div className="flex flex-col justify-between h-70 w-100 bg-white rounded-sm bg-card text-card-foreground shadow-sm px-4 py-5">
+-      {/*Card Header (includes title and category)*/}
++    <div className="flex h-70 w-100 flex-col justify-between rounded-2xl border border-border bg-surface-raised px-4 py-5 text-primary">
+       <div className="flex items-center justify-between gap-2">
+         <div className="flex">
+-          <span className="text-lg font-bold">{title}</span>
++          <span className="text-heading text-lg">{title}</span>
+ 
+-          {/*category*/}
+-          <div className="bg-gray-200 rounded-full px-2 ml-2">
+-            <span className="text-xs font-medium">{category}</span>
++          <div className="ml-2 rounded-full bg-surface px-2">
++            <span className="text-label text-xs text-muted">{category}</span>
+           </div>
+         </div>
+ 
+-        {/*Dropdown*/}
+         <SetDropdown onDelete={onSetDelete} title={title} />
+       </div>
+ 
+-      {/*Card Description*/}
+       <div className="mt-3 h-12 overflow-y-auto no-scrollbar">
+-        <span className="text-gray-500">{description}</span>
++        <span className="text-body text-muted">{description}</span>
+       </div>
+ 
+-      {/*Progress and Bar*/}
+       <div className="mt-8">
+         <div className="flex justify-between text-sm">
+-          <span className="text-gray-600">Progress</span>
+-          <span className="font-medium">
++          <span className="text-label text-muted">Progress</span>
++          <span className="text-numeral text-label">
+             {completedLessons}/{totalLessons} lessons
+           </span>
+         </div>
+@@ -99,16 +76,15 @@ export default function SetCard({
+         </div>
+       </div>
+ 
+-      {/*Date and Continue/Start button*/}
+       <div className="mt-12 flex items-center justify-between">
+-        <div className="flex items-center text-sm text-gray-500">
+-          <BookOpen className="w-4 h-4 mr-1" />
+-          <span>Created at {dateString}</span>
++        <div className="flex items-center text-sm text-muted">
++          <BookOpen className="mr-1 h-4 w-4" />
++          <span className="text-body">Created at {dateString}</span>
+         </div>
+ 
+         <Link href={`/sets/${id}`}>
+-          <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
+-            <Play className="w-4 h-4 mr-2" />
++          <button className="focus-ring flex h-11 cursor-pointer items-center rounded-full bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
++            <Play className="mr-2 h-4 w-4" />
+             <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
+           </button>
+         </Link>
+diff --git a/app/components/cards/StatCards.tsx b/app/components/cards/StatCards.tsx
+index d34d30d..e46bd77 100644
+--- a/app/components/cards/StatCards.tsx
++++ b/app/components/cards/StatCards.tsx
+@@ -8,25 +8,22 @@ type StatCardProps = {
+ 
+ export default function StatCard({ title, icon, content }: StatCardProps) {
+   return (
+-    <div className="h-30 w-100 bg-white rounded-sm bg-card text-card-foreground shadow-sm px-4 py-5">
+-      {/*Card Header*/}
++    <div className="h-30 w-100 rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary">
+       <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+-        <span className="text-sm font-bold">{title}</span>
+-        {/*<BookOpen className="h-4 w-4 text-muted-foreground" />*/}
++        <span className="text-label text-sm">{title}</span>
+         {icon === 1 ? (
+-          <BookOpen className="h-4 w-4 text-muted-foreground" />
++          <BookOpen className="h-4 w-4 text-muted" />
+         ) : icon === 2 ? (
+-          <Trophy className="h-4 w-4 text-muted-foreground" />
++          <Trophy className="h-4 w-4 text-accent" />
+         ) : icon === 3 ? (
+-          <ChartLine className="h-4 w-4 text-muted-foreground" />
++          <ChartLine className="h-4 w-4 text-accent-progress" />
+         ) : (
+           ""
+         )}
+       </div>
+ 
+-      {/*Card Content*/}
+       <div className="pt-3">
+-        <span className="text-2xl font-bold">{content}</span>
++        <span className="text-numeral text-2xl font-bold">{content}</span>
+       </div>
+     </div>
+   );
+diff --git a/app/components/cards/StudyBuddyCards.tsx b/app/components/cards/StudyBuddyCards.tsx
+index cd3efc2..f1283b0 100644
+--- a/app/components/cards/StudyBuddyCards.tsx
++++ b/app/components/cards/StudyBuddyCards.tsx
+@@ -2,7 +2,6 @@
+ 
+ import Link from "next/link";
+ import { useState } from "react";
+-import { useRouter } from "next/navigation";
+ import { Play, Newspaper } from "lucide-react";
+ import DocumentModal from "../modals/DocumentModal";
+ 
+@@ -26,49 +25,41 @@ export default function StudyBuddyCard({
+   description,
+   documents,
+ }: StudyBuddyCardProps) {
+-  const router = useRouter();
+-
+   const [documentModalOpen, setDocumentModalOpen] = useState<boolean>(false);
+ 
+   return (
+-    <div className="flex flex-col justify-between h-70 w-100 bg-white rounded-sm bg-card text-card-foreground shadow-sm px-4 py-5">
+-      {/*Card Header (includes title and category)*/}
++    <div className="flex h-70 w-100 flex-col justify-between rounded-2xl border border-border bg-surface-raised px-4 py-5 text-primary">
+       <div className="flex items-center justify-between gap-2">
+         <div className="flex">
+-          <span className="text-lg font-bold">{title}</span>
++          <span className="text-heading text-lg">{title}</span>
+ 
+-          {/*category*/}
+-          <div className="bg-gray-200 rounded-full px-2 ml-2">
+-            <span className="text-xs font-medium">{category}</span>
++          <div className="ml-2 rounded-full bg-surface px-2">
++            <span className="text-label text-xs text-muted">{category}</span>
+           </div>
+         </div>
+       </div>
+ 
+-      {/*Card Description*/}
+       <div className="mt-3">
+-        <span className="text-gray-500">{description}</span>
++        <span className="text-body text-muted">{description}</span>
+       </div>
+ 
+-      {/*Date and Continue/Start button*/}
+       <div className="mt-12 flex items-center gap-2">
+         <Link href={`/buddy/${id}`}>
+-          <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
+-            <Play className="w-4 h-4 mr-2" />
++          <button className="focus-ring flex h-11 cursor-pointer items-center rounded-full bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
++            <Play className="mr-2 h-4 w-4" />
+             <span>Chat</span>
+           </button>
+         </Link>
+ 
+-        {/*View Documents button*/}
+         <button
+-          className="flex items-center h-9 rounded-md px-3 bg-gray-500 text-white hover:bg-gray-300 active:bg-gray-400 transition-colors duration-200 cursor-pointer"
++          className="focus-ring flex h-11 cursor-pointer items-center rounded-full border border-border-interactive bg-surface px-3 text-label text-primary hover:bg-surface-raised"
+           onClick={() => setDocumentModalOpen(true)}
+         >
+-          <Newspaper className="w-4 h-4 mr-2" />
++          <Newspaper className="mr-2 h-4 w-4" />
+           <span>View Documents</span>
+         </button>
+       </div>
+ 
+-      {/*Document Modal*/}
+       <DocumentModal
+         open={documentModalOpen}
+         onClose={() => setDocumentModalOpen(false)}
+diff --git a/app/components/controllers/CreateSetController.tsx b/app/components/controllers/CreateSetController.tsx
+index 56dcde9..1fbb5e7 100644
+--- a/app/components/controllers/CreateSetController.tsx
++++ b/app/components/controllers/CreateSetController.tsx
+@@ -18,8 +18,7 @@ export default function CreateSetController({
+   return (
+     <div>
+       <button
+-        className="flex justify-center items-center bg-black text-white p-3 rounded-md hover:bg-gray-800 active:bg-white active:text-black 
+-             transition-colors duration-200 cursor-pointer"
++        className="focus-ring flex min-h-11 cursor-pointer items-center justify-center rounded-full bg-cta p-3 text-label text-cta-text hover:bg-cta-hover"
+         onClick={() => setCreateModalOpen(true)}
+       >
+         <Plus className="w-4 h-4 mr-2" />
+diff --git a/app/components/controllers/CreateStudyBuddyController.tsx b/app/components/controllers/CreateStudyBuddyController.tsx
+index 0bb52d6..989e6a8 100644
+--- a/app/components/controllers/CreateStudyBuddyController.tsx
++++ b/app/components/controllers/CreateStudyBuddyController.tsx
+@@ -16,8 +16,7 @@ export default function CreateStudyBuddyController({
+   return (
+     <div>
+       <button
+-        className="flex justify-center items-center bg-black text-white p-3 rounded-md hover:bg-gray-800 active:bg-white active:text-black 
+-             transition-colors duration-200 cursor-pointer"
++        className="focus-ring flex min-h-11 cursor-pointer items-center justify-center rounded-full bg-cta p-3 text-label text-cta-text hover:bg-cta-hover"
+         onClick={() => {
+           console.log("Opening Create Study Buddy Modal");
+           setCreateModalOpen(true);
+diff --git a/app/components/misc/Profile.tsx b/app/components/misc/Profile.tsx
+index 01febe3..84dbf2a 100644
+--- a/app/components/misc/Profile.tsx
++++ b/app/components/misc/Profile.tsx
+@@ -2,10 +2,9 @@
+ 
+ import { useState, useRef, useEffect } from "react";
+ import { LogOut, User } from "lucide-react";
+-import toast from "react-hot-toast";
+-
+ import Link from "next/link";
+ import { useRouter } from "next/navigation";
++import toast from "react-hot-toast";
+ 
+ type ProfileProps = {
+   onSignOut: () => void;
+@@ -32,7 +31,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+     return () => document.removeEventListener("mousedown", handleClickOutside);
+   }, []);
+ 
+-  const deleteAccount = async (e) => {
++  const deleteAccount = async (e: React.MouseEvent<HTMLButtonElement>) => {
+     e.preventDefault();
+     //console.log("Deleting account...");
+ 
+@@ -53,7 +52,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+         router.replace("/");
+         return;
+       }
+-    } catch (error) {
++    } catch {
+       toast.error("An error occurred while trying to delete the account.");
+     }
+   };
+@@ -63,22 +62,22 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+       {/*Trigger*/}
+       <button
+         type="button"
+-        className="w-28 h-10 border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-100 transition-all duration-150"
++        className="focus-ring h-11 w-28 cursor-pointer rounded-full border border-border-interactive bg-surface px-4 text-label text-primary hover:bg-surface-raised"
+         onClick={() => setDropdownOpen(!dropdownOpen)}
+       >
+-        <span className="font-semibold">Profile</span>
++        <span>Profile</span>
+       </button>
+ 
+       {/*Dropdown*/}
+       {dropdownOpen && (
+-        <div className="absolute left-0 z-10 mt-1 w-32 origin-top-right rounded-md bg-white shadow-lg border border-gray-300">
++        <div className="absolute left-0 z-10 mt-1 w-36 origin-top-right rounded-2xl border border-border bg-surface-raised shadow-sm">
+           <Link href="/profile">
+             <button
+               type="button"
+-              className="cursor-pointer flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
++              className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm hover:bg-surface"
+               onClick={onViewProfile}
+             >
+-              <User className="text-xs" />
++              <User className="text-xs text-primary" />
+               <span className="ml-2">View Profile</span>
+             </button>
+           </Link>
+@@ -86,7 +85,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+           <Link href="/">
+             <button
+               type="button"
+-              className="cursor-pointer text-red-400 flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
++              className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm text-error hover:bg-surface"
+               onClick={onSignOut}
+             >
+               <LogOut className="text-xs" />
+@@ -96,10 +95,10 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
+ 
+           <button
+             type="button"
+-            className="cursor-pointer flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
++            className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm hover:bg-surface"
+             onClick={deleteAccount}
+           >
+-            <User className="text-xs text-red-400" />
++            <User className="text-xs text-error" />
+             <span className="ml-2">Delete Account</span>
+           </button>
+         </div>
+diff --git a/app/components/misc/Progress.tsx b/app/components/misc/Progress.tsx
+index 3e03c7e..6307f1d 100644
+--- a/app/components/misc/Progress.tsx
++++ b/app/components/misc/Progress.tsx
+@@ -1,21 +1,19 @@
+ export default function Progress({
+   width,
+   percentage,
+-  color,
+ }: {
+   width: number;
+   percentage: number;
+-  color?: string;
+ }) {
+   return (
+     <div
+-      className={`h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-[${width}px]`}
++      className="h-2.5 rounded-full bg-accent-progress-track"
+       style={{ width: `${width}px` }}
+     >
+       <div
+-        className={`bg-${color ?? "blue"}-600 h-2.5 rounded-full`}
+-        style={{ width: `${percentage}%`, backgroundColor: color ?? "#2563eb" }}
+-      ></div>
++        className="h-2.5 rounded-full bg-accent-progress"
++        style={{ width: `${percentage}%` }}
++      />
+     </div>
+   );
+ }
+diff --git a/app/components/misc/SignInWithGoogle.tsx b/app/components/misc/SignInWithGoogle.tsx
+index e3a5dec..88157d6 100644
+--- a/app/components/misc/SignInWithGoogle.tsx
++++ b/app/components/misc/SignInWithGoogle.tsx
+@@ -1,15 +1,13 @@
+ "use client";
+ 
+ import Image from "next/image";
+-import toast from "react-hot-toast";
+-import { createSupabaseClient } from "@/lib/supabase";
+ 
+ export default function SignInWithGoogle({ login }: { login: boolean }) {
+   return (
+     <form action="/api/login/google" method="GET" className="w-96 mt-1">
+       <button
+         type="submit"
+-        className="w-full bg-[#1d4159] py-2 rounded-lg cursor-pointer hover:bg-[#166ea8] transition-colors duration-400 disabled:bg-[#9ccef0] flex items-center justify-center gap-2"
++        className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-label text-primary hover:bg-surface-raised"
+       >
+         <Image src="/google2.png" alt="google" height="30" width="30" />
+         {login ? "Log In" : "Sign Up"} with Google
+diff --git a/app/components/modals/CreateSetModal.tsx b/app/components/modals/CreateSetModal.tsx
+index 2748bc4..6643b0d 100644
+--- a/app/components/modals/CreateSetModal.tsx
++++ b/app/components/modals/CreateSetModal.tsx
+@@ -169,7 +169,7 @@ export default function CreateSetModal({
+     return validFields;
+   };
+ 
+-  const formSubmit = async (e) => {
++  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+ 
+     setIsLoading(true);
+@@ -197,7 +197,7 @@ export default function CreateSetModal({
+       });
+ 
+       if (!response.ok) {
+-        alert("Error - 156");
++        toast.error("Could not validate this set input.");
+         setIsLoading(false);
+         return;
+       }
+@@ -219,8 +219,8 @@ export default function CreateSetModal({
+       console.log(data, "data from input-check api");
+       numLessons = data.parsedResponse?.lessons.length;
+       setId = data.setId;
+-    } catch (error) {
+-      alert(error);
++    } catch {
++      toast.error("Could not validate this set input.");
+       setIsLoading(false);
+       return;
+     }
+@@ -235,11 +235,12 @@ export default function CreateSetModal({
+     <div
+       onMouseDown={handleClose}
+       className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
+-        open ? "visible opacity-100 bg-black/20" : "invisible opacity-0"
++        open ? "visible opacity-100" : "invisible opacity-0"
+       }`}
++      style={{ backgroundColor: "var(--overlay)" }}
+     >
+       <div
+-        className={`bg-white rounded-md z-50 shadow p-6 text-center transition-all ${
++        className={`z-50 rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
+         } `}
+         onClick={(e) => e.stopPropagation()}
+@@ -251,14 +252,14 @@ export default function CreateSetModal({
+           onMouseDown={(e) => e.stopPropagation()}
+         >
+           <button
+-            className="absolute top-2 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"
++            className="focus-ring absolute right-2 top-2 rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
+             onClick={handleClose}
+             disabled={isLoading}
+           >
+             <X />
+           </button>
+-          <span className="font-semibold">Create New Learning Set</span>
+-          <span className="text-sm text-gray-500">
++          <span className="text-heading">Create New Learning Set</span>
++          <span className="text-body text-sm text-muted">
+             AI will generate bite-sized lessons based on your
+             <br />
+             topic and description.
+@@ -268,9 +269,9 @@ export default function CreateSetModal({
+             className="flex flex-col items-start mt-4 space-y-2"
+             onSubmit={formSubmit}
+           >
+-            <label className="text-sm">
++            <label className="text-label text-sm">
+               Title
+-              <span className="text-xs ml-3 text-red-500">
++              <span className="ml-3 text-xs text-error">
+                 {requireTitle
+                   ? "Required: Please enter a title"
+                   : !validTitleLength
+@@ -283,14 +284,14 @@ export default function CreateSetModal({
+             <input
+               type="text"
+               placeholder="Title"
+-              className="border border-gray-200 w-80 rounded-sm px-2 py-1"
++              className="focus-ring w-80 rounded-xl border border-border-interactive bg-background px-2 py-2 text-body text-primary placeholder:text-muted"
+               required
+               onChange={(e) => setTitle(e.target.value)}
+             />
+ 
+-            <label>
++            <label className="text-label">
+               Description
+-              <span className="text-xs ml-3 text-red-500">
++              <span className="ml-3 text-xs text-error">
+                 {requireDescription
+                   ? "Required: Please enter a description"
+                   : !validDescriptionLength
+@@ -303,21 +304,21 @@ export default function CreateSetModal({
+             <textarea
+               placeholder="Describe what you want to learn..."
+               rows={3}
+-              className="border border-gray-200 w-80 rounded-sm px-2 py-1 resize-none"
++              className="focus-ring w-80 resize-none rounded-xl border border-border-interactive bg-background px-2 py-2 text-body text-primary placeholder:text-muted"
+               required
+               onChange={(e) => setDescription(e.target.value)}
+             />
+ 
+-            <label>
++            <label className="text-label">
+               Category
+-              <span className="text-xs ml-3 text-red-500">
++              <span className="ml-3 text-xs text-error">
+                 {requireCategory ? "Required: Please select a category" : ""}
+               </span>
+             </label>
+             <select
+               name="category"
+               id="category"
+-              className="border border-gray-200 w-80 rounded-sm px-3 py-3"
++              className="focus-ring w-80 rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary"
+               onChange={(e) => setCategory(e.target.value)}
+             >
+               <option value="Select a category">Select a category</option>
+@@ -338,7 +339,7 @@ export default function CreateSetModal({
+             <div className="mt-7 flex">
+               <button
+                 type="button"
+-                className="w-39 border border-gray-200 rounded-sm py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
++                className="focus-ring w-39 cursor-pointer rounded-full border border-border bg-surface py-2 text-label text-primary hover:bg-surface-raised"
+                 onClick={handleClose}
+                 disabled={isLoading}
+               >
+@@ -346,7 +347,7 @@ export default function CreateSetModal({
+               </button>
+               <button
+                 type="submit"
+-                className="w-39 border border-gray-200 rounded-sm py-2 bg-gray-400 disabled:bg-gray-300 text-gray-50 ml-2 cursor-pointer hover:bg-gray-500 transition-colors duration-200 flex items-center justify-center gap-2"
++                className="focus-ring ml-2 flex w-39 cursor-pointer items-center justify-center gap-2 rounded-full bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
+                 disabled={isLoading}
+               >
+                 {isLoading && (
+diff --git a/app/components/modals/CreateStudyBuddyModal.tsx b/app/components/modals/CreateStudyBuddyModal.tsx
+index 6f8e0ce..3d30a86 100644
+--- a/app/components/modals/CreateStudyBuddyModal.tsx
++++ b/app/components/modals/CreateStudyBuddyModal.tsx
+@@ -69,7 +69,7 @@ export default function CreateStudyBuddyModal({
+   };
+ 
+   // form submission
+-  const formSubmit = async (e) => {
++  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+ 
+     setIsLoading(true);
+@@ -152,7 +152,8 @@ export default function CreateStudyBuddyModal({
+ 
+       console.log(data);
+ 
+-      if (data.status == "success") {
++      if (data.status === "success") {
++        onCreateStudyBuddy(title, description, category);
+         setIsLoading(false);
+         toast.success("Study buddy has been successfully created");
+       }
+@@ -177,12 +178,13 @@ export default function CreateStudyBuddyModal({
+   return (
+     <div
+       className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
+-        open ? "visible opacity-100 bg-black/20" : "invisible opacity-0"
++        open ? "visible opacity-100" : "invisible opacity-0"
+       }`}
++      style={{ backgroundColor: "var(--overlay)" }}
+       onMouseDown={handleClose}
+     >
+       <div
+-        className={`bg-white rounded-md z-50 shadow p-6 text-center max-h-[80vh] overflow-y-auto transition-all ${
++        className={`z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
+         } `}
+         onClick={(e) => e.stopPropagation()}
+@@ -194,13 +196,13 @@ export default function CreateStudyBuddyModal({
+           onMouseDown={(e) => e.stopPropagation()}
+         >
+           <button
+-            className="absolute top-2 right-2 p-1 cursor-pointer rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"
++            className="focus-ring absolute right-2 top-2 cursor-pointer rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
+             onClick={handleClose}
+           >
+             <X />
+           </button>
+-          <span className="font-semibold">Create New Study Buddy</span>
+-          <span className="text-sm text-gray-500">
++          <span className="text-heading">Create New Study Buddy</span>
++          <span className="text-body text-sm text-muted">
+             Upload study materials and chat with an AI
+             <br />
+             about your content
+@@ -211,53 +213,53 @@ export default function CreateStudyBuddyModal({
+             onSubmit={formSubmit}
+           >
+             <div className="flex flex-col gap-1">
+-              <label className="text-sm">Title</label>
++              <label className="text-label text-sm">Title</label>
+               <input
+                 type="text"
+                 placeholder="Title"
+-                className="border border-gray-200 w-80 rounded-sm px-2 py-1"
++                className="focus-ring w-80 rounded-xl border border-border-interactive bg-background px-2 py-2 text-body text-primary placeholder:text-muted"
+                 required
+                 onChange={(e) => setTitle(e.target.value)}
+               />
+             </div>
+ 
+             <div className="flex flex-col gap-1">
+-              <label>Category</label>
++              <label className="text-label">Category</label>
+ 
+               <input
+                 type="text"
+                 placeholder="e.g., Biology, History, Math"
+-                className="border border-gray-200 w-80 rounded-sm px-2 py-1"
++                className="focus-ring w-80 rounded-xl border border-border-interactive bg-background px-2 py-2 text-body text-primary placeholder:text-muted"
+                 required
+                 onChange={(e) => setCategory(e.target.value)}
+               />
+             </div>
+ 
+             <div className="flex flex-col gap-1 col-span-2">
+-              <label>Description</label>
++              <label className="text-label">Description</label>
+               <textarea
+                 placeholder="What will your Study Buddy help you with?"
+                 rows={3}
+-                className="border border-gray-200 rounded-sm px-2 py-1 resize-none"
++                className="focus-ring resize-none rounded-xl border border-border-interactive bg-background px-2 py-2 text-body text-primary placeholder:text-muted"
+                 required
+                 onChange={(e) => setDescription(e.target.value)}
+               />
+             </div>
+ 
+             <div className="flex flex-col gap-1 md:col-span-2 items-center text-center">
+-              <label>Upload files (.pdf or .pptx, max 4)</label>
++              <label className="text-label">Upload files (.pdf or .pptx, max 4)</label>
+               <input
+                 type="file"
+                 multiple
+                 onChange={handleFileUpload}
+-                className="file:cursor-pointer text-sm text-stone-500 file:mr-5 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-blue-700 file:hover:file:bg-blue-100"
++                className="text-body text-sm text-muted file:mr-5 file:cursor-pointer file:rounded-full file:border file:border-border file:bg-surface file:px-4 file:py-2 file:text-label file:text-primary hover:file:bg-surface-raised"
+               />
+               <div className="mt-2"></div>
+               {uploadedFiles.map((file, index) => {
+                 return (
+                   <div
+                     key={index}
+-                    className={`w-80 py-2 text-white bg-red-300 rounded-md truncate px-2 ${
++                    className={`w-80 truncate rounded-xl border border-border bg-surface px-2 py-2 text-body text-primary ${
+                       index !== uploadedFiles.length - 1 ? "mb-1" : ""
+                     }`}
+                   >
+@@ -271,7 +273,7 @@ export default function CreateStudyBuddyModal({
+             <div className="mt-7 flex md:col-span-2 justify-center">
+               <button
+                 type="button"
+-                className="w-39 border border-gray-200 rounded-sm py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
++                className="focus-ring w-39 cursor-pointer rounded-full border border-border bg-surface py-2 text-label text-primary hover:bg-surface-raised"
+                 onClick={handleClose}
+                 disabled={isLoading}
+               >
+@@ -279,7 +281,7 @@ export default function CreateStudyBuddyModal({
+               </button>
+               <button
+                 type="submit"
+-                className="w-39 border border-gray-200 rounded-sm py-2 bg-gray-400 disabled:bg-gray-300 text-gray-50 ml-2 cursor-pointer hover:bg-gray-500 transition-colors duration-200 flex items-center justify-center gap-2"
++                className="focus-ring ml-2 flex w-39 cursor-pointer items-center justify-center gap-2 rounded-full bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
+                 disabled={isLoading}
+               >
+                 {isLoading && (
+diff --git a/app/components/modals/DeleteSetModal.tsx b/app/components/modals/DeleteSetModal.tsx
+index fc4dce4..cc6e485 100644
+--- a/app/components/modals/DeleteSetModal.tsx
++++ b/app/components/modals/DeleteSetModal.tsx
+@@ -22,24 +22,24 @@ export default function DeleteSetModal({
+       }`}
+     >
+       <div
+-        className={`bg-white rounded-md z-50 shadow p-6 text-center transition-all ${
++        className={`z-50 rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
+         } `}
+         onClick={(e) => e.stopPropagation()}
+       >
+-        <span className="text-2xl">Confirm delete for the following set?</span>
++        <span className="text-heading text-2xl text-primary">Confirm delete for the following set?</span>
+         <br />
+-        <span className="text-2xl font-bold text-center">{title}</span>
++        <span className="text-heading text-2xl text-center text-primary">{title}</span>
+ 
+         <div className="mt-10 flex justify-around items-center">
+           <button
+-            className="py-3 px-7 bg-gray-100 hover:bg-gray-200 rounded-xs border-0 shadow-sm cursor-pointer transition-colors duration-200"
++            className="focus-ring cursor-pointer rounded-full border border-border bg-surface px-7 py-3 text-label text-primary hover:bg-surface-raised"
+             onClick={onClose}
+           >
+             <span className="">No</span>
+           </button>
+           <button
+-            className="py-3 px-7 bg-red-50 hover:bg-red-100 rounded-xs shadow-sm text-red-400 border border-red-400 cursor-pointer transition-colors duration-200"
++            className="focus-ring cursor-pointer rounded-full border border-error bg-surface px-7 py-3 text-label text-error hover:bg-surface-raised"
+             onClick={() => {
+               onDelete();
+               onClose();
+diff --git a/app/components/modals/DocumentModal.tsx b/app/components/modals/DocumentModal.tsx
+index 4a3639c..0c4ee0e 100644
+--- a/app/components/modals/DocumentModal.tsx
++++ b/app/components/modals/DocumentModal.tsx
+@@ -2,22 +2,23 @@
+ import { X } from "lucide-react";
+ 
+ const DocumentTab = ({ name, size }: { name: string; size: number }) => {
+-  // size in KB
+-  const mapToColor = (size: number): string[] => {
++  const mapToToken = (size: number): { container: string; text: string } => {
+     if (size < 100) {
+-      return ["bg-green-200", "text-green-800"];
++      return { container: "bg-accent/20", text: "text-accent-progress" };
+     } else if (size < 500) {
+-      return ["bg-yellow-200", "text-yellow-800"];
++      return { container: "bg-warning/20", text: "text-warning" };
+     } else {
+-      return ["bg-red-200", "text-red-800"];
++      return { container: "bg-error/20", text: "text-error" };
+     }
+   };
+ 
++  const color = mapToToken(size);
++
+   return (
+-    <div className="px-3 py-5 w-65 bg-blue-200 rounded-md flex items-center justify-between gap-3">
+-      <span className="text-blue-700">{name}</span>
+-      <div className={`px-2 py-1 rounded-full ${mapToColor(size)[0]}`}>
+-        <span className={`text-xs text-${mapToColor(size)[1]}`}>{size} KB</span>
++    <div className="flex w-65 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-3 py-5">
++      <span className="text-body text-primary">{name}</span>
++      <div className={`rounded-full px-2 py-1 ${color.container}`}>
++        <span className={`text-xs ${color.text} text-numeral`}>{size} KB</span>
+       </div>
+     </div>
+   );
+@@ -46,7 +47,7 @@ export default function DocumentModal({
+       onMouseDown={onClose}
+     >
+       <div
+-        className={`relative bg-white rounded-md z-50 shadow p-6 text-center max-h-[80vh] overflow-y-auto transition-all ${
++        className={`relative z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
+           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
+         } `}
+         onClick={(e) => e.stopPropagation()}
+@@ -55,19 +56,16 @@ export default function DocumentModal({
+         <button
+           type="button"
+           onClick={onClose}
+-          className="absolute top-3 right-3 rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
++          className="focus-ring absolute right-3 top-3 rounded-xl p-1 text-muted transition-colors hover:bg-surface hover:text-primary"
+           aria-label="Close modal"
+         >
+           <X className="h-5 w-5" />
+         </button>
+         {/*List of Documents*/}
+         <div className="flex flex-col gap-3 mx-6">
+-          {documents.length === 0 && <span>No documents found.</span>}
++          {documents.length === 0 && <span className="text-body text-muted">No documents found.</span>}
+           {documents.length > 0 && (
+-            <h3
+-              className="text-xl font-semibold 
+-  text-gray-900"
+-            >
++            <h3 className="text-heading text-xl text-primary">
+               Documents for {buddyName}
+             </h3>
+           )}
+diff --git a/app/components/modals/SetDropdown.tsx b/app/components/modals/SetDropdown.tsx
+index 29cc213..6276dd6 100644
+--- a/app/components/modals/SetDropdown.tsx
++++ b/app/components/modals/SetDropdown.tsx
+@@ -32,20 +32,20 @@ export default function SetDropdown({ onDelete, title }: SetDropdownProps) {
+       {/*Trigger*/}
+       <button
+         onClick={() => setOpen(!open)}
+-        className="p-1 rounded-full hover:bg-gray-100 transition-all duration-200"
++        className="focus-ring rounded-full p-1 transition-all duration-200 hover:bg-surface"
+       >
+         <EllipsisVertical className="h-5 w-5" />
+       </button>
+ 
+       {/*Dropdown*/}
+       {open && (
+-        <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg border border-gray-300">
++        <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-2xl border border-border bg-surface-raised shadow-sm">
+           <button
+             onClick={() => {
+               setOpen(false);
+               setDeleteModalOpen(true);
+             }}
+-            className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left"
++            className="focus-ring block w-full px-4 py-2 text-left text-body text-sm text-error hover:bg-surface"
+           >
+             <div className="flex items-center justify-between">
+               Delete Set
+diff --git a/app/components/nav/AuthNav.tsx b/app/components/nav/AuthNav.tsx
+index 543d3ca..440030f 100644
+--- a/app/components/nav/AuthNav.tsx
++++ b/app/components/nav/AuthNav.tsx
+@@ -3,8 +3,6 @@
+ import { BookOpen } from "lucide-react";
+ import Profile from "../misc/Profile";
+ import toast from "react-hot-toast";
+-import { createSupabaseClient } from "@/lib/supabase";
+-import Link from "next/link";
+ 
+ import { useState, useEffect } from "react";
+ 
+@@ -25,7 +23,7 @@ export default function AuthNav() {
+         } else {
+           toast.error("Could not fetch username");
+         }
+-      } catch (error) {
++      } catch {
+         toast.error("Could not fetch username");
+       }
+     };
+@@ -39,26 +37,24 @@ export default function AuthNav() {
+       const response = await fetch("/api/logout");
+ 
+       if (!response.ok) {
+-        alert("Error - 10");
++        toast.error("Could not sign out");
+         return;
+       }
+-
+-      // successful, should redirect
+-    } catch (error) {
+-      alert(error);
++    } catch {
++      toast.error("Could not sign out");
+       return;
+     }
+   };
+ 
+   return (
+-    <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
+-      <div className="flex justify-between items-center h-16 sm:mx-[4.5rem] lg:mx-18">
++    <nav className="fixed top-0 left-0 z-50 w-full border-b border-border bg-surface-raised">
++      <div className="mx-4 flex h-16 items-center justify-between sm:mx-[4.5rem] lg:mx-18">
+         <div className="flex items-center space-x-3">
+-          <BookOpen className="w-8 h-8 text-blue-600" />
+-          <span className="text-xl font-bold text-gray-900">Learnium</span>
++          <BookOpen className="h-8 w-8 text-brand" />
++          <span className="text-heading text-xl text-primary">Learnium</span>
+         </div>
+         <div className="flex items-center space-x-4">
+-          <span className="text-sm text-gray-700">
++          <span className="text-body text-sm text-muted">
+             {username && `Welcome, ${username}`}
+           </span>
+ 
+diff --git a/app/dashboard/page.tsx b/app/dashboard/page.tsx
+index 4e0285a..0c96871 100644
+--- a/app/dashboard/page.tsx
++++ b/app/dashboard/page.tsx
+@@ -6,7 +6,6 @@ import SetCard from "../components/cards/SetCards";
+ import StudyBuddyCard from "../components/cards/StudyBuddyCards";
+ import CreateSetController from "../components/controllers/CreateSetController";
+ 
+-import { Plus } from "lucide-react";
+ import { useState, useEffect } from "react";
+ import toast from "react-hot-toast";
+ import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
+@@ -40,22 +39,6 @@ type StudyBuddyCards = {
+   }[];
+ };
+ 
+-type SetResponse = {
+-  id: number;
+-  title: string;
+-  category: string;
+-  description: string;
+-  numLessons: number;
+-  date: string;
+-  profile_id: string;
+-  is_flagged: boolean;
+-};
+-
+-type APIResponse = {
+-  data?: SetResponse;
+-  error?: string;
+-};
+-
+ export default function Dashboard() {
+   // state for skeleton loading
+   const [loading, setLoading] = useState<boolean>(true);
+@@ -95,23 +78,6 @@ export default function Dashboard() {
+     useState<boolean>(true);
+   const [studyBuddySets, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
+   const [profileData, setProfileData] = useState<StatCards[]>([]);
+-  const sampleStatCards: StatCards[] = [
+-    {
+-      title: "Total Sets",
+-      icon: 1,
+-      content: "3",
+-    },
+-    {
+-      title: "Completed Lessons",
+-      icon: 2,
+-      content: "10",
+-    },
+-    {
+-      title: "Overall Progress",
+-      icon: 3,
+-      content: "26%",
+-    },
+-  ];
+ 
+   const createSet = (
+     title: string,
+@@ -199,7 +165,7 @@ export default function Dashboard() {
+           setLoading(false);
+           toast.success("Fetched sets");
+         }
+-      } catch (error) {
++      } catch {
+         toast.error("Could not fetch sets - 124");
+       }
+     };
+@@ -234,7 +200,7 @@ export default function Dashboard() {
+           }
+           setLoading(false);
+         }
+-      } catch (error) {
++      } catch {
+         toast.error("Could not fetch study buddies");
+       }
+     };
+@@ -269,7 +235,7 @@ export default function Dashboard() {
+             },
+           ]);
+         }
+-      } catch (error) {
++      } catch {
+         toast.error("Could not fetch profile data");
+       }
+     };
+@@ -280,10 +246,10 @@ export default function Dashboard() {
+   }, []);
+ 
+   return (
+-    <div className="min-h-screen bg-gray-50">
++    <div className="min-h-screen bg-background">
+       <AuthNav />
+ 
+-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
++      <main className="mx-auto max-w-[72rem] px-4 pt-16 sm:px-6 lg:px-8">
+         {/*Stat Cards*/}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
+           {profileData.length === 0 &&
+@@ -293,7 +259,7 @@ export default function Dashboard() {
+                 return (
+                   <div
+                     key={index}
+-                    className="h-30 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
++                    className="h-30 w-100 animate-pulse rounded-xl border border-border bg-surface"
+                   />
+                 );
+               })}
+@@ -312,23 +278,29 @@ export default function Dashboard() {
+ 
+         {/* Learning Sets */}
+         <div className="flex justify-between items-center mb-6">
+-          <div className="px-3 py-2 bg-gray-200 rounded-md flex">
+-            <h2
+-              className={`text-2xl px-2 py-1 ${
+-                isLearningSetsActive ? "bg-white" : ""
+-              } font-bold text-gray-900 rounded-md cursor-pointer`}
++          <div className="flex rounded-2xl border border-border bg-surface p-1">
++            <button
++              type="button"
++              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
++                isLearningSetsActive
++                  ? "bg-surface-raised text-primary"
++                  : "text-muted"
++              } cursor-pointer`}
+               onClick={() => setIsLearningSetsActive(true)}
+             >
+               Learning Sets
+-            </h2>
+-            <h2
+-              className={`text-2xl font-bold px-2 py-1 ${
+-                isLearningSetsActive ? "" : "bg-white"
+-              } text-gray-900 rounded-md cursor-pointer`}
++            </button>
++            <button
++              type="button"
++              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
++                isLearningSetsActive
++                  ? "text-muted"
++                  : "bg-surface-raised text-primary"
++              } cursor-pointer`}
+               onClick={() => setIsLearningSetsActive(false)}
+             >
+               Study Buddies
+-            </h2>
++            </button>
+           </div>
+ 
+           {isLearningSetsActive && (
+@@ -349,7 +321,7 @@ export default function Dashboard() {
+                 .map((_, index) => {
+                   return (
+                     <div
+-                      className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
++                      className="h-70 w-100 animate-pulse rounded-2xl border border-border bg-surface"
+                       key={index}
+                     />
+                   );
+@@ -375,13 +347,13 @@ export default function Dashboard() {
+ 
+         {!isLearningSetsActive && (
+           <div>
+-            <span className="text-gray-500 text-md">
++            <span className="text-body text-md text-muted">
+               Upload your study materials and chat with AI to enhance your
+               learning
+             </span>
+             <br />
+             {!studyBuddySets.length && (
+-              <span className="font-bold text-lg">
++              <span className="text-heading text-lg text-primary">
+                 No Study Buddies created yet. Upload study materials to get
+                 started!
+               </span>
+diff --git a/app/globals.css b/app/globals.css
+index efad711..335e243 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -2,24 +2,127 @@
+ 
+ :root {
+   --background: #ffffff;
+-  --foreground: #171717;
++  --surface: #f7f8fa;
++  --surface-raised: #ffffff;
++  --border: #e6e9ee;
++  --border-strong: #d3d9e0;
++  --border-interactive: #6b7480;
++  --text-primary: #0b0f14;
++  --text-muted: #5a6672;
++  --text-disabled: #9aa6b2;
++  --brand: #142937;
++  --brand-hover: #0e1f2b;
++  --cta-fill: #142937;
++  --cta-text: #ffffff;
++  --cta-fill-hover: #0e1f2b;
++  --cta-disabled: #e6e9ee;
++  --accent: #84cc16;
++  --accent-glow: #b8f135;
++  --accent-progress: #4d7c0f;
++  --accent-progress-track: #d3d9e0;
++  --on-accent: #0b1400;
++  --streak: #f59e0b;
++  --success: #84cc16;
++  --warning: #f59e0b;
++  --error: #dc2626;
++  --info: #3b82f6;
++  --selection: #d3d9e0;
++  --overlay: rgb(11 15 20 / 0.45);
+ }
+ 
+ @theme inline {
+   --color-background: var(--background);
+-  --color-foreground: var(--foreground);
+-  --font-sans: var(--font-geist-sans);
+-  --font-mono: var(--font-geist-mono);
++  --color-surface: var(--surface);
++  --color-surface-raised: var(--surface-raised);
++  --color-border: var(--border);
++  --color-border-strong: var(--border-strong);
++  --color-border-interactive: var(--border-interactive);
++  --color-primary: var(--text-primary);
++  --color-muted: var(--text-muted);
++  --color-disabled: var(--text-disabled);
++  --color-brand: var(--brand);
++  --color-brand-hover: var(--brand-hover);
++  --color-cta: var(--cta-fill);
++  --color-cta-text: var(--cta-text);
++  --color-cta-hover: var(--cta-fill-hover);
++  --color-cta-disabled: var(--cta-disabled);
++  --color-accent: var(--accent);
++  --color-accent-glow: var(--accent-glow);
++  --color-accent-progress: var(--accent-progress);
++  --color-accent-progress-track: var(--accent-progress-track);
++  --color-on-accent: var(--on-accent);
++  --color-streak: var(--streak);
++  --color-success: var(--success);
++  --color-warning: var(--warning);
++  --color-error: var(--error);
++  --color-info: var(--info);
++  --font-display: var(--font-bricolage);
++  --font-heading: var(--font-space-grotesk);
++  --font-body: var(--font-inter);
++  --font-sans: var(--font-inter);
++  --radius-xl: 12px;
++  --radius-2xl: 16px;
++  --radius-full: 9999px;
++  --spacing-content-max: 72rem;
+ }
+ 
+ @media (prefers-color-scheme: dark) {
+   :root {
+-    --background: #0a0a0a;
+-    --foreground: #ededed;
++    --background: #000000;
++    --surface: #0c1116;
++    --surface-raised: #18222c;
++    --border: #1c2530;
++    --border-strong: #2a3644;
++    --border-interactive: #4d5b6a;
++    --text-primary: #f5f7fa;
++    --text-muted: #8b98a5;
++    --text-disabled: #5a6672;
++    --brand: #5b7e9a;
++    --brand-hover: #6b8eaa;
++    --cta-fill: #ffffff;
++    --cta-text: #000000;
++    --cta-fill-hover: #e6e9ee;
++    --cta-disabled: #2a3644;
++    --accent-progress: #84cc16;
++    --error: #f87171;
++    --info: #60a5fa;
++    --selection: #2a3644;
++    --overlay: rgb(0 0 0 / 0.6);
+   }
+ }
+ 
+ @layer utilities {
++  .text-display {
++    font-family: var(--font-bricolage);
++    font-weight: 800;
++    letter-spacing: -0.02em;
++  }
++
++  .text-heading {
++    font-family: var(--font-space-grotesk);
++    font-weight: 700;
++  }
++
++  .text-label {
++    font-family: var(--font-space-grotesk);
++    font-weight: 500;
++  }
++
++  .text-body {
++    font-family: var(--font-inter);
++    line-height: 1.6;
++  }
++
++  .text-numeral {
++    font-family: var(--font-space-grotesk);
++    font-variant-numeric: tabular-nums lining-nums;
++  }
++
++  .focus-ring:focus-visible {
++    outline: 2px solid var(--info);
++    outline-offset: 2px;
++  }
++
+   /* Hide scrollbar for Chrome, Safari and Opera */
+   .no-scrollbar::-webkit-scrollbar {
+     display: none;
+@@ -31,8 +134,40 @@
+   }
+ }
+ 
++@media (prefers-reduced-motion: reduce) {
++  * {
++    animation-duration: 0.01ms !important;
++    animation-iteration-count: 1 !important;
++    transition-duration: 0.01ms !important;
++    scroll-behavior: auto !important;
++  }
++}
++
++html,
+ body {
+   background: var(--background);
+-  color: var(--foreground);
+-  font-family: Arial, Helvetica, sans-serif;
++  color: var(--text-primary);
++  font-family: var(--font-inter), sans-serif;
++}
++
++* {
++  border-color: var(--border);
++}
++
++::selection {
++  background: var(--selection);
++  color: var(--text-primary);
++}
++
++button,
++a,
++input,
++textarea,
++select {
++  font-family: inherit;
++}
++
++:focus-visible {
++  outline: 2px solid var(--info);
++  outline-offset: 2px;
+ }
+diff --git a/app/layout.tsx b/app/layout.tsx
+index aa9f3f1..cb98652 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -1,21 +1,29 @@
+ import type { Metadata } from "next";
+-import { Geist, Geist_Mono } from "next/font/google";
++import { Bricolage_Grotesque, Inter, Space_Grotesk } from "next/font/google";
+ import "./globals.css";
+ import Providers from "./providers";
+ 
+-const geistSans = Geist({
+-  variable: "--font-geist-sans",
++const inter = Inter({
++  variable: "--font-inter",
++  display: "swap",
+   subsets: ["latin"],
+ });
+ 
+-const geistMono = Geist_Mono({
+-  variable: "--font-geist-mono",
++const spaceGrotesk = Space_Grotesk({
++  variable: "--font-space-grotesk",
++  display: "swap",
++  subsets: ["latin"],
++});
++
++const bricolage = Bricolage_Grotesque({
++  variable: "--font-bricolage",
++  display: "swap",
+   subsets: ["latin"],
+ });
+ 
+ export const metadata: Metadata = {
+-  title: "Create Next App",
+-  description: "Generated by create next app",
++  title: "Learnium",
++  description: "Personalized microlearning powered by AI.",
+ };
+ 
+ export default function RootLayout({
+@@ -24,10 +32,11 @@ export default function RootLayout({
+   children: React.ReactNode;
+ }>) {
+   return (
+-    <html lang="en">
+-      <body
+-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+-      >
++    <html
++      lang="en"
++      className={`${inter.variable} ${spaceGrotesk.variable} ${bricolage.variable}`}
++    >
++      <body className="antialiased text-body">
+         <Providers>{children}</Providers>
+       </body>
+     </html>
+diff --git a/app/login/page.tsx b/app/login/page.tsx
+index e08474b..b1f2001 100644
+--- a/app/login/page.tsx
++++ b/app/login/page.tsx
+@@ -1,8 +1,7 @@
+ "use client";
+ 
+ import Link from "next/link";
+-import { useState, useEffect } from "react";
+-import { useTransition } from "react";
++import { useState } from "react";
+ import { useRouter } from "next/navigation";
+ import toast from "react-hot-toast";
+ 
+@@ -21,7 +20,7 @@ export default function LoginPage() {
+   // display loading state
+   const [loading, setLoading] = useState<boolean>(false);
+ 
+-  const handleSubmit = async (e) => {
++  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+     setLoading(true);
+ 
+@@ -48,56 +47,55 @@ export default function LoginPage() {
+       setError(false);
+       toast.success("Logged In");
+       router.replace("/dashboard");
+-    } catch (error) {
+-      alert(error);
++    } catch {
++      toast.error("Login failed. Please try again.");
+       setLoading(false);
+       return;
+     }
+   };
+ 
+   return (
+-    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+-      {/*Name & Logo*/}
+-      <div className="text-4xl font-extrabold text-[#142937]">Learnium</div>
+-      <span className="my-2 text-xl text-gray-500">Welcome Back!</span>
+-      <div className="w-120 py-8 bg-[#142937] rounded-md shadow-lg text-white flex flex-col items-center justify-center space-y-2">
+-        <span className="text-2xl font-extrabold">Log In</span>
++    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background py-5">
++      <div className="text-display text-4xl text-primary">Learnium</div>
++      <span className="text-body my-2 text-xl text-muted">Welcome Back!</span>
++      <div className="flex w-[30rem] flex-col items-center justify-center space-y-2 rounded-2xl border border-border bg-surface-raised py-8 text-primary">
++        <span className="text-heading text-2xl">Log In</span>
+         <form
+-          className="flex flex-col space-y-4 w-full max-w-sm"
++          className="flex w-full max-w-sm flex-col space-y-4"
+           onSubmit={handleSubmit}
+         >
+-          <label>Email</label>
++          <label className="text-label">Email</label>
+           <input
+             type="email"
+             placeholder="Enter your email"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onChange={(e) => setEmail(e.target.value)}
+           />
+-          <label>Password</label>
++          <label className="text-label">Password</label>
+           <input
+             type="password"
+             placeholder="Enter your password"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onChange={(e) => setPassword(e.target.value)}
+           />
+ 
+           {error && (
+-            <span className="text-red-400 text-sm">
++            <span className="text-body text-sm text-error">
+               Incorrect Email or Password. Please Try Again
+             </span>
+           )}
+ 
+           <Link href="/signup" className="text-center">
+-            <span className="text-center text-[#166ea8] cursor-pointer hover:underline">
+-              Don't have an account? Create One
++            <span className="text-label cursor-pointer text-brand hover:underline">
++              Don&apos;t have an account? Create One
+             </span>
+           </Link>
+ 
+           <button
+             type="submit"
+-            className="w-full bg-[#1d4159] py-2 rounded-lg cursor-pointer hover:bg-[#166ea8] transition-colors duration-400 disabled:bg-[#9ccef0] flex items-center justify-center gap-2"
++            className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
+             disabled={loading}
+           >
+             {loading && (
+diff --git a/app/page.tsx b/app/page.tsx
+index bf05bc3..7bcded1 100644
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -3,36 +3,29 @@ import Link from "next/link";
+ 
+ export default function Home() {
+   return (
+-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col text-[#142937]">
+-      {/* Header */}
+-      <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+-        <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
++    <div className="min-h-screen bg-background text-primary flex flex-col">
++      <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
++        <nav className="mx-auto flex max-w-[72rem] items-center justify-between px-6 py-4">
+           <div className="flex items-center space-x-2">
+-            <div className="w-8 h-8 bg-[#142937] rounded-lg flex items-center justify-center">
+-              <span className="text-white font-bold text-sm">L</span>
++            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand">
++              <span className="text-label text-cta-text">L</span>
+             </div>
+-            <h1 className="text-2xl font-bold text-[#142937]">Learnium</h1>
++            <h1 className="text-heading text-2xl">Learnium</h1>
+           </div>
+           <div className="flex items-center space-x-4">
+-            <Link
+-              href="#features"
+-              className="text-[#142937] hover:text-blue-600 transition-colors"
+-            >
++            <Link href="#features" className="focus-ring text-label text-muted hover:text-primary">
+               Features
+             </Link>
+-            <Link
+-              href="#how-it-works"
+-              className="text-[#142937] hover:text-blue-600 transition-colors"
+-            >
++            <Link href="#how-it-works" className="focus-ring text-label text-muted hover:text-primary">
+               How It Works
+             </Link>
+             <Link href="/login">
+-              <button className="text-[#142937] hover:text-blue-600 font-medium transition-colors">
++              <button className="focus-ring text-label text-primary hover:text-brand cursor-pointer">
+                 Sign In
+               </button>
+             </Link>
+             <Link href="/signup">
+-              <button className="rounded-full bg-[#142937] text-white px-6 py-2 font-semibold shadow-lg hover:bg-[#1a3a4a] transition-all hover:scale-105">
++              <button className="focus-ring min-h-11 rounded-full bg-cta px-6 py-2 text-label text-cta-text hover:bg-cta-hover cursor-pointer">
+                 Get Started Free
+               </button>
+             </Link>
+@@ -40,28 +33,26 @@ export default function Home() {
+         </nav>
+       </header>
+ 
+-      {/* Hero Section */}
+       <main className="flex-grow">
+-        <section className="relative overflow-hidden">
+-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+-          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32">
++        <section className="border-b border-border bg-background">
++          <div className="mx-auto max-w-[72rem] px-6 py-24 sm:py-32">
+             <div className="text-center">
+-              <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight bg-gradient-to-r from-[#142937] to-blue-600 bg-clip-text text-transparent">
++              <h1 className="text-display text-5xl leading-tight sm:text-7xl">
+                 Master Any Skill with AI-Powered Learning
+               </h1>
+-              <p className="mt-8 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
++              <p className="text-body mx-auto mt-8 max-w-3xl text-xl text-muted sm:text-2xl">
+                 Transform complex topics into bite-sized, personalized lessons.
+                 Learn faster, retain more, and achieve your goals with
+-                Learnium's intelligent learning platform.
++                Learnium&apos;s intelligent learning platform.
+               </p>
+-              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
++              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                 <Link href="/signup">
+-                  <button className="rounded-full bg-[#142937] text-white px-8 py-4 text-lg font-semibold shadow-xl hover:bg-[#1a3a4a] transition-all hover:scale-105 hover:shadow-2xl">
++                  <button className="focus-ring min-h-11 rounded-full bg-cta px-8 py-4 text-label text-lg text-cta-text hover:bg-cta-hover cursor-pointer">
+                     Start Learning Today
+                   </button>
+                 </Link>
+                 <Link href="#demo">
+-                  <button className="rounded-full border-2 border-[#142937] text-[#142937] px-8 py-4 text-lg font-semibold hover:bg-[#142937] hover:text-white transition-all hover:scale-105">
++                  <button className="focus-ring min-h-11 rounded-full border border-border-interactive px-8 py-4 text-label text-lg text-primary hover:bg-surface cursor-pointer">
+                     Watch Demo
+                   </button>
+                 </Link>
+@@ -70,46 +61,31 @@ export default function Home() {
+           </div>
+         </section>
+ 
+-        {/* Social Proof */}
+-        <section className="py-16 bg-white">
+-          <div className="mx-auto max-w-7xl px-6">
++        <section className="bg-surface py-16">
++          <div className="mx-auto max-w-[72rem] px-6">
+             <div className="text-center">
+-              <p className="text-gray-600 mb-12 text-lg">
+-                Why Microlearning Works
+-              </p>
++              <p className="text-body mb-12 text-lg text-muted">Why Microlearning Works</p>
+               <div className="grid gap-8 md:grid-cols-3">
+-                <div className="p-6 bg-gradient-to-br from-blue-50 to-transparent rounded-2xl">
+-                  <div className="text-4xl font-bold text-blue-600 mb-3">
+-                    ~50%
+-                  </div>
+-                  <p className="text-gray-700 font-semibold mb-2">
+-                    Better Retention
+-                  </p>
+-                  <p className="text-gray-600 text-sm">
++                <div className="rounded-2xl border border-border bg-surface-raised p-6">
++                  <div className="text-numeral text-heading mb-3 text-4xl text-accent-progress">~50%</div>
++                  <p className="text-heading mb-2 text-primary">Better Retention</p>
++                  <p className="text-body text-sm text-muted">
+                     Short, focused lessons improve information retention and
+                     reduce cognitive overload
+                   </p>
+                 </div>
+-                <div className="p-6 bg-gradient-to-br from-green-50 to-transparent rounded-2xl">
+-                  <div className="text-4xl font-bold text-green-600 mb-3">
+-                    5 Min
+-                  </div>
+-                  <p className="text-gray-700 font-semibold mb-2">
+-                    Fits Your Schedule
+-                  </p>
+-                  <p className="text-gray-600 text-sm">
++                <div className="rounded-2xl border border-border bg-surface-raised p-6">
++                  <div className="text-numeral text-heading mb-3 text-4xl text-accent-progress">5 Min</div>
++                  <p className="text-heading mb-2 text-primary">Fits Your Schedule</p>
++                  <p className="text-body text-sm text-muted">
+                     Learn during commutes, coffee breaks, or whenever you have a
+                     few minutes
+                   </p>
+                 </div>
+-                <div className="p-6 bg-gradient-to-br from-purple-50 to-transparent rounded-2xl">
+-                  <div className="text-4xl font-bold text-purple-600 mb-3">
+-                    3x
+-                  </div>
+-                  <p className="text-gray-700 font-semibold mb-2">
+-                    Faster Progress
+-                  </p>
+-                  <p className="text-gray-600 text-sm">
++                <div className="rounded-2xl border border-border bg-surface-raised p-6">
++                  <div className="text-numeral text-heading mb-3 text-4xl text-accent-progress">3x</div>
++                  <p className="text-heading mb-2 text-primary">Faster Progress</p>
++                  <p className="text-body text-sm text-muted">
+                     Focused learning paths help you achieve your goals 3x faster
+                     than traditional methods
+                   </p>
+@@ -119,21 +95,17 @@ export default function Home() {
+           </div>
+         </section>
+ 
+-        {/* Features Section */}
+-        <section id="features" className="py-24 bg-gray-50">
+-          <div className="mx-auto max-w-7xl px-6">
+-            <div className="text-center mb-16">
+-              <h2 className="text-4xl font-bold text-[#142937] mb-4">
+-                Why Choose Learnium?
+-              </h2>
+-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
++        <section id="features" className="bg-background py-24">
++          <div className="mx-auto max-w-[72rem] px-6">
++            <div className="mb-16 text-center">
++              <h2 className="text-heading mb-4 text-4xl">Why Choose Learnium?</h2>
++              <p className="text-body mx-auto max-w-2xl text-xl text-muted">
+                 Our AI-powered platform adapts to your learning style and pace
+               </p>
+             </div>
+             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+-              {/* Feature 1 */}
+-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
+-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
+                   <Image
+                     src="/icons/ai.png"
+                     alt="AI Icon"
+@@ -141,19 +113,15 @@ export default function Home() {
+                     height={32}
+                   />
+                 </div>
+-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
+-                  AI-Powered Curriculum
+-                </h3>
+-                <p className="text-gray-600 leading-relaxed">
++                <h3 className="text-heading mb-4 text-2xl">AI-Powered Curriculum</h3>
++                <p className="text-body text-muted">
+                   Simply describe your learning goal, and our AI creates a
+                   personalized roadmap of bite-sized lessons tailored to your
+                   needs.
+                 </p>
+               </div>
+-
+-              {/* Feature 2 */}
+-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
+-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
+                   <Image
+                     src="/icons/clock.png"
+                     alt="Clock Icon"
+@@ -161,18 +129,14 @@ export default function Home() {
+                     height={32}
+                   />
+                 </div>
+-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
+-                  Learn at Your Pace
+-                </h3>
+-                <p className="text-gray-600 leading-relaxed">
++                <h3 className="text-heading mb-4 text-2xl">Learn at Your Pace</h3>
++                <p className="text-body text-muted">
+                   Flexible scheduling with progress tracking. Learn 5 minutes or
+                   2 hours a dayΓÇöyour journey, your timeline.
+                 </p>
+               </div>
+-
+-              {/* Feature 3 */}
+-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
+-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
+                   <Image
+                     src="/icons/mobile.png"
+                     alt="Mobile Icon"
+@@ -180,10 +144,10 @@ export default function Home() {
+                     height={32}
+                   />
+                 </div>
+-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
++                <h3 className="text-heading mb-4 text-2xl">
+                   Anywhere, Anytime
+                 </h3>
+-                <p className="text-gray-600 leading-relaxed">
++                <p className="text-body text-muted">
+                   Seamless learning across all devices. Start on your phone,
+                   continue on desktopΓÇönever miss a beat.
+                 </p>
+@@ -192,24 +156,20 @@ export default function Home() {
+           </div>
+         </section>
+ 
+-        {/* How It Works */}
+-        <section id="how-it-works" className="py-24 bg-[#142937] text-white">
+-          <div className="mx-auto max-w-7xl px-6">
+-            <div className="text-center mb-16">
+-              <h2 className="text-4xl font-bold mb-4">How It Works</h2>
+-              <p className="text-xl text-blue-100">
++        <section id="how-it-works" className="bg-brand py-24 text-cta-text">
++          <div className="mx-auto max-w-[72rem] px-6">
++            <div className="mb-16 text-center">
++              <h2 className="text-heading mb-4 text-4xl">How It Works</h2>
++              <p className="text-body text-xl text-surface">
+                 Three simple steps to start your learning journey
+               </p>
+             </div>
+             <div className="grid gap-12 md:grid-cols-3">
+-              {/* Step 1 */}
+               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row lg:gap-16 animate-fadeIn">
+                 <div>
+-                  <h4 className="text-2xl font-semibold text-white">
+-                    1. Pick a Topic
+-                  </h4>
+-                  <p className="mt-2 text-white/80 max-w-lg">
+-                    Enter any subjectΓÇöΓÇ£Basics of GuitarΓÇ¥ or ΓÇ£Intro to Machine
++                  <h4 className="text-heading text-2xl">1. Pick a Topic</h4>
++                  <p className="text-body mt-2 max-w-lg text-surface">
++                    Enter any subjectΓÇö&ldquo;Basics of Guitar&rdquo; or &ldquo;Intro to Machine
+                     Learning.ΓÇ¥ Our AI instantly analyzes core concepts.
+                   </p>
+                 </div>
+@@ -221,14 +181,12 @@ export default function Home() {
+                   style={{ width: "auto", height: "auto", maxWidth: "128px" }}
+                 />
+               </div>
+-
+-              {/* Step 2 */}
+               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row-reverse lg:gap-16 animate-fadeIn delay-[200ms]">
+                 <div>
+-                  <h4 className="text-2xl font-semibold text-white">
++                  <h4 className="text-heading text-2xl">
+                     2. Observe Lesson Content
+                   </h4>
+-                  <p className="mt-2 text-white max-w-lg">
++                  <p className="text-body mt-2 max-w-lg text-surface">
+                     Look over the amount of lessons and the topics. Create your
+                     own schedule to finish the lessons.
+                   </p>
+@@ -241,14 +199,12 @@ export default function Home() {
+                   style={{ width: "auto", height: "auto", maxWidth: "128px" }}
+                 />
+               </div>
+-
+-              {/* Step 3 */}
+               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row lg:gap-16 animate-fadeIn delay-[400ms]">
+                 <div>
+-                  <h4 className="text-2xl font-semibold text-white">
++                  <h4 className="text-heading text-2xl">
+                     3. Learn & Track Progress
+                   </h4>
+-                  <p className="mt-2 text-white max-w-lg">
++                  <p className="text-body mt-2 max-w-lg text-surface">
+                     Start your first lesson immediately. Progress auto-saves.
+                     Pick up exactly where you left offΓÇödesktop or mobile.
+                   </p>
+@@ -265,123 +221,118 @@ export default function Home() {
+           </div>
+         </section>
+ 
+-        {/* Testimonials */}
+-        <section className="py-24 bg-white">
+-          <div className="mx-auto max-w-7xl px-6">
+-            <div className="text-center mb-16">
+-              <h2 className="text-4xl font-bold text-[#142937] mb-4">
++        <section className="bg-surface py-24">
++          <div className="mx-auto max-w-[72rem] px-6">
++            <div className="mb-16 text-center">
++              <h2 className="text-heading mb-4 text-4xl">
+                 What Our Learners Say
+               </h2>
+-              <p className="text-xl text-gray-600">
+-                Real results from real learners
+-              </p>
++              <p className="text-body text-xl text-muted">Real results from real learners</p>
+             </div>
+             <div className="grid gap-8 md:grid-cols-3">
+-              <div className="bg-gray-50 rounded-2xl p-8">
+-                <div className="flex items-center mb-4">
+-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-4 flex items-center">
++                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
+                     S
+                   </div>
+                   <div className="ml-4">
+-                    <h4 className="font-semibold text-[#142937]">Sarah Chen</h4>
+-                    <p className="text-gray-600">Software Developer</p>
++                    <h4 className="text-heading">Sarah Chen</h4>
++                    <p className="text-body text-muted">Software Developer</p>
+                   </div>
+                 </div>
+-                <p className="text-gray-700 italic">
+-                  "Learnium helped me master React in just 3 weeks. The
+-                  bite-sized lessons fit perfectly into my busy schedule!"
++                <p className="text-body italic text-primary">
++                  &ldquo;Learnium helped me master React in just 3 weeks. The
++                  bite-sized lessons fit perfectly into my busy schedule!&rdquo;
+                 </p>
+               </div>
+-              <div className="bg-gray-50 rounded-2xl p-8">
+-                <div className="flex items-center mb-4">
+-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-4 flex items-center">
++                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
+                     M
+                   </div>
+                   <div className="ml-4">
+-                    <h4 className="font-semibold text-[#142937]">
++                    <h4 className="text-heading">
+                       Marcus Johnson
+                     </h4>
+-                    <p className="text-gray-600">Marketing Manager</p>
++                    <p className="text-body text-muted">Marketing Manager</p>
+                   </div>
+                 </div>
+-                <p className="text-gray-700 italic">
+-                  "Finally learned data analysis! The personalized approach made
+-                  complex topics actually enjoyable."
++                <p className="text-body italic text-primary">
++                  &ldquo;Finally learned data analysis! The personalized approach made
++                  complex topics actually enjoyable.&rdquo;
+                 </p>
+               </div>
+-              <div className="bg-gray-50 rounded-2xl p-8">
+-                <div className="flex items-center mb-4">
+-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
++              <div className="rounded-2xl border border-border bg-surface-raised p-8">
++                <div className="mb-4 flex items-center">
++                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
+                     A
+                   </div>
+                   <div className="ml-4">
+-                    <h4 className="font-semibold text-[#142937]">
++                    <h4 className="text-heading">
+                       Anna Rodriguez
+                     </h4>
+-                    <p className="text-gray-600">Student</p>
++                    <p className="text-body text-muted">Student</p>
+                   </div>
+                 </div>
+-                <p className="text-gray-700 italic">
+-                  "The progress tracking keeps me motivated. I've completed 5
+-                  courses and counting!"
++                <p className="text-body italic text-primary">
++                  &ldquo;The progress tracking keeps me motivated. I&apos;ve completed 5
++                  courses and counting!&rdquo;
+                 </p>
+               </div>
+             </div>
+           </div>
+         </section>
+ 
+-        {/* Final CTA */}
+-        <section className="py-24 bg-gradient-to-r from-[#142937] to-blue-600 text-white">
++        <section className="bg-brand py-24 text-cta-text">
+           <div className="mx-auto max-w-4xl px-6 text-center">
+-            <h2 className="text-4xl font-bold mb-6">
++            <h2 className="text-display mb-6 text-4xl">
+               Start Your Microlearning Journey Today
+             </h2>
+-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
++            <p className="text-body mb-8 text-xl text-surface">
+               Join thousands of learners who are mastering new skills one
+               bite-sized lesson at a time. Begin your personalized microlearning
+               journey now.
+             </p>
+             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+               <Link href="/signup">
+-                <button className="rounded-full bg-white text-[#142937] px-10 py-4 text-lg font-semibold shadow-xl hover:bg-gray-100 transition-all hover:scale-105">
++                <button className="focus-ring min-h-11 rounded-full bg-cta px-10 py-4 text-label text-lg text-cta-text hover:bg-cta-hover cursor-pointer">
+                   Start Microlearning Today
+                 </button>
+               </Link>
+               <Link href="/login">
+-                <button className="rounded-full border-2 border-white text-white px-10 py-4 text-lg font-semibold hover:bg-white hover:text-[#142937] transition-all hover:scale-105">
++                <button className="focus-ring min-h-11 rounded-full border border-border-interactive px-10 py-4 text-label text-lg text-cta-text hover:bg-surface hover:text-primary cursor-pointer">
+                   Sign In
+                 </button>
+               </Link>
+             </div>
+-            <p className="mt-6 text-blue-200 text-sm">
++            <p className="text-body mt-6 text-sm text-surface">
+               No credit card required ΓÇó Start anytime ΓÇó Learn at your pace
+             </p>
+           </div>
+         </section>
+       </main>
+ 
+-      {/* Footer */}
+-      <footer className="bg-[#142937] text-white py-12">
+-        <div className="mx-auto max-w-7xl px-6">
++      <footer className="bg-surface-raised py-12">
++        <div className="mx-auto max-w-[72rem] px-6">
+           <div className="grid gap-8 md:grid-cols-4">
+             <div>
+-              <div className="flex items-center space-x-2 mb-4">
+-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+-                  <span className="text-[#142937] font-bold text-sm">L</span>
++              <div className="mb-4 flex items-center space-x-2">
++                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand">
++                  <span className="text-label text-cta-text">L</span>
+                 </div>
+-                <h3 className="text-xl font-bold">Learnium</h3>
++                <h3 className="text-heading text-xl">Learnium</h3>
+               </div>
+-              <p className="text-blue-100">
++              <p className="text-body text-muted">
+                 Empowering learners worldwide with AI-driven education.
+               </p>
+             </div>
+             <div>
+-              <h4 className="font-semibold mb-4">Product</h4>
+-              <ul className="space-y-2 text-blue-100">
++              <h4 className="text-heading mb-4">Product</h4>
++              <ul className="space-y-2 text-body text-muted">
+                 <li>
+                   <Link
+                     href="#features"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Features
+                   </Link>
+@@ -389,7 +340,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="#how-it-works"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     How It Works
+                   </Link>
+@@ -397,7 +348,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="/pricing"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Pricing
+                   </Link>
+@@ -405,12 +356,12 @@ export default function Home() {
+               </ul>
+             </div>
+             <div>
+-              <h4 className="font-semibold mb-4">Support</h4>
+-              <ul className="space-y-2 text-blue-100">
++              <h4 className="text-heading mb-4">Support</h4>
++              <ul className="space-y-2 text-body text-muted">
+                 <li>
+                   <Link
+                     href="/help"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Help Center
+                   </Link>
+@@ -418,7 +369,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="/contact"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Contact Us
+                   </Link>
+@@ -426,7 +377,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="/faq"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     FAQ
+                   </Link>
+@@ -434,12 +385,12 @@ export default function Home() {
+               </ul>
+             </div>
+             <div>
+-              <h4 className="font-semibold mb-4">Company</h4>
+-              <ul className="space-y-2 text-blue-100">
++              <h4 className="text-heading mb-4">Company</h4>
++              <ul className="space-y-2 text-body text-muted">
+                 <li>
+                   <Link
+                     href="/about"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     About
+                   </Link>
+@@ -447,7 +398,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="/blog"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Blog
+                   </Link>
+@@ -455,7 +406,7 @@ export default function Home() {
+                 <li>
+                   <Link
+                     href="/careers"
+-                    className="hover:text-white transition-colors"
++                    className="focus-ring hover:text-primary"
+                   >
+                     Careers
+                   </Link>
+@@ -463,7 +414,7 @@ export default function Home() {
+               </ul>
+             </div>
+           </div>
+-          <div className="border-t border-blue-800 mt-8 pt-8 text-center text-blue-200">
++          <div className="mt-8 border-t border-border pt-8 text-center text-body text-muted">
+             <p>
+               &copy; {new Date().getFullYear()} Learnium. All rights reserved.
+             </p>
+diff --git a/app/signup/page.tsx b/app/signup/page.tsx
+index ceb1a02..375b838 100644
+--- a/app/signup/page.tsx
++++ b/app/signup/page.tsx
+@@ -2,15 +2,12 @@
+ 
+ import Link from "next/link";
+ import { useState } from "react";
+-import { useRouter } from "next/navigation";
+ import { Loader2 } from "lucide-react";
+ 
+ import toast from "react-hot-toast";
+ import SignInWithGoogle from "../components/misc/SignInWithGoogle";
+ 
+ export default function SignupPage() {
+-  const router = useRouter();
+-
+   // state for input errors
+   const [usernameError, setUsernameError] = useState<boolean>(false); // please enter at least 5 alphanumeric characters
+   const [usernameLengthError, setUsernameLengthError] =
+@@ -28,7 +25,7 @@ export default function SignupPage() {
+ 
+   const [loading, setLoading] = useState<boolean>(false);
+ 
+-  const handleSubmit = async (e) => {
++  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+     setLoading(true);
+     // password check
+@@ -102,7 +99,7 @@ export default function SignupPage() {
+       // request was successful, redirect to confirm email page (create confirm email page)
+       toast.success("Check your email to confirm your account!");
+       setLoading(false);
+-    } catch (error) {
++    } catch {
+       toast.error("Signup failed. Please try again");
+       setLoading(false);
+       return;
+@@ -110,25 +107,24 @@ export default function SignupPage() {
+   };
+ 
+   return (
+-    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-center py-5">
+-      {/*Name & Logo*/}
+-      <div className="text-4xl font-extrabold text-[#142937]">
++    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background py-5">
++      <div className="text-display text-4xl text-primary">
+         Welcome to Learnium
+       </div>
+-      <span className="my-2 text-xl text-gray-500">
+-        We're thrilled to have you!
++      <span className="text-body my-2 text-xl text-muted">
++        We&apos;re thrilled to have you!
+       </span>
+-      <div className="w-120 py-8 bg-[#142937] rounded-md shadow-lg text-white flex flex-col items-center justify-center space-y-2">
+-        <span className="text-2xl font-extrabold">Sign Up</span>
++      <div className="flex w-[30rem] flex-col items-center justify-center space-y-2 rounded-2xl border border-border bg-surface-raised py-8 text-primary">
++        <span className="text-heading text-2xl">Sign Up</span>
+         <form
+-          className="flex flex-col space-y-4 w-full max-w-sm"
++          className="flex w-full max-w-sm flex-col space-y-4"
+           onSubmit={handleSubmit}
+         >
+-          <label>Start by creating a username</label>
++          <label className="text-label">Start by creating a username</label>
+           <input
+             type="text"
+             placeholder="Create a username"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onKeyDown={(e) => {
+               if (e.key === " ") e.preventDefault();
+@@ -138,30 +134,30 @@ export default function SignupPage() {
+               setUsername(e.target.value);
+             }}
+           />
+-          <span className="text-sm text-red-400">
++          <span className="text-body text-sm text-error">
+             {usernameLengthError
+               ? "Please enter no more than 15 characters"
+               : usernameError
+               ? "Please enter at least 5 alphanumeric characters"
+               : ""}
+           </span>
+-          <label>Email</label>
++          <label className="text-label">Email</label>
+           <input
+             type="email"
+             placeholder="Enter your email"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onChange={(e) => setEmail(e.target.value)}
+           />
+-          <label>Password</label>
++          <label className="text-label">Password</label>
+           <input
+             type="password"
+             placeholder="Enter your password"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onChange={(e) => setPassword(e.target.value)}
+           />
+-          <span className="text-sm text-red-400">
++          <span className="text-body text-sm text-error">
+             {passwordLengthError
+               ? "Please use at least 8 characters"
+               : passwordError
+@@ -169,15 +165,15 @@ export default function SignupPage() {
+               : ""}
+           </span>
+ 
+-          <label>Confirm Password</label>
++          <label className="text-label">Confirm Password</label>
+           <input
+             type="password"
+             placeholder="Confirm your password"
+-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
++            className="focus-ring rounded-xl border border-border-interactive bg-background px-3 py-3 text-body text-primary placeholder:text-muted"
+             required
+             onChange={(e) => setConfirmPassword(e.target.value)}
+           />
+-          <span className="text-sm text-red-400">
++          <span className="text-body text-sm text-error">
+             {confirmError
+               ? "Please make sure that password and confirm password are the same"
+               : ""}
+@@ -185,14 +181,14 @@ export default function SignupPage() {
+ 
+           <Link
+             href="/login"
+-            className="text-center text-[#166ea8] cursor-pointer hover:underline"
++            className="text-center text-label text-brand cursor-pointer hover:underline"
+           >
+             Already have an account? Sign In
+           </Link>
+ 
+           <button
+             type="submit"
+-            className="w-full bg-[#1d4159] py-2 rounded-lg cursor-pointer hover:bg-[#166ea8] transition-colors duration-400 disabled:bg-[#9ccef0] flex items-center justify-center gap-2"
++            className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
+             disabled={loading}
+           >
+             {loading && (

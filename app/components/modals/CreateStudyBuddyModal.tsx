@@ -10,7 +10,8 @@ type CreateStudyBuddyModalProps = {
   onCreateStudyBuddy: (
     title: string,
     description: string,
-    category: string
+    category: string,
+    buddyId?: number,
   ) => void;
 };
 
@@ -69,7 +70,7 @@ export default function CreateStudyBuddyModal({
   };
 
   // form submission
-  const formSubmit = async (e) => {
+  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);
@@ -152,18 +153,19 @@ export default function CreateStudyBuddyModal({
 
       console.log(data);
 
-      if (data.status == "success") {
-        setIsLoading(false);
+      if (data.status === "success") {
+        onCreateStudyBuddy(title, description, category, createdBuddyId);
         toast.success("Study buddy has been successfully created");
+        setIsLoading(false);
+        handleClose();
+        return;
       }
 
-      // resume 1/3 creating the buddy works successfully in supabase and RAG
-      // make the UI card of the buddy to display on the dashboard and make the UI of a study buddy
-      // use the created buddy for testing
-      // test text retrieval and chat response to a query sent by the user about the text
-
+      toast.error(
+        "There was an error creating your Study Buddy. Please try again.",
+      );
       setIsLoading(false);
-      handleClose();
+      return;
     } catch (error) {
       console.log("Error creating study buddy:", error);
       toast.error(
@@ -177,12 +179,13 @@ export default function CreateStudyBuddyModal({
   return (
     <div
       className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
-        open ? "visible opacity-100 bg-black/20" : "invisible opacity-0"
+        open ? "visible opacity-100" : "invisible opacity-0"
       }`}
+      style={{ backgroundColor: "var(--overlay)" }}
       onMouseDown={handleClose}
     >
       <div
-        className={`bg-white rounded-md z-50 shadow p-6 text-center max-h-[80vh] overflow-y-auto transition-all ${
+        className={`z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
         } `}
         onClick={(e) => e.stopPropagation()}
@@ -194,13 +197,13 @@ export default function CreateStudyBuddyModal({
           onMouseDown={(e) => e.stopPropagation()}
         >
           <button
-            className="absolute top-2 right-2 p-1 cursor-pointer rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"
+            className="focus-ring absolute right-2 top-2 cursor-pointer rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
             onClick={handleClose}
           >
             <X />
           </button>
-          <span className="font-semibold">Create New Study Buddy</span>
-          <span className="text-sm text-gray-500">
+          <span className="text-heading">Create New Study Buddy</span>
+          <span className="text-body text-sm text-muted">
             Upload study materials and chat with an AI
             <br />
             about your content
@@ -211,53 +214,53 @@ export default function CreateStudyBuddyModal({
             onSubmit={formSubmit}
           >
             <div className="flex flex-col gap-1">
-              <label className="text-sm">Title</label>
+              <label className="text-label text-sm">Title</label>
               <input
                 type="text"
                 placeholder="Title"
-                className="border border-gray-200 w-80 rounded-sm px-2 py-1"
+                className="focus-ring w-80 rounded-xl border border-border-interactive bg-surface-raised px-2 py-2 text-body text-primary placeholder:text-muted"
                 required
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
             <div className="flex flex-col gap-1">
-              <label>Category</label>
+              <label className="text-label">Category</label>
 
               <input
                 type="text"
                 placeholder="e.g., Biology, History, Math"
-                className="border border-gray-200 w-80 rounded-sm px-2 py-1"
+                className="focus-ring w-80 rounded-xl border border-border-interactive bg-surface-raised px-2 py-2 text-body text-primary placeholder:text-muted"
                 required
                 onChange={(e) => setCategory(e.target.value)}
               />
             </div>
 
             <div className="flex flex-col gap-1 col-span-2">
-              <label>Description</label>
+              <label className="text-label">Description</label>
               <textarea
                 placeholder="What will your Study Buddy help you with?"
                 rows={3}
-                className="border border-gray-200 rounded-sm px-2 py-1 resize-none"
+                className="focus-ring resize-none rounded-xl border border-border-interactive bg-surface-raised px-2 py-2 text-body text-primary placeholder:text-muted"
                 required
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
             <div className="flex flex-col gap-1 md:col-span-2 items-center text-center">
-              <label>Upload files (.pdf or .pptx, max 4)</label>
+              <label className="text-label">Upload files (.pdf or .pptx, max 4)</label>
               <input
                 type="file"
                 multiple
                 onChange={handleFileUpload}
-                className="file:cursor-pointer text-sm text-stone-500 file:mr-5 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-blue-700 file:hover:file:bg-blue-100"
+                className="text-body text-sm text-muted file:mr-5 file:cursor-pointer file:rounded-full file:border file:border-border file:bg-surface file:px-4 file:py-2 file:text-label file:text-primary hover:file:bg-surface-raised"
               />
               <div className="mt-2"></div>
               {uploadedFiles.map((file, index) => {
                 return (
                   <div
                     key={index}
-                    className={`w-80 py-2 text-white bg-red-300 rounded-md truncate px-2 ${
+                    className={`w-80 truncate rounded-xl border border-border bg-surface px-2 py-2 text-body text-primary ${
                       index !== uploadedFiles.length - 1 ? "mb-1" : ""
                     }`}
                   >
@@ -271,7 +274,7 @@ export default function CreateStudyBuddyModal({
             <div className="mt-7 flex md:col-span-2 justify-center">
               <button
                 type="button"
-                className="w-39 border border-gray-200 rounded-sm py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                className="focus-ring w-39 cursor-pointer rounded-xl border border-border bg-surface py-2 text-label text-primary hover:bg-surface-raised"
                 onClick={handleClose}
                 disabled={isLoading}
               >
@@ -279,7 +282,7 @@ export default function CreateStudyBuddyModal({
               </button>
               <button
                 type="submit"
-                className="w-39 border border-gray-200 rounded-sm py-2 bg-gray-400 disabled:bg-gray-300 text-gray-50 ml-2 cursor-pointer hover:bg-gray-500 transition-colors duration-200 flex items-center justify-center gap-2"
+                className="focus-ring ml-2 flex w-39 cursor-pointer items-center justify-center gap-2 rounded-xl bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
                 disabled={isLoading}
               >
                 {isLoading && (

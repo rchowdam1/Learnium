@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import toast from "react-hot-toast";
 import SignInWithGoogle from "../components/misc/SignInWithGoogle";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   // state for input errors
   const [usernameError, setUsernameError] = useState<boolean>(false); // please enter at least 5 alphanumeric characters
   const [usernameLengthError, setUsernameLengthError] =
@@ -28,7 +25,7 @@ export default function SignupPage() {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     // password check
@@ -102,7 +99,7 @@ export default function SignupPage() {
       // request was successful, redirect to confirm email page (create confirm email page)
       toast.success("Check your email to confirm your account!");
       setLoading(false);
-    } catch (error) {
+    } catch {
       toast.error("Signup failed. Please try again");
       setLoading(false);
       return;
@@ -110,25 +107,24 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-center py-5">
-      {/*Name & Logo*/}
-      <div className="text-4xl font-extrabold text-[#142937]">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background py-5">
+      <div className="text-display text-4xl text-primary">
         Welcome to Learnium
       </div>
-      <span className="my-2 text-xl text-gray-500">
-        We're thrilled to have you!
+      <span className="text-body my-2 text-xl text-muted">
+        We&apos;re thrilled to have you!
       </span>
-      <div className="w-120 py-8 bg-[#142937] rounded-md shadow-lg text-white flex flex-col items-center justify-center space-y-2">
-        <span className="text-2xl font-extrabold">Sign Up</span>
+      <div className="flex w-[30rem] flex-col items-center justify-center space-y-2 rounded-2xl border border-border bg-surface-raised py-8 text-primary">
+        <span className="text-heading text-2xl">Sign Up</span>
         <form
-          className="flex flex-col space-y-4 w-full max-w-sm"
+          className="flex w-full max-w-sm flex-col space-y-4"
           onSubmit={handleSubmit}
         >
-          <label>Start by creating a username</label>
+          <label className="text-label">Start by creating a username</label>
           <input
             type="text"
             placeholder="Create a username"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onKeyDown={(e) => {
               if (e.key === " ") e.preventDefault();
@@ -138,30 +134,30 @@ export default function SignupPage() {
               setUsername(e.target.value);
             }}
           />
-          <span className="text-sm text-red-400">
+          <span className="text-body text-sm text-error">
             {usernameLengthError
               ? "Please enter no more than 15 characters"
               : usernameError
               ? "Please enter at least 5 alphanumeric characters"
               : ""}
           </span>
-          <label>Email</label>
+          <label className="text-label">Email</label>
           <input
             type="email"
             placeholder="Enter your email"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onChange={(e) => setEmail(e.target.value)}
           />
-          <label>Password</label>
+          <label className="text-label">Password</label>
           <input
             type="password"
             placeholder="Enter your password"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onChange={(e) => setPassword(e.target.value)}
           />
-          <span className="text-sm text-red-400">
+          <span className="text-body text-sm text-error">
             {passwordLengthError
               ? "Please use at least 8 characters"
               : passwordError
@@ -169,15 +165,15 @@ export default function SignupPage() {
               : ""}
           </span>
 
-          <label>Confirm Password</label>
+          <label className="text-label">Confirm Password</label>
           <input
             type="password"
             placeholder="Confirm your password"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <span className="text-sm text-red-400">
+          <span className="text-body text-sm text-error">
             {confirmError
               ? "Please make sure that password and confirm password are the same"
               : ""}
@@ -185,14 +181,14 @@ export default function SignupPage() {
 
           <Link
             href="/login"
-            className="text-center text-[#166ea8] cursor-pointer hover:underline"
+            className="text-center text-label text-brand cursor-pointer hover:underline"
           >
             Already have an account? Sign In
           </Link>
 
           <button
             type="submit"
-            className="w-full bg-[#1d4159] py-2 rounded-lg cursor-pointer hover:bg-[#166ea8] transition-colors duration-400 disabled:bg-[#9ccef0] flex items-center justify-center gap-2"
+            className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
             disabled={loading}
           >
             {loading && (

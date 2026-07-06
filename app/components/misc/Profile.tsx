@@ -2,10 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { LogOut, User } from "lucide-react";
-import toast from "react-hot-toast";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type ProfileProps = {
   onSignOut: () => void;
@@ -32,7 +31,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const deleteAccount = async (e) => {
+  const deleteAccount = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     //console.log("Deleting account...");
 
@@ -53,7 +52,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
         router.replace("/");
         return;
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while trying to delete the account.");
     }
   };
@@ -63,22 +62,22 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
       {/*Trigger*/}
       <button
         type="button"
-        className="w-28 h-10 border border-gray-300 rounded-sm cursor-pointer hover:bg-gray-100 transition-all duration-150"
+        className="focus-ring h-11 w-28 cursor-pointer rounded-xl border border-border-interactive bg-surface px-4 text-label text-primary hover:bg-surface-raised"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
-        <span className="font-semibold">Profile</span>
+        <span>Profile</span>
       </button>
 
       {/*Dropdown*/}
       {dropdownOpen && (
-        <div className="absolute left-0 z-10 mt-1 w-32 origin-top-right rounded-md bg-white shadow-lg border border-gray-300">
+        <div className="absolute left-0 z-10 mt-1 w-36 origin-top-right rounded-2xl border border-border bg-surface-raised shadow-sm">
           <Link href="/profile">
             <button
               type="button"
-              className="cursor-pointer flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
+              className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm hover:bg-surface"
               onClick={onViewProfile}
             >
-              <User className="text-xs" />
+              <User className="text-xs text-primary" />
               <span className="ml-2">View Profile</span>
             </button>
           </Link>
@@ -86,7 +85,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
           <Link href="/">
             <button
               type="button"
-              className="cursor-pointer text-red-400 flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
+              className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm text-error hover:bg-surface"
               onClick={onSignOut}
             >
               <LogOut className="text-xs" />
@@ -96,10 +95,10 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
 
           <button
             type="button"
-            className="cursor-pointer flex items-center py-2 px-1 text-sm hover:bg-gray-50 w-32"
+            className="focus-ring flex w-36 cursor-pointer items-center px-3 py-2 text-body text-sm text-error hover:bg-surface"
             onClick={deleteAccount}
           >
-            <User className="text-xs text-red-400" />
+            <User className="text-xs text-error" />
             <span className="ml-2">Delete Account</span>
           </button>
         </div>

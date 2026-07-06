@@ -18,8 +18,7 @@ export default function CreateSetController({
   return (
     <div>
       <button
-        className="flex justify-center items-center bg-black text-white p-3 rounded-md hover:bg-gray-800 active:bg-white active:text-black 
-             transition-colors duration-200 cursor-pointer"
+        className="focus-ring flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-cta p-3 text-label text-cta-text hover:bg-cta-hover"
         onClick={() => setCreateModalOpen(true)}
       >
         <Plus className="w-4 h-4 mr-2" />

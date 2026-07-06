@@ -3,36 +3,29 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col text-[#142937]">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-50">
-        <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-background text-primary flex flex-col">
+      <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-sm">
+        <nav className="mx-auto flex max-w-[72rem] items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-[#142937] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">L</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand">
+              <span className="text-label text-cta-text">L</span>
             </div>
-            <h1 className="text-2xl font-bold text-[#142937]">Learnium</h1>
+            <h1 className="text-heading text-2xl">Learnium</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <Link
-              href="#features"
-              className="text-[#142937] hover:text-blue-600 transition-colors"
-            >
+            <Link href="#features" className="focus-ring text-label text-muted hover:text-primary">
               Features
             </Link>
-            <Link
-              href="#how-it-works"
-              className="text-[#142937] hover:text-blue-600 transition-colors"
-            >
+            <Link href="#how-it-works" className="focus-ring text-label text-muted hover:text-primary">
               How It Works
             </Link>
             <Link href="/login">
-              <button className="text-[#142937] hover:text-blue-600 font-medium transition-colors">
+              <button className="focus-ring text-label text-primary hover:text-brand cursor-pointer">
                 Sign In
               </button>
             </Link>
             <Link href="/signup">
-              <button className="rounded-full bg-[#142937] text-white px-6 py-2 font-semibold shadow-lg hover:bg-[#1a3a4a] transition-all hover:scale-105">
+              <button className="focus-ring min-h-11 rounded-xl bg-cta px-6 py-2 text-label text-cta-text hover:bg-cta-hover cursor-pointer">
                 Get Started Free
               </button>
             </Link>
@@ -40,28 +33,26 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* Hero Section */}
       <main className="flex-grow">
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-          <div className="relative mx-auto max-w-7xl px-6 py-24 sm:py-32">
+        <section className="border-b border-border bg-background">
+          <div className="mx-auto max-w-[72rem] px-6 py-24 sm:py-32">
             <div className="text-center">
-              <h1 className="text-5xl sm:text-7xl font-extrabold leading-tight bg-gradient-to-r from-[#142937] to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-display text-5xl leading-tight sm:text-7xl">
                 Master Any Skill with AI-Powered Learning
               </h1>
-              <p className="mt-8 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-body mx-auto mt-8 max-w-3xl text-xl text-muted sm:text-2xl">
                 Transform complex topics into bite-sized, personalized lessons.
                 Learn faster, retain more, and achieve your goals with
-                Learnium's intelligent learning platform.
+                Learnium&apos;s intelligent learning platform.
               </p>
-              <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link href="/signup">
-                  <button className="rounded-full bg-[#142937] text-white px-8 py-4 text-lg font-semibold shadow-xl hover:bg-[#1a3a4a] transition-all hover:scale-105 hover:shadow-2xl">
+                  <button className="focus-ring min-h-11 rounded-xl bg-cta px-8 py-4 text-label text-lg text-cta-text hover:bg-cta-hover cursor-pointer">
                     Start Learning Today
                   </button>
                 </Link>
                 <Link href="#demo">
-                  <button className="rounded-full border-2 border-[#142937] text-[#142937] px-8 py-4 text-lg font-semibold hover:bg-[#142937] hover:text-white transition-all hover:scale-105">
+                  <button className="focus-ring min-h-11 rounded-xl border border-border-interactive px-8 py-4 text-label text-lg text-primary hover:bg-surface cursor-pointer">
                     Watch Demo
                   </button>
                 </Link>
@@ -70,46 +61,31 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Social Proof */}
-        <section className="py-16 bg-white">
-          <div className="mx-auto max-w-7xl px-6">
+        <section className="bg-surface py-16">
+          <div className="mx-auto max-w-[72rem] px-6">
             <div className="text-center">
-              <p className="text-gray-600 mb-12 text-lg">
-                Why Microlearning Works
-              </p>
+              <p className="text-body mb-12 text-lg text-muted">Why Microlearning Works</p>
               <div className="grid gap-8 md:grid-cols-3">
-                <div className="p-6 bg-gradient-to-br from-blue-50 to-transparent rounded-2xl">
-                  <div className="text-4xl font-bold text-blue-600 mb-3">
-                    ~50%
-                  </div>
-                  <p className="text-gray-700 font-semibold mb-2">
-                    Better Retention
-                  </p>
-                  <p className="text-gray-600 text-sm">
+                <div className="rounded-xl border border-border bg-surface-raised p-6">
+                  <div className="text-numeral text-heading mb-3 text-4xl text-primary">~50%</div>
+                  <p className="text-heading mb-2 text-primary">Better Retention</p>
+                  <p className="text-body text-sm text-muted">
                     Short, focused lessons improve information retention and
                     reduce cognitive overload
                   </p>
                 </div>
-                <div className="p-6 bg-gradient-to-br from-green-50 to-transparent rounded-2xl">
-                  <div className="text-4xl font-bold text-green-600 mb-3">
-                    5 Min
-                  </div>
-                  <p className="text-gray-700 font-semibold mb-2">
-                    Fits Your Schedule
-                  </p>
-                  <p className="text-gray-600 text-sm">
+                <div className="rounded-xl border border-border bg-surface-raised p-6">
+                  <div className="text-numeral text-heading mb-3 text-4xl text-primary">5 Min</div>
+                  <p className="text-heading mb-2 text-primary">Fits Your Schedule</p>
+                  <p className="text-body text-sm text-muted">
                     Learn during commutes, coffee breaks, or whenever you have a
                     few minutes
                   </p>
                 </div>
-                <div className="p-6 bg-gradient-to-br from-purple-50 to-transparent rounded-2xl">
-                  <div className="text-4xl font-bold text-purple-600 mb-3">
-                    3x
-                  </div>
-                  <p className="text-gray-700 font-semibold mb-2">
-                    Faster Progress
-                  </p>
-                  <p className="text-gray-600 text-sm">
+                <div className="rounded-xl border border-border bg-surface-raised p-6">
+                  <div className="text-numeral text-heading mb-3 text-4xl text-primary">3x</div>
+                  <p className="text-heading mb-2 text-primary">Faster Progress</p>
+                  <p className="text-body text-sm text-muted">
                     Focused learning paths help you achieve your goals 3x faster
                     than traditional methods
                   </p>
@@ -119,21 +95,17 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-24 bg-gray-50">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-[#142937] mb-4">
-                Why Choose Learnium?
-              </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <section id="features" className="bg-background py-24">
+          <div className="mx-auto max-w-[72rem] px-6">
+            <div className="mb-16 text-center">
+              <h2 className="text-heading mb-4 text-4xl">Why Choose Learnium?</h2>
+              <p className="text-body mx-auto max-w-2xl text-xl text-muted">
                 Our AI-powered platform adapts to your learning style and pace
               </p>
             </div>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {/* Feature 1 */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
                   <Image
                     src="/icons/ai.png"
                     alt="AI Icon"
@@ -141,19 +113,15 @@ export default function Home() {
                     height={32}
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
-                  AI-Powered Curriculum
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <h3 className="text-heading mb-4 text-2xl">AI-Powered Curriculum</h3>
+                <p className="text-body text-muted">
                   Simply describe your learning goal, and our AI creates a
                   personalized roadmap of bite-sized lessons tailored to your
                   needs.
                 </p>
               </div>
-
-              {/* Feature 2 */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
                   <Image
                     src="/icons/clock.png"
                     alt="Clock Icon"
@@ -161,18 +129,14 @@ export default function Home() {
                     height={32}
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
-                  Learn at Your Pace
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <h3 className="text-heading mb-4 text-2xl">Learn at Your Pace</h3>
+                <p className="text-body text-muted">
                   Flexible scheduling with progress tracking. Learn 5 minutes or
                   2 hours a day—your journey, your timeline.
                 </p>
               </div>
-
-              {/* Feature 3 */}
-              <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all hover:scale-105">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl bg-surface">
                   <Image
                     src="/icons/mobile.png"
                     alt="Mobile Icon"
@@ -180,10 +144,10 @@ export default function Home() {
                     height={32}
                   />
                 </div>
-                <h3 className="text-2xl font-semibold text-[#142937] mb-4">
+                <h3 className="text-heading mb-4 text-2xl">
                   Anywhere, Anytime
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-body text-muted">
                   Seamless learning across all devices. Start on your phone,
                   continue on desktop—never miss a beat.
                 </p>
@@ -192,24 +156,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section id="how-it-works" className="py-24 bg-[#142937] text-white">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">How It Works</h2>
-              <p className="text-xl text-blue-100">
+        <section id="how-it-works" className="bg-brand py-24 text-cta-text">
+          <div className="mx-auto max-w-[72rem] px-6">
+            <div className="mb-16 text-center">
+              <h2 className="text-heading mb-4 text-4xl">How It Works</h2>
+              <p className="text-body text-xl text-surface">
                 Three simple steps to start your learning journey
               </p>
             </div>
             <div className="grid gap-12 md:grid-cols-3">
-              {/* Step 1 */}
               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row lg:gap-16 animate-fadeIn">
                 <div>
-                  <h4 className="text-2xl font-semibold text-white">
-                    1. Pick a Topic
-                  </h4>
-                  <p className="mt-2 text-white/80 max-w-lg">
-                    Enter any subject—“Basics of Guitar” or “Intro to Machine
+                  <h4 className="text-heading text-2xl">1. Pick a Topic</h4>
+                  <p className="text-body mt-2 max-w-lg text-surface">
+                    Enter any subject—&ldquo;Basics of Guitar&rdquo; or &ldquo;Intro to Machine
                     Learning.” Our AI instantly analyzes core concepts.
                   </p>
                 </div>
@@ -221,14 +181,12 @@ export default function Home() {
                   style={{ width: "auto", height: "auto", maxWidth: "128px" }}
                 />
               </div>
-
-              {/* Step 2 */}
               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row-reverse lg:gap-16 animate-fadeIn delay-[200ms]">
                 <div>
-                  <h4 className="text-2xl font-semibold text-white">
+                  <h4 className="text-heading text-2xl">
                     2. Observe Lesson Content
                   </h4>
-                  <p className="mt-2 text-white max-w-lg">
+                  <p className="text-body mt-2 max-w-lg text-surface">
                     Look over the amount of lessons and the topics. Create your
                     own schedule to finish the lessons.
                   </p>
@@ -241,14 +199,12 @@ export default function Home() {
                   style={{ width: "auto", height: "auto", maxWidth: "128px" }}
                 />
               </div>
-
-              {/* Step 3 */}
               <div className="flex flex-col-reverse items-center gap-8 lg:flex-row lg:gap-16 animate-fadeIn delay-[400ms]">
                 <div>
-                  <h4 className="text-2xl font-semibold text-white">
+                  <h4 className="text-heading text-2xl">
                     3. Learn & Track Progress
                   </h4>
-                  <p className="mt-2 text-white max-w-lg">
+                  <p className="text-body mt-2 max-w-lg text-surface">
                     Start your first lesson immediately. Progress auto-saves.
                     Pick up exactly where you left off—desktop or mobile.
                   </p>
@@ -265,123 +221,118 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="py-24 bg-white">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-[#142937] mb-4">
+        <section className="bg-surface py-24">
+          <div className="mx-auto max-w-[72rem] px-6">
+            <div className="mb-16 text-center">
+              <h2 className="text-heading mb-4 text-4xl">
                 What Our Learners Say
               </h2>
-              <p className="text-xl text-gray-600">
-                Real results from real learners
-              </p>
+              <p className="text-body text-xl text-muted">Real results from real learners</p>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
-              <div className="bg-gray-50 rounded-2xl p-8">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-4 flex items-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
                     S
                   </div>
                   <div className="ml-4">
-                    <h4 className="font-semibold text-[#142937]">Sarah Chen</h4>
-                    <p className="text-gray-600">Software Developer</p>
+                    <h4 className="text-heading">Sarah Chen</h4>
+                    <p className="text-body text-muted">Software Developer</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
-                  "Learnium helped me master React in just 3 weeks. The
-                  bite-sized lessons fit perfectly into my busy schedule!"
+                <p className="text-body italic text-primary">
+                  &ldquo;Learnium helped me master React in just 3 weeks. The
+                  bite-sized lessons fit perfectly into my busy schedule!&rdquo;
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-8">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-4 flex items-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
                     M
                   </div>
                   <div className="ml-4">
-                    <h4 className="font-semibold text-[#142937]">
+                    <h4 className="text-heading">
                       Marcus Johnson
                     </h4>
-                    <p className="text-gray-600">Marketing Manager</p>
+                    <p className="text-body text-muted">Marketing Manager</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
-                  "Finally learned data analysis! The personalized approach made
-                  complex topics actually enjoyable."
+                <p className="text-body italic text-primary">
+                  &ldquo;Finally learned data analysis! The personalized approach made
+                  complex topics actually enjoyable.&rdquo;
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-8">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-[#142937] rounded-full flex items-center justify-center text-white font-bold">
+              <div className="rounded-xl border border-border bg-surface-raised p-8">
+                <div className="mb-4 flex items-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand text-label text-cta-text">
                     A
                   </div>
                   <div className="ml-4">
-                    <h4 className="font-semibold text-[#142937]">
+                    <h4 className="text-heading">
                       Anna Rodriguez
                     </h4>
-                    <p className="text-gray-600">Student</p>
+                    <p className="text-body text-muted">Student</p>
                   </div>
                 </div>
-                <p className="text-gray-700 italic">
-                  "The progress tracking keeps me motivated. I've completed 5
-                  courses and counting!"
+                <p className="text-body italic text-primary">
+                  &ldquo;The progress tracking keeps me motivated. I&apos;ve completed 5
+                  courses and counting!&rdquo;
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="py-24 bg-gradient-to-r from-[#142937] to-blue-600 text-white">
+        <section className="bg-brand py-24 text-cta-text">
           <div className="mx-auto max-w-4xl px-6 text-center">
-            <h2 className="text-4xl font-bold mb-6">
+            <h2 className="text-display mb-6 text-4xl">
               Start Your Microlearning Journey Today
             </h2>
-            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+            <p className="text-body mb-8 text-xl text-surface">
               Join thousands of learners who are mastering new skills one
               bite-sized lesson at a time. Begin your personalized microlearning
               journey now.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/signup">
-                <button className="rounded-full bg-white text-[#142937] px-10 py-4 text-lg font-semibold shadow-xl hover:bg-gray-100 transition-all hover:scale-105">
+                <button className="focus-ring min-h-11 rounded-xl bg-surface-raised px-10 py-4 text-label text-lg text-primary hover:bg-surface cursor-pointer">
                   Start Microlearning Today
                 </button>
               </Link>
               <Link href="/login">
-                <button className="rounded-full border-2 border-white text-white px-10 py-4 text-lg font-semibold hover:bg-white hover:text-[#142937] transition-all hover:scale-105">
+                <button className="focus-ring min-h-11 rounded-xl border border-cta-text px-10 py-4 text-label text-lg text-cta-text hover:bg-surface-raised hover:text-primary cursor-pointer">
                   Sign In
                 </button>
               </Link>
             </div>
-            <p className="mt-6 text-blue-200 text-sm">
+            <p className="text-body mt-6 text-sm text-surface">
               No credit card required • Start anytime • Learn at your pace
             </p>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#142937] text-white py-12">
-        <div className="mx-auto max-w-7xl px-6">
+      <footer className="bg-brand py-12 text-cta-text">
+        <div className="mx-auto max-w-[72rem] px-6">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <span className="text-[#142937] font-bold text-sm">L</span>
+              <div className="mb-4 flex items-center space-x-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-raised">
+                  <span className="text-label text-brand">L</span>
                 </div>
-                <h3 className="text-xl font-bold">Learnium</h3>
+                <h3 className="text-heading text-xl text-cta-text">Learnium</h3>
               </div>
-              <p className="text-blue-100">
+              <p className="text-body text-surface">
                 Empowering learners worldwide with AI-driven education.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-blue-100">
+              <h4 className="text-heading mb-4 text-cta-text">Product</h4>
+              <ul className="space-y-2 text-body text-surface">
                 <li>
                   <Link
                     href="#features"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Features
                   </Link>
@@ -389,7 +340,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="#how-it-works"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     How It Works
                   </Link>
@@ -397,7 +348,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/pricing"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Pricing
                   </Link>
@@ -405,12 +356,12 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-blue-100">
+              <h4 className="text-heading mb-4 text-cta-text">Support</h4>
+              <ul className="space-y-2 text-body text-surface">
                 <li>
                   <Link
                     href="/help"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Help Center
                   </Link>
@@ -418,7 +369,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/contact"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Contact Us
                   </Link>
@@ -426,7 +377,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/faq"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     FAQ
                   </Link>
@@ -434,12 +385,12 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-blue-100">
+              <h4 className="text-heading mb-4 text-cta-text">Company</h4>
+              <ul className="space-y-2 text-body text-surface">
                 <li>
                   <Link
                     href="/about"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     About
                   </Link>
@@ -447,7 +398,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/blog"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Blog
                   </Link>
@@ -455,7 +406,7 @@ export default function Home() {
                 <li>
                   <Link
                     href="/careers"
-                    className="hover:text-white transition-colors"
+                    className="focus-ring hover:text-cta-text"
                   >
                     Careers
                   </Link>
@@ -463,7 +414,7 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-blue-800 mt-8 pt-8 text-center text-blue-200">
+          <div className="mt-8 border-t border-border-strong pt-8 text-center text-body text-surface">
             <p>
               &copy; {new Date().getFullYear()} Learnium. All rights reserved.
             </p>

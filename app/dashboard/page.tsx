@@ -6,7 +6,6 @@ import SetCard from "../components/cards/SetCards";
 import StudyBuddyCard from "../components/cards/StudyBuddyCards";
 import CreateSetController from "../components/controllers/CreateSetController";
 
-import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
@@ -38,22 +37,6 @@ type StudyBuddyCards = {
     name: string;
     size: number;
   }[];
-};
-
-type SetResponse = {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  numLessons: number;
-  date: string;
-  profile_id: string;
-  is_flagged: boolean;
-};
-
-type APIResponse = {
-  data?: SetResponse;
-  error?: string;
 };
 
 export default function Dashboard() {
@@ -95,23 +78,6 @@ export default function Dashboard() {
     useState<boolean>(true);
   const [studyBuddySets, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
   const [profileData, setProfileData] = useState<StatCards[]>([]);
-  const sampleStatCards: StatCards[] = [
-    {
-      title: "Total Sets",
-      icon: 1,
-      content: "3",
-    },
-    {
-      title: "Completed Lessons",
-      icon: 2,
-      content: "10",
-    },
-    {
-      title: "Overall Progress",
-      icon: 3,
-      content: "26%",
-    },
-  ];
 
   const createSet = (
     title: string,
@@ -144,7 +110,6 @@ export default function Dashboard() {
     category: string,
     buddyId?: number,
   ): void => {
-    toast.success("Study Buddy created successfully!");
     setStudyBuddySets((prevStudyBuddySets) => {
       return [
         ...prevStudyBuddySets,
@@ -199,7 +164,7 @@ export default function Dashboard() {
           setLoading(false);
           toast.success("Fetched sets");
         }
-      } catch (error) {
+      } catch {
         toast.error("Could not fetch sets - 124");
       }
     };
@@ -234,7 +199,7 @@ export default function Dashboard() {
           }
           setLoading(false);
         }
-      } catch (error) {
+      } catch {
         toast.error("Could not fetch study buddies");
       }
     };
@@ -269,7 +234,7 @@ export default function Dashboard() {
             },
           ]);
         }
-      } catch (error) {
+      } catch {
         toast.error("Could not fetch profile data");
       }
     };
@@ -280,10 +245,10 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <AuthNav />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+      <main className="mx-auto max-w-[72rem] px-4 pt-16 sm:px-6 lg:px-8">
         {/*Stat Cards*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
           {profileData.length === 0 &&
@@ -293,7 +258,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={index}
-                    className="h-30 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                    className="h-30 w-100 animate-pulse rounded-xl border border-border bg-surface"
                   />
                 );
               })}
@@ -312,23 +277,33 @@ export default function Dashboard() {
 
         {/* Learning Sets */}
         <div className="flex justify-between items-center mb-6">
-          <div className="px-3 py-2 bg-gray-200 rounded-md flex">
-            <h2
-              className={`text-2xl px-2 py-1 ${
-                isLearningSetsActive ? "bg-white" : ""
-              } font-bold text-gray-900 rounded-md cursor-pointer`}
+          <div className="flex rounded-2xl border border-border bg-surface p-1" role="tablist" aria-label="Dashboard views">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={isLearningSetsActive}
+              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
+                isLearningSetsActive
+                  ? "bg-surface-raised text-primary"
+                  : "text-muted"
+              } cursor-pointer`}
               onClick={() => setIsLearningSetsActive(true)}
             >
               Learning Sets
-            </h2>
-            <h2
-              className={`text-2xl font-bold px-2 py-1 ${
-                isLearningSetsActive ? "" : "bg-white"
-              } text-gray-900 rounded-md cursor-pointer`}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={!isLearningSetsActive}
+              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
+                isLearningSetsActive
+                  ? "text-muted"
+                  : "bg-surface-raised text-primary"
+              } cursor-pointer`}
               onClick={() => setIsLearningSetsActive(false)}
             >
               Study Buddies
-            </h2>
+            </button>
           </div>
 
           {isLearningSetsActive && (
@@ -349,7 +324,7 @@ export default function Dashboard() {
                 .map((_, index) => {
                   return (
                     <div
-                      className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                      className="h-70 w-100 animate-pulse rounded-2xl border border-border bg-surface"
                       key={index}
                     />
                   );
@@ -375,13 +350,13 @@ export default function Dashboard() {
 
         {!isLearningSetsActive && (
           <div>
-            <span className="text-gray-500 text-md">
+            <span className="text-body text-md text-muted">
               Upload your study materials and chat with AI to enhance your
               learning
             </span>
             <br />
             {!studyBuddySets.length && (
-              <span className="font-bold text-lg">
+              <span className="text-heading text-lg text-primary">
                 No Study Buddies created yet. Upload study materials to get
                 started!
               </span>

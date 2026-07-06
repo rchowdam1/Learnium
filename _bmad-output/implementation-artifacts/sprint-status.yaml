@@ -1,0 +1,133 @@
+# generated: 2026-07-05T20:35:28.6604107-05:00
+# last_updated: 2026-07-05T21:30:00-05:00
+# project: Learnium
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: C:/Users/arnav/Desktop/Learnium/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; sprint-status surfaces open ones
+
+generated: "2026-07-05T20:35:28.6604107-05:00"
+last_updated: "2026-07-05T21:30:00-05:00"
+project: Learnium
+project_key: NOKEY
+tracking_system: file-system
+story_location: "C:/Users/arnav/Desktop/Learnium/_bmad-output/implementation-artifacts"
+
+development_status:
+  epic-1: in-progress
+  1-1-design-token-system-and-typography: in-progress
+  1-2-core-ui-component-library: backlog
+  1-3-app-layout-shell-and-5-tab-navigation: backlog
+  1-4-persistent-chrome-with-status-slots: backlog
+  1-5-landing-page-refresh: backlog
+  1-6-auth-pages-refresh: backlog
+  1-7-onboarding-flow-routing: backlog
+  1-8-settings-page-and-route-protection: backlog
+  1-9-accessibility-floor-and-test-ci-scaffold: backlog
+  1-10-learn-hub-surface: backlog
+  epic-1-retrospective: optional
+  epic-2: backlog
+  2-1-fix-set-generation-quota-ordering: backlog
+  2-2-topic-validation-and-category-specific-rejection: backlog
+  2-3-content-quality-validation-and-atomic-set-persistence: backlog
+  2-4-generation-progress-ux-and-60-second-ceiling: backlog
+  2-5-report-content-control-and-ai-disclosure: backlog
+  2-6-lesson-progression-hardening: backlog
+  2-7-set-completion-celebration-and-next-actions: backlog
+  2-8-in-lesson-nova-panel: backlog
+  2-9-lesson-grounded-chat-and-rag-contract: backlog
+  2-10-chat-quota-hardening-and-out-of-quota-upsell: backlog
+  2-11-buddy-rag-ingestion-lifecycle: backlog
+  2-12-ai-provider-privacy-configuration: backlog
+  2-13-provider-environment-contract: backlog
+  2-14-next-js-generation-client-drop-in-swap: backlog
+  2-15-python-rag-chat-provider-swap: backlog
+  2-16-provider-privacy-cost-and-model-routing-audit: backlog
+  2-17-compatibility-verification-and-rollback: backlog
+  epic-2-retrospective: optional
+  epic-3: backlog
+  3-1-xp-events-schema-and-reward-service: backlog
+  3-2-wire-xp-into-lesson-and-set-completion: backlog
+  3-3-level-threshold-table-and-computation: backlog
+  3-4-level-up-celebration-and-chrome-display: backlog
+  3-5-badge-catalog-and-award-service: backlog
+  3-6-first-lesson-and-first-set-badges: backlog
+  3-7-profile-rewards-display: backlog
+  epic-3-retrospective: optional
+  epic-4: backlog
+  4-1-daily-goal-tiers-and-timezone-storage: backlog
+  4-2-daily-xp-ledger-and-dashboard-progress: backlog
+  4-3-streak-tracking-and-soft-loss-ui: backlog
+  4-4-review-queue-schema-and-lesson-seeding: backlog
+  4-5-spaced-repetition-scheduler: backlog
+  4-6-review-session-flow: backlog
+  4-7-wire-review-and-daily-goal-into-xp: backlog
+  4-8-dashboard-due-reviews-and-review-tab: backlog
+  4-9-daily-email-reminders: backlog
+  epic-4-retrospective: optional
+  epic-5: backlog
+  5-1-monthly-quota-model-and-visibility: backlog
+  5-2-stripe-webhook-and-entitlement-sync: backlog
+  5-3-checkout-portal-and-return-to-intent: backlog
+  5-4-16-age-gate-reinforcement: backlog
+  5-5-account-deletion-and-data-cascade: backlog
+  5-6-gdpr-export-request: backlog
+  5-7-quota-reset-scheduled-job: backlog
+  epic-5-retrospective: optional
+  epic-6: backlog
+  6-1-league-schema-and-weekly-xp-ledger: backlog
+  6-2-cohort-assignment-and-weekly-cycle-jobs: backlog
+  6-3-league-standings-api-and-page: backlog
+  6-4-league-opt-out-and-privacy: backlog
+  6-5-league-top-3-badge: backlog
+  epic-6-retrospective: optional
+  epic-7: backlog
+  7-1-learning-path-schema-and-outline-api: backlog
+  7-2-first-set-immediate-generation-on-path-create: backlog
+  7-3-path-map-ui-and-progress-display: backlog
+  7-4-lazy-next-set-generation: backlog
+  7-5-path-completion-celebration-and-badge: backlog
+  7-6-path-shareable-summary: backlog
+  epic-7-retrospective: optional
+  epic-8: backlog
+  8-1-profile-visibility-and-public-profile-route: backlog
+  8-2-milestone-share-cards: backlog
+  8-3-friendship-model-and-requests: backlog
+  8-4-invite-link-friend-flow: backlog
+  8-5-friends-leaderboard: backlog
+  8-6-streak-milestone-share-and-profile-polish: backlog
+  epic-8-retrospective: optional

@@ -32,20 +32,21 @@ export default function SetDropdown({ onDelete, title }: SetDropdownProps) {
       {/*Trigger*/}
       <button
         onClick={() => setOpen(!open)}
-        className="p-1 rounded-full hover:bg-gray-100 transition-all duration-200"
+        aria-label="Set options"
+        className="focus-ring rounded-xl p-1 transition-all duration-200 hover:bg-surface"
       >
         <EllipsisVertical className="h-5 w-5" />
       </button>
 
       {/*Dropdown*/}
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white shadow-lg border border-gray-300">
+        <div className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-2xl border border-border bg-surface-raised shadow-sm">
           <button
             onClick={() => {
               setOpen(false);
               setDeleteModalOpen(true);
             }}
-            className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left"
+            className="focus-ring block w-full px-4 py-2 text-left text-body text-sm text-error hover:bg-surface"
           >
             <div className="flex items-center justify-between">
               Delete Set

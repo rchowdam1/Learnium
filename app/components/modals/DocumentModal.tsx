@@ -2,22 +2,23 @@
 import { X } from "lucide-react";
 
 const DocumentTab = ({ name, size }: { name: string; size: number }) => {
-  // size in KB
-  const mapToColor = (size: number): string[] => {
+  const mapToToken = (size: number): { container: string; text: string } => {
     if (size < 100) {
-      return ["bg-green-200", "text-green-800"];
+      return { container: "bg-surface", text: "text-muted" };
     } else if (size < 500) {
-      return ["bg-yellow-200", "text-yellow-800"];
+      return { container: "bg-surface border border-border", text: "text-primary" };
     } else {
-      return ["bg-red-200", "text-red-800"];
+      return { container: "bg-surface border border-border-strong", text: "text-primary" };
     }
   };
 
+  const color = mapToToken(size);
+
   return (
-    <div className="px-3 py-5 w-65 bg-blue-200 rounded-md flex items-center justify-between gap-3">
-      <span className="text-blue-700">{name}</span>
-      <div className={`px-2 py-1 rounded-full ${mapToColor(size)[0]}`}>
-        <span className={`text-xs text-${mapToColor(size)[1]}`}>{size} KB</span>
+    <div className="flex w-65 items-center justify-between gap-3 rounded-xl border border-border bg-surface px-3 py-5">
+      <span className="text-body text-primary">{name}</span>
+      <div className={`rounded-full px-2 py-1 ${color.container}`}>
+        <span className={`text-xs ${color.text} text-numeral`}>{size} KB</span>
       </div>
     </div>
   );
@@ -41,12 +42,13 @@ export default function DocumentModal({
   return (
     <div
       className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
-        open ? "visible opacity-100 bg-black/20" : "invisible opacity-0"
+        open ? "visible opacity-100" : "invisible opacity-0"
       }`}
+      style={{ backgroundColor: "var(--overlay)" }}
       onMouseDown={onClose}
     >
       <div
-        className={`relative bg-white rounded-md z-50 shadow p-6 text-center max-h-[80vh] overflow-y-auto transition-all ${
+        className={`relative z-50 max-h-[80vh] overflow-y-auto rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
         } `}
         onClick={(e) => e.stopPropagation()}
@@ -55,19 +57,16 @@ export default function DocumentModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+          className="focus-ring absolute right-3 top-3 rounded-xl p-1 text-muted transition-colors hover:bg-surface hover:text-primary"
           aria-label="Close modal"
         >
           <X className="h-5 w-5" />
         </button>
         {/*List of Documents*/}
         <div className="flex flex-col gap-3 mx-6">
-          {documents.length === 0 && <span>No documents found.</span>}
+          {documents.length === 0 && <span className="text-body text-muted">No documents found.</span>}
           {documents.length > 0 && (
-            <h3
-              className="text-xl font-semibold 
-  text-gray-900"
-            >
+            <h3 className="text-heading text-xl text-primary">
               Documents for {buddyName}
             </h3>
           )}

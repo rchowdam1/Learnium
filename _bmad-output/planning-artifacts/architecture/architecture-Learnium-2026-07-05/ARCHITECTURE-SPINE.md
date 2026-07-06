@@ -36,7 +36,7 @@ flowchart LR
   Actions --> RAG[Python RAG sidecar]
   RAG --> Cache[(Semantic cache)]
   RAG --> Vector[(Chroma vector store)]
-  RAG --> OpenAI[OpenAI]
+  RAG --> OpenRouter[OpenRouter]
   Middleware[Next middleware] --> UI
 ```
 
@@ -78,13 +78,13 @@ Dependency direction is inward to server authority. Components display state and
 
 - **Binds:** Study Buddy, uploaded Buddy documents, future grounded tutor endpoints.
 - **Prevents:** UI/API routes bypassing retrieval/cache, divergent chat schemas, and ungrounded general assistant behavior.
-- **Rule:** Next.js server code communicates with the Python RAG service only through configured HTTP endpoints using service-to-service authentication; browser code never calls RAG directly with arbitrary `buddyId`. RAG does not trust raw object ids without a signed/server-authenticated request. Request/response payloads are governed by a versioned contract artifact shared by Next.js and Python, and RAG endpoints check semantic cache before model calls.
+- **Rule:** Next.js server code communicates with the Python RAG service only through configured HTTP endpoints using service-to-service authentication (via `RAG_SERVICE_URL` and `RAG_SERVICE_API_KEY` environment variables); browser code never calls RAG directly with arbitrary `buddyId`. RAG does not trust raw object ids without a signed/server-authenticated request. Request/response payloads are governed by a versioned contract artifact shared by Next.js and Python, and RAG endpoints check semantic cache before model calls.
 
 ### AD-7 - Stripe As Billing Source Of Truth [ADOPTED]
 
 - **Binds:** Free/Plus tier, checkout, customer portal, quota lifts, cancellation/downgrade.
 - **Prevents:** Client redirects or checkout success pages granting paid capabilities before Stripe confirms them.
-- **Rule:** Subscription entitlement is derived from verified Stripe subscription lifecycle events (`customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`) mapped idempotently by Stripe event id and customer id. `checkout.session.completed` resumes interrupted intent but does not by itself grant entitlement. Cancellation applies at period end unless Stripe reports immediate entitlement loss. Quota RPCs read the derived entitlement; webhooks do not directly spend user quota.
+- **Rule:** Subscription entitlement is derived from verified Stripe subscription lifecycle events (`customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`) mapped idempotently by Stripe event id and customer id. `checkout.session.completed` resumes interrupted intent but does not by itself grant entitlement. Stripe Checkout sessions must persist user intent and return path details (e.g., set generation, lesson progression) via metadata and return URLs, redirecting the user back to their exact interrupted action upon completion while preserving browser navigation history. Cancellation applies at period end unless Stripe reports immediate entitlement loss. Quota RPCs read the derived entitlement; webhooks do not directly spend user quota.
 
 ### AD-8 - Privacy-Minimized Social Projection
 
@@ -100,9 +100,9 @@ Dependency direction is inward to server authority. Components display state and
 
 ### AD-10 - Deployable Service Configuration
 
-- **Binds:** Next.js deployment, Python RAG deployment, Supabase service role, Stripe webhooks, OpenAI keys.
+- **Binds:** Next.js deployment, Python RAG deployment, Supabase service role, Stripe webhooks, OpenRouter keys and model routing.
 - **Prevents:** Localhost-only production, secrets in browser bundles, service-role leakage, and environment drift.
-- **Rule:** Provider keys and service URLs live in environment variables scoped to the deployed service. Next.js calls RAG through `RAG_SERVICE_URL`; service-role Supabase access is restricted to server-only privileged modules and never used for regular user-facing queries.
+- **Rule:** Provider keys and service URLs live in environment variables scoped to the deployed service. Next.js calls RAG through `RAG_SERVICE_URL` authenticated with `RAG_SERVICE_API_KEY`; LLM calls route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and server-only model-name env vars (e.g. `OPENROUTER_MODEL_GENERATION`, `OPENROUTER_MODEL_CHAT`). Service-role Supabase access is restricted to server-only privileged modules and never used for regular user-facing queries.
 
 ### AD-11 - Scheduled Work Authority
 
@@ -138,7 +138,7 @@ Dependency direction is inward to server authority. Components display state and
 
 - **Binds:** Daily Goals, Streaks, reminders, League cycles, quota resets, billing periods.
 - **Prevents:** Different teams using incompatible day/week/month boundaries for retention, competition, and billing.
-- **Rule:** Streak and Daily Goal boundaries use the user's stored timezone. League cycles use one global reset boundary. Billing and quota reset dates follow Stripe/subscription period authority unless a server-owned quota policy explicitly overrides them.
+- **Rule:** Streak and Daily Goal boundaries use the user's stored local timezone to calculate the end-of-day resets and maintain correct daily streaks. In contrast, League cycles use a single global reset boundary in UTC (resetting weekly on Sunday at 23:59 UTC). To prevent rank discrepancy and cohort mismatch during reset windows, the system must translate and record all XP timestamp transactions in UTC for League standings validation, while local timezone evaluation is reserved strictly for individual user goal completions and streak metrics. Billing and quota resets follow Stripe period authority.
 
 ### AD-17 - Age Gate And Provider Privacy
 
@@ -159,6 +159,7 @@ Dependency direction is inward to server authority. Components display state and
 | AI schemas | Shared AI/RAG payloads are versioned in a contract artifact checked by both Next.js and Python before rollout. |
 | Accessibility | Real controls, visible focus, `aria-live` feedback, reduced motion, persistent-chrome focus protection, and 44px targets are implementation constraints, not visual polish. |
 | Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, RAG URL, model names, and service-role keys stay server-only. |
+| LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure base URL, API key, model slugs, and optional attribution headers through env vars so provider swaps do not alter product/domain code. |
 | Service-role boundary | Service-role Supabase access is limited to named server-only privileged modules for account deletion, profile bootstrap/repair, and admin reconciliation; regular user-facing reads/writes cannot import it. |
 | API errors | API failures keep `{ success: false, message, code, retryable }`; `code` distinguishes auth, authorization, validation, quota, provider, readiness, billing, and unknown failures. |
 
@@ -173,8 +174,8 @@ Dependency direction is inward to server authority. Components display state and
 | Supabase JS | 2.50.0 manifest baseline; npm latest checked as 2.110.0 on 2026-07-05 |
 | Stripe Node | 18.4.0 manifest baseline; npm latest checked as 22.3.0 on 2026-07-05 |
 | Tailwind CSS | 4.x manifest baseline; npm latest checked as 4.3.2 on 2026-07-05 |
-| OpenAI JS | 5.3.0 manifest baseline; npm latest checked as 6.45.0 on 2026-07-05 |
-| Python RAG | FastAPI, LangChain, Chroma, OpenAI, Pydantic, Redis LangCache pattern |
+| OpenAI-compatible JS client | `openai` 5.3.0 manifest baseline used as compatibility client; npm latest checked as 6.45.0 on 2026-07-05; runtime provider target is OpenRouter |
+| Python RAG | FastAPI, LangChain, Chroma, OpenRouter/OpenAI-compatible clients, Pydantic, Redis LangCache pattern |
 
 ## Structural Seed
 
@@ -240,17 +241,17 @@ sequenceDiagram
 | FR-19..FR-20 Social layer | public profile, share cards, friends leaderboard | AD-8 |
 | FR-21..FR-23 Billing and account deletion | Stripe routes/webhooks, profile quota fields, deletion jobs | AD-3, AD-7, AD-11, AD-16, AD-17 |
 
-## Deferred
+## Deferred Decisions & Resolutions
 
-| Decision | Deferred Because |
+| Decision | Status / Resolution |
 | --- | --- |
-| Exact Free/Plus quota numbers, pricing, and fair-use cap | Product/unit economics still open; architecture binds ordering and authority, not numbers. |
-| Streak protection mechanic | Product behavior is open; architecture only needs idempotent streak events and soft-loss support. |
-| League tier count and promotion/demotion counts | Product tuning can happen below this spine as long as weekly cohort authority and privacy rules hold. |
-| Fixed interval vs SM-2 Review algorithm | V1 can start with fixed intervals; recurrence state is server-owned so the algorithm can evolve. |
-| Email vs web push reminders | V1 assumes web/email; push/PWA requires a later platform decision and permission model. |
-| RAG production host and vector/cache managed services | Deploy hardening must select hosting for Python, Chroma persistence, and Redis/LangCache before launch. |
-| Test framework and CI shape | Required for launch hardening, but exact Jest/Vitest/Playwright/GitHub Actions composition belongs to test architecture setup. |
-| Next 16 / React 19.2 upgrade | Local stack is valid but behind current npm releases; upgrade should be assessed separately from the launch spine. |
-| Python dependency pinning and model config | `rag/requirements.txt` is unpinned and missing `langcache`; deploy hardening must pin packages and move hardcoded model names to env config. |
-| Exact Stripe API version and handler details | The spine binds subscription event classes and idempotency; exact SDK/API version and handler mapping need billing implementation design. |
+| Exact Free/Plus quota numbers, pricing, and fair-use cap | Resolved: Free = 5 sets/30 chats/mo, Plus = $9.99/mo (unlimited sets/chats). |
+| Streak protection mechanic | Resolved: 1-day monthly auto-repair grace period and 500 XP Streak Freeze (max 2 held). |
+| League tier count and promotion/demotion counts | Resolved: 5 tiers (Bronze-Diamond), cohorts of 30, top/bottom 5 promote/demote. |
+| Fixed interval vs SM-2 Review algorithm | Deferred: V1 starts with fixed intervals; recurrence state is server-owned so the algorithm can evolve. |
+| Email vs web push reminders | Resolved: email-only for v1. |
+| RAG production host and vector/cache managed services | Deferred: Deploy hardening must select hosting for Python, Chroma persistence, and Redis/LangCache before launch. |
+| Test framework and CI shape | Deferred: Required for launch hardening, but exact Vitest/Playwright composition belongs to test architecture setup. |
+| Next 16 / React 19.2 upgrade | Deferred: Local stack is valid but upgrade should be assessed separately. |
+| Python dependency pinning and model config | Resolved: Configured via environment variables (`OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and environment-selected model slugs). |
+| Exact Stripe API version and handler details | Deferred: The spine binds subscription event classes; handler details are billing-specific. |

@@ -20,7 +20,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres
 - Stripe 18.4.0 — subscriptions/billing
 - Tailwind CSS v4 (`@tailwindcss/postcss`)
-- Separate Python/FastAPI microservice in `rag/` (not built by Next.js): LangChain, Chroma vector store, OpenAI SDK, Redis LangCache (`langcache` pkg) for semantic response caching
+- Separate Python/FastAPI microservice in `rag/` (not built by Next.js): LangChain, Chroma vector store, OpenRouter via OpenAI-compatible SDK/client configuration, Redis LangCache (`langcache` pkg) for semantic response caching
 - zod 3.25.62 (LLM output schema validation), franc 6.2.0 (language detection), axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
 - **No test framework configured** (no Jest/Vitest/Playwright) — known gap, not yet a project convention
 
@@ -42,8 +42,9 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - API routes live at `app/api/<kebab-case-action>/route.ts`, one per verb-style action (e.g. `get-buddies`, `mark-lesson-complete`) — not grouped as RESTful resources. Follow this naming for new endpoints.
 - `middleware.ts` `protectedPaths` array is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
 - Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy}`, not by feature — place new components in the matching role folder
-- Next.js ↔ Python RAG service boundary: communication only via `fetch("http://localhost:8000/api/...")`, no shared types — mirror any schema change (e.g. `OutputSchema`) manually in `rag/main.py`'s Pydantic models
+- Next.js ↔ Python RAG service boundary: communication only via configured `RAG_SERVICE_URL` endpoints, no shared types — mirror any schema change (e.g. `OutputSchema`) manually in `rag/main.py`'s Pydantic models
 - New RAG endpoints should check the semantic cache (`rag/scache.py`, Redis LangCache) before calling the LLM, matching the pattern in `/api/chat`
+- LLM provider configuration should be OpenRouter-first and env-driven: `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, server-only model names, and optional OpenRouter app attribution headers. Do not hardcode direct provider models or base URLs in route handlers.
 
 ### Testing Rules
 
@@ -67,7 +68,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 - `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It's **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present/populated in a fresh clone.
 - `middleware.ts` gates `protectedPaths` via `url.pathname.startsWith(path)` — a **prefix match, not exact**. New routes with overlapping prefixes (e.g. `/dashboardX` vs `/dashboard`) can be unintentionally protected/unprotected. Be precise when adding paths.
-- RAG service URL is **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. Flag this on deploy-related work.
+- RAG service URL is currently **hardcoded** as `http://localhost:8000` in `app/api/send-chat/route.ts` — dev-only, no env var, will break in any deployed environment. OpenRouter migration work should move this to `RAG_SERVICE_URL` while moving model/provider config to OpenRouter env vars.
 - Known existing bug, don't propagate: `app/api/webhook/route.ts` types its param as `NextRequest` but only imports `NextResponse` — replicate the *pattern* (raw `.text()` body + `stripe-signature` header + `constructEvent`) for new Stripe webhooks, not the missing import.
 - Quota ordering in `/api/send-chat` is strict: check `chats_remaining` → call RAG → insert user message → insert assistant message → decrement quota via `decrement_chat_quota` RPC. Preserve check-before-spend, decrement-after-success ordering in similar flows.
 

@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -21,7 +20,7 @@ export default function LoginPage() {
   // display loading state
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -48,56 +47,55 @@ export default function LoginPage() {
       setError(false);
       toast.success("Logged In");
       router.replace("/dashboard");
-    } catch (error) {
-      alert(error);
+    } catch {
+      toast.error("Login failed. Please try again.");
       setLoading(false);
       return;
     }
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      {/*Name & Logo*/}
-      <div className="text-4xl font-extrabold text-[#142937]">Learnium</div>
-      <span className="my-2 text-xl text-gray-500">Welcome Back!</span>
-      <div className="w-120 py-8 bg-[#142937] rounded-md shadow-lg text-white flex flex-col items-center justify-center space-y-2">
-        <span className="text-2xl font-extrabold">Log In</span>
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background py-5">
+      <div className="text-display text-4xl text-primary">Learnium</div>
+      <span className="text-body my-2 text-xl text-muted">Welcome Back!</span>
+      <div className="flex w-[30rem] flex-col items-center justify-center space-y-2 rounded-2xl border border-border bg-surface-raised py-8 text-primary">
+        <span className="text-heading text-2xl">Log In</span>
         <form
-          className="flex flex-col space-y-4 w-full max-w-sm"
+          className="flex w-full max-w-sm flex-col space-y-4"
           onSubmit={handleSubmit}
         >
-          <label>Email</label>
+          <label className="text-label">Email</label>
           <input
             type="email"
             placeholder="Enter your email"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onChange={(e) => setEmail(e.target.value)}
           />
-          <label>Password</label>
+          <label className="text-label">Password</label>
           <input
             type="password"
             placeholder="Enter your password"
-            className="px-2 py-3 text-lg rounded-md border border-gray-500 transition-colors duration-400 outline-none focus:border-2 focus:border-[#166ea8]"
+            className="focus-ring rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary placeholder:text-muted"
             required
             onChange={(e) => setPassword(e.target.value)}
           />
 
           {error && (
-            <span className="text-red-400 text-sm">
+            <span className="text-body text-sm text-error">
               Incorrect Email or Password. Please Try Again
             </span>
           )}
 
           <Link href="/signup" className="text-center">
-            <span className="text-center text-[#166ea8] cursor-pointer hover:underline">
-              Don't have an account? Create One
+            <span className="text-label cursor-pointer text-brand hover:underline">
+              Don&apos;t have an account? Create One
             </span>
           </Link>
 
           <button
             type="submit"
-            className="w-full bg-[#1d4159] py-2 rounded-lg cursor-pointer hover:bg-[#166ea8] transition-colors duration-400 disabled:bg-[#9ccef0] flex items-center justify-center gap-2"
+            className="focus-ring flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
             disabled={loading}
           >
             {loading && (

@@ -169,7 +169,7 @@ export default function CreateSetModal({
     return validFields;
   };
 
-  const formSubmit = async (e) => {
+  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);
@@ -197,7 +197,7 @@ export default function CreateSetModal({
       });
 
       if (!response.ok) {
-        alert("Error - 156");
+        toast.error("Could not validate this set input.");
         setIsLoading(false);
         return;
       }
@@ -219,8 +219,8 @@ export default function CreateSetModal({
       console.log(data, "data from input-check api");
       numLessons = data.parsedResponse?.lessons.length;
       setId = data.setId;
-    } catch (error) {
-      alert(error);
+    } catch {
+      toast.error("Could not validate this set input.");
       setIsLoading(false);
       return;
     }
@@ -235,11 +235,12 @@ export default function CreateSetModal({
     <div
       onMouseDown={handleClose}
       className={`fixed inset-0 z-40 flex justify-center items-center transition-all duration-200 ${
-        open ? "visible opacity-100 bg-black/20" : "invisible opacity-0"
+        open ? "visible opacity-100" : "invisible opacity-0"
       }`}
+      style={{ backgroundColor: "var(--overlay)" }}
     >
       <div
-        className={`bg-white rounded-md z-50 shadow p-6 text-center transition-all ${
+        className={`z-50 rounded-2xl border border-border bg-surface-raised p-6 text-center shadow-sm transition-all ${
           open ? "scale-100 opacity-100" : "scale-125 opacity-0"
         } `}
         onClick={(e) => e.stopPropagation()}
@@ -251,14 +252,14 @@ export default function CreateSetModal({
           onMouseDown={(e) => e.stopPropagation()}
         >
           <button
-            className="absolute top-2 right-2 p-1 rounded-lg text-gray-400 bg-white hover:bg-gray-50 hover:text-gray-600"
+            className="focus-ring absolute right-2 top-2 rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
             onClick={handleClose}
             disabled={isLoading}
           >
             <X />
           </button>
-          <span className="font-semibold">Create New Learning Set</span>
-          <span className="text-sm text-gray-500">
+          <span className="text-heading">Create New Learning Set</span>
+          <span className="text-body text-sm text-muted">
             AI will generate bite-sized lessons based on your
             <br />
             topic and description.
@@ -268,9 +269,9 @@ export default function CreateSetModal({
             className="flex flex-col items-start mt-4 space-y-2"
             onSubmit={formSubmit}
           >
-            <label className="text-sm">
+            <label className="text-label text-sm">
               Title
-              <span className="text-xs ml-3 text-red-500">
+              <span className="ml-3 text-xs text-error">
                 {requireTitle
                   ? "Required: Please enter a title"
                   : !validTitleLength
@@ -283,14 +284,14 @@ export default function CreateSetModal({
             <input
               type="text"
               placeholder="Title"
-              className="border border-gray-200 w-80 rounded-sm px-2 py-1"
+              className="focus-ring w-80 rounded-xl border border-border-interactive bg-surface-raised px-2 py-2 text-body text-primary placeholder:text-muted"
               required
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            <label>
+            <label className="text-label">
               Description
-              <span className="text-xs ml-3 text-red-500">
+              <span className="ml-3 text-xs text-error">
                 {requireDescription
                   ? "Required: Please enter a description"
                   : !validDescriptionLength
@@ -303,21 +304,21 @@ export default function CreateSetModal({
             <textarea
               placeholder="Describe what you want to learn..."
               rows={3}
-              className="border border-gray-200 w-80 rounded-sm px-2 py-1 resize-none"
+              className="focus-ring w-80 resize-none rounded-xl border border-border-interactive bg-surface-raised px-2 py-2 text-body text-primary placeholder:text-muted"
               required
               onChange={(e) => setDescription(e.target.value)}
             />
 
-            <label>
+            <label className="text-label">
               Category
-              <span className="text-xs ml-3 text-red-500">
+              <span className="ml-3 text-xs text-error">
                 {requireCategory ? "Required: Please select a category" : ""}
               </span>
             </label>
             <select
               name="category"
               id="category"
-              className="border border-gray-200 w-80 rounded-sm px-3 py-3"
+              className="focus-ring w-80 rounded-xl border border-border-interactive bg-surface-raised px-3 py-3 text-body text-primary"
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="Select a category">Select a category</option>
@@ -338,7 +339,7 @@ export default function CreateSetModal({
             <div className="mt-7 flex">
               <button
                 type="button"
-                className="w-39 border border-gray-200 rounded-sm py-2 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                className="focus-ring w-39 cursor-pointer rounded-xl border border-border bg-surface py-2 text-label text-primary hover:bg-surface-raised"
                 onClick={handleClose}
                 disabled={isLoading}
               >
@@ -346,7 +347,7 @@ export default function CreateSetModal({
               </button>
               <button
                 type="submit"
-                className="w-39 border border-gray-200 rounded-sm py-2 bg-gray-400 disabled:bg-gray-300 text-gray-50 ml-2 cursor-pointer hover:bg-gray-500 transition-colors duration-200 flex items-center justify-center gap-2"
+                className="focus-ring ml-2 flex w-39 cursor-pointer items-center justify-center gap-2 rounded-xl bg-cta py-2 text-label text-cta-text hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-muted"
                 disabled={isLoading}
               >
                 {isLoading && (

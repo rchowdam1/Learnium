@@ -128,6 +128,7 @@ NFR16: Launch hardening must address the current lack of automated test framewor
 - Signup must enforce the 16+ age gate before account creation, and AI provider calls must use privacy-approved settings while avoiding unnecessary personal data in prompts.
 - Deploy hardening must move the RAG URL out of `app/api/send-chat/route.ts`, provision the gitignored service-role client in deployment, add missing `NextRequest` import in the Stripe webhook route, pin Python dependencies including LangCache, and choose RAG/vector/cache hosting.
 - Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres, Stripe, a Python/FastAPI RAG microservice, quota plumbing for `sets_remaining` and `chats_remaining`, and Redis LangCache semantic caching as the baseline to preserve.
+- OpenRouter is the default LLM provider gateway. Existing OpenAI-compatible SDK/client surfaces may remain where they enable a drop-in migration, but provider base URLs, API keys, model slugs, and optional OpenRouter attribution headers must be env-driven and server-only.
 - Launch phasing per PRD §7.1: Phase A (pre-launch harden and retain — Sets, Lessons, Buddy, Streaks/Daily Goals, XP/Levels/Badges, Review Sessions, billing/tiers), Phase B (Leagues and Learning Paths, launch or ≤4 weeks post-launch), Phase C (social layer — public profiles, share cards, friends leaderboard).
 
 ### UX Design Requirements
@@ -215,8 +216,8 @@ Users can discover Learnium, sign up with a 16+ age gate, complete onboarding, a
 Users can enter any topic, receive a quality-validated course, complete lessons with visible progress, celebrate Set completion, and get grounded Nova help during lessons.
 **Brownfield status:** ~60% EXISTS, ~40% HARDEN
 **FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6
-**UX/NFR:** UX-DR11–15 · NFR1–3, NFR6–7, NFR12
-**Stories:** 2.1–2.12
+**UX/NFR:** UX-DR11–15 · NFR1–4, NFR6–7, NFR12
+**Stories:** 2.1–2.17
 **Phase:** A
 
 ### Epic 3: Progress, XP & Recognition
@@ -954,7 +955,7 @@ So that personal learning data is never used to train third-party models.
 
 **Acceptance Criteria:**
 
-**Given** OpenAI and RAG provider configuration
+**Given** OpenRouter and RAG provider configuration
 **When** deployed to any environment
 **Then** provider calls use product-approved privacy settings (no training on customer data) (NFR4, AD-17)
 **And** configuration is env-driven and documented in deploy checklist
@@ -968,6 +969,131 @@ So that personal learning data is never used to train third-party models.
 **When** sent to providers
 **Then** data handling complies with PRD §6 Privacy — not used for third-party model training (NFR4)
 **And** integration tests verify privacy flags are set on provider client initialization
+
+---
+
+### Story 2.13: Provider Environment Contract
+
+As a platform operator,
+I want one documented OpenRouter provider contract,
+So that every LLM-touching endpoint can be configured without code changes.
+
+**Acceptance Criteria:**
+
+**Given** any deployed environment
+**When** provider configuration is loaded
+**Then** server-only env vars define `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, generation model, tutor/chat model, embedding model decision, and optional OpenRouter attribution headers
+**And** no browser-exposed `NEXT_PUBLIC_*` variable contains provider secrets
+
+**Given** existing OpenAI-compatible SDK usage
+**When** the provider client is initialized
+**Then** the base URL and API key point to OpenRouter
+**And** model names are read from env, not hardcoded as direct-provider model ids
+
+**Given** configuration is missing or invalid
+**When** an LLM-touching route starts
+**Then** it fails fast with a server log and user-safe `{ success: false, code: 'provider' }` response
+**And** no quota is consumed
+
+---
+
+### Story 2.14: Next.js Generation Client Drop-In Swap
+
+As a learner,
+I want Set and Path generation to behave the same after the provider pivot,
+So that the migration does not change learning flows.
+
+**Acceptance Criteria:**
+
+**Given** `/api/input-check` or any Set/Path generation endpoint calls the model
+**When** OpenRouter is configured
+**Then** the existing schema validation, zod parsing, safety checks, and input-language checks still run before persistence
+**And** quota is checked before provider work and decremented only after durable success (NFR12)
+
+**Given** OpenAI-compatible response parsing differs for the selected OpenRouter model
+**When** structured output is requested
+**Then** the route either uses a compatible structured-output path or normalizes the response before existing schema validation
+**And** malformed output fails cleanly without consuming quota
+
+**Given** provider errors, rate limits, or model routing failures
+**When** they occur
+**Then** the user sees the existing generation-failure UX copy pattern
+**And** logs include provider error category without leaking prompt content or personal data
+
+---
+
+### Story 2.15: Python RAG Chat Provider Swap
+
+As a learner,
+I want Nova Study Buddy chat to keep grounded answers after the provider pivot,
+So that tutoring quality and cache behavior are preserved.
+
+**Acceptance Criteria:**
+
+**Given** the Python RAG sidecar answers `/api/chat`
+**When** OpenRouter is configured
+**Then** chat completion calls route through OpenRouter using OpenAI-compatible client settings
+**And** semantic cache lookup still occurs before model calls (NFR7)
+
+**Given** embeddings are needed for retrieval
+**When** OpenRouter does not provide the selected embedding path
+**Then** the implementation records an explicit embedding-provider decision: keep current embeddings temporarily, select an OpenRouter-compatible embedding model, or split chat vs embedding providers behind env vars
+**And** the decision is documented without changing the chat API contract
+
+**Given** RAG returns an answer
+**When** Next.js persists chat messages
+**Then** the canonical chat write path remains authenticate -> check quota -> call RAG -> persist user/assistant messages -> decrement quota -> return committed state
+**And** provider failure does not save orphan assistant messages or consume chat quota
+
+---
+
+### Story 2.16: Provider Privacy, Cost, and Model Routing Audit
+
+As a platform,
+I want the OpenRouter pivot audited against privacy and cost rules,
+So that Learnium's PRD promises remain true after migration.
+
+**Acceptance Criteria:**
+
+**Given** prompts for generation, Study Buddy chat, Path outline generation, or future LLM endpoints
+**When** payloads are assembled
+**Then** unnecessary PII such as email and full name is excluded
+**And** only minimum owned lesson, buddy, or topic context needed for grounding is sent (NFR4)
+
+**Given** OpenRouter model routing is configured
+**When** model env vars are reviewed
+**Then** every LLM-touching flow has a named model, fallback policy, and cost class
+**And** the LLM cost per weekly-active-user metric remains trackable (NFR6)
+
+**Given** provider data handling policy is documented
+**When** deployment checklist is reviewed
+**Then** it confirms learner chats, uploads, learning history, and generated progress data are not used to train third-party models
+**And** provider logs/redaction/retention assumptions are captured for launch review
+
+---
+
+### Story 2.17: Compatibility Verification and Rollback
+
+As a maintainer,
+I want a small verification and rollback plan for the provider pivot,
+So that OpenRouter can be adopted without blocking launch hardening.
+
+**Acceptance Criteria:**
+
+**Given** the provider pivot is implemented
+**When** smoke verification runs locally
+**Then** Set generation, invalid-topic rejection, Study Buddy chat, semantic-cache hit behavior, and quota decrement-after-success are manually verified or covered by available tests
+**And** failures are categorized as configuration, provider, validation, quota, or persistence
+
+**Given** OpenRouter is unavailable or a selected model regresses
+**When** rollback is needed
+**Then** switching env vars can route back to the previous OpenAI-compatible endpoint or a known-good OpenRouter model without code changes
+**And** rollback does not require database migration or persisted content changes
+
+**Given** docs are updated
+**When** a future agent reads project context, architecture, PRD addendum, or this story
+**Then** OpenRouter is clearly the default provider gateway
+**And** OpenAI-compatible SDK references are understood as client compatibility, not direct OpenAI vendor commitment
 
 ---
 
@@ -2139,5 +2265,3 @@ So that long-term consistency is visible to others I choose.
 **When** toggling public profile in Settings
 **Then** live preview shows visitor view before saving
 **And** turning public off immediately revokes anonymous access
-
----

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Play, Newspaper } from "lucide-react";
 import DocumentModal from "../modals/DocumentModal";
 
@@ -26,49 +25,41 @@ export default function StudyBuddyCard({
   description,
   documents,
 }: StudyBuddyCardProps) {
-  const router = useRouter();
-
   const [documentModalOpen, setDocumentModalOpen] = useState<boolean>(false);
 
   return (
-    <div className="flex flex-col justify-between h-70 w-100 bg-white rounded-sm bg-card text-card-foreground shadow-sm px-4 py-5">
-      {/*Card Header (includes title and category)*/}
+    <div className="flex h-70 w-100 flex-col justify-between rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary">
       <div className="flex items-center justify-between gap-2">
         <div className="flex">
-          <span className="text-lg font-bold">{title}</span>
+          <span className="text-heading text-lg">{title}</span>
 
-          {/*category*/}
-          <div className="bg-gray-200 rounded-full px-2 ml-2">
-            <span className="text-xs font-medium">{category}</span>
+          <div className="ml-2 rounded-full bg-surface px-2">
+            <span className="text-label text-xs text-muted">{category}</span>
           </div>
         </div>
       </div>
 
-      {/*Card Description*/}
       <div className="mt-3">
-        <span className="text-gray-500">{description}</span>
+        <span className="text-body text-muted">{description}</span>
       </div>
 
-      {/*Date and Continue/Start button*/}
       <div className="mt-12 flex items-center gap-2">
         <Link href={`/buddy/${id}`}>
-          <button className="flex items-center h-9 rounded-md px-3 bg-black text-white hover:bg-gray-800 active:bg-white active:text-black transition-colors duration-200 cursor-pointer">
-            <Play className="w-4 h-4 mr-2" />
+          <button className="focus-ring flex h-11 cursor-pointer items-center rounded-xl bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
+            <Play className="mr-2 h-4 w-4" />
             <span>Chat</span>
           </button>
         </Link>
 
-        {/*View Documents button*/}
         <button
-          className="flex items-center h-9 rounded-md px-3 bg-gray-500 text-white hover:bg-gray-300 active:bg-gray-400 transition-colors duration-200 cursor-pointer"
+          className="focus-ring flex h-11 cursor-pointer items-center rounded-xl border border-border-interactive bg-surface px-3 text-label text-primary hover:bg-surface-raised"
           onClick={() => setDocumentModalOpen(true)}
         >
-          <Newspaper className="w-4 h-4 mr-2" />
+          <Newspaper className="mr-2 h-4 w-4" />
           <span>View Documents</span>
         </button>
       </div>
 
-      {/*Document Modal*/}
       <DocumentModal
         open={documentModalOpen}
         onClose={() => setDocumentModalOpen(false)}
