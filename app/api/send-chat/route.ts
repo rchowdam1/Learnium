@@ -53,10 +53,12 @@ export async function POST(request: Request) {
   const messageToSend = reqData.userMessage;
   const buddyId = reqData.buddyId;
 
+  const ragServiceUrl = process.env.RAG_SERVICE_URL || "http://localhost:8000";
+
   let assistantMessage: string = "";
 
   try {
-    const response = await fetch("http://localhost:8000/api/chat", {
+    const response = await fetch(`${ragServiceUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -138,7 +140,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        message: "Coudn't insert assistant's chat into database",
+        message: "Couldn't insert assistant's chat into database",
       },
       { status: 400 },
     );

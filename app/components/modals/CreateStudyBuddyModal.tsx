@@ -136,7 +136,7 @@ export default function CreateStudyBuddyModal({
 
       // send the files to backend for RAG implementation
       // POST request to fastAPI
-      response = await fetch("http://localhost:8000/api/create-study-buddy", {
+      response = await fetch(`${process.env.NEXT_PUBLIC_RAG_SERVICE_URL || "http://localhost:8000"}/api/create-study-buddy`, {
         method: "POST",
         body: formData,
       });

@@ -20,6 +20,7 @@ The application uses the following environment variables:
 - `STRIPE_SECRET_KEY`: Stripe API key for payments.
 - `OPENROUTER_API_KEY`: OpenRouter API key for AI course/lesson generation (required).
 - `OPENROUTER_MODEL`: OpenRouter model ID (default: `meta-llama/llama-3.2-3b-instruct:free`).
+- `RAG_SERVICE_URL`: URL of the Python RAG microservice (default: `http://localhost:8000`).
 
 ## Testing
 
