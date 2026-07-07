@@ -1,0 +1,1393 @@
+{
+  "meta": {
+    "root_path": ".",
+    "scanned_at": "2026-07-05T18:34:58Z",
+    "vcs": {
+      "remote": "https://github.com/rchowdam1/Learnium.git",
+      "default_branch": "static-data-cache"
+    }
+  },
+  "manifests": [
+    {
+      "type": "package.json",
+      "path": "package.json",
+      "name": "learnium",
+      "description": null,
+      "entry_points": []
+    }
+  ],
+  "languages": {
+    "typescript": 94.2,
+    "css": 0.5,
+    "python": 4.5,
+    "markdown": 0.5,
+    "javascript": 0.3
+  },
+  "totals": {
+    "files": 95,
+    "loc": 128683
+  },
+  "tree": {
+    "path": ".",
+    "type": "dir",
+    "loc": 128683,
+    "file_count": 95,
+    "children": [
+      {
+        "path": "actions",
+        "type": "dir",
+        "loc": 335,
+        "file_count": 2,
+        "children": [
+          {
+            "path": "actions\\ProfileUpdates.ts",
+            "type": "file",
+            "loc": 143,
+            "language": "typescript"
+          },
+          {
+            "path": "actions\\dbops.ts",
+            "type": "file",
+            "loc": 192,
+            "language": "typescript"
+          }
+        ]
+      },
+      {
+        "path": "app",
+        "type": "dir",
+        "loc": 6620,
+        "file_count": 58,
+        "children": [
+          {
+            "path": "app\\api",
+            "type": "dir",
+            "loc": 1924,
+            "file_count": 22,
+            "children": [
+              {
+                "path": "app\\api\\checkout",
+                "type": "dir",
+                "loc": 41,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\checkout\\route.ts",
+                    "type": "file",
+                    "loc": 41,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\create-buddy",
+                "type": "dir",
+                "loc": 151,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\create-buddy\\route.ts",
+                    "type": "file",
+                    "loc": 151,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\customer-portal",
+                "type": "dir",
+                "loc": 42,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\customer-portal\\route.ts",
+                    "type": "file",
+                    "loc": 42,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\delete-user",
+                "type": "dir",
+                "loc": 46,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\delete-user\\route.ts",
+                    "type": "file",
+                    "loc": 46,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-buddies",
+                "type": "dir",
+                "loc": 114,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-buddies\\route.ts",
+                    "type": "file",
+                    "loc": 114,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-buddy-data",
+                "type": "dir",
+                "loc": 55,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-buddy-data\\[buddyId]",
+                    "type": "dir",
+                    "loc": 55,
+                    "file_count": 1,
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-profile-data",
+                "type": "dir",
+                "loc": 217,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-profile-data\\route.ts",
+                    "type": "file",
+                    "loc": 217,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-set-data",
+                "type": "dir",
+                "loc": 257,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-set-data\\[setId]",
+                    "type": "dir",
+                    "loc": 257,
+                    "file_count": 1,
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-sets",
+                "type": "dir",
+                "loc": 106,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-sets\\route.ts",
+                    "type": "file",
+                    "loc": 106,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-sets-progress",
+                "type": "dir",
+                "loc": 0,
+                "file_count": 0,
+                "children": []
+              },
+              {
+                "path": "app\\api\\get-subscription-status",
+                "type": "dir",
+                "loc": 38,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-subscription-status\\route.ts",
+                    "type": "file",
+                    "loc": 38,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\get-username",
+                "type": "dir",
+                "loc": 35,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\get-username\\route.ts",
+                    "type": "file",
+                    "loc": 35,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\hello",
+                "type": "dir",
+                "loc": 5,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\hello\\route.ts",
+                    "type": "file",
+                    "loc": 5,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\input-check",
+                "type": "dir",
+                "loc": 247,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\input-check\\route.ts",
+                    "type": "file",
+                    "loc": 247,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\login",
+                "type": "dir",
+                "loc": 53,
+                "file_count": 2,
+                "children": [
+                  {
+                    "path": "app\\api\\login\\google",
+                    "type": "dir",
+                    "loc": 26,
+                    "file_count": 1,
+                    "children": []
+                  },
+                  {
+                    "path": "app\\api\\login\\route.ts",
+                    "type": "file",
+                    "loc": 27,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\logout",
+                "type": "dir",
+                "loc": 15,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\logout\\route.ts",
+                    "type": "file",
+                    "loc": 15,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\mark-lesson-complete",
+                "type": "dir",
+                "loc": 129,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\mark-lesson-complete\\route.ts",
+                    "type": "file",
+                    "loc": 129,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\mark-set-complete",
+                "type": "dir",
+                "loc": 49,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\mark-set-complete\\route.ts",
+                    "type": "file",
+                    "loc": 49,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\save-chat-message",
+                "type": "dir",
+                "loc": 89,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\save-chat-message\\route.ts",
+                    "type": "file",
+                    "loc": 89,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\send-chat",
+                "type": "dir",
+                "loc": 165,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\send-chat\\route.ts",
+                    "type": "file",
+                    "loc": 165,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\signup",
+                "type": "dir",
+                "loc": 37,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\signup\\route.ts",
+                    "type": "file",
+                    "loc": 37,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\api\\webhook",
+                "type": "dir",
+                "loc": 33,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\api\\webhook\\route.ts",
+                    "type": "file",
+                    "loc": 33,
+                    "language": "typescript"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "app\\auth",
+            "type": "dir",
+            "loc": 117,
+            "file_count": 2,
+            "children": [
+              {
+                "path": "app\\auth\\callback",
+                "type": "dir",
+                "loc": 89,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\auth\\callback\\route.ts",
+                    "type": "file",
+                    "loc": 89,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\auth\\confirm",
+                "type": "dir",
+                "loc": 28,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\auth\\confirm\\route.ts",
+                    "type": "file",
+                    "loc": 28,
+                    "language": "typescript"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "app\\buddy",
+            "type": "dir",
+            "loc": 50,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\buddy\\[buddyId]",
+                "type": "dir",
+                "loc": 50,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\buddy\\[buddyId]\\page.tsx",
+                    "type": "file",
+                    "loc": 50,
+                    "language": "typescript"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "app\\components",
+            "type": "dir",
+            "loc": 2307,
+            "file_count": 20,
+            "children": [
+              {
+                "path": "app\\components\\cards",
+                "type": "dir",
+                "loc": 364,
+                "file_count": 4,
+                "children": [
+                  {
+                    "path": "app\\components\\cards\\SetCards.tsx",
+                    "type": "file",
+                    "loc": 118,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\cards\\StatCards.tsx",
+                    "type": "file",
+                    "loc": 33,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\cards\\StudyBuddyCards.tsx",
+                    "type": "file",
+                    "loc": 80,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\cards\\SubscriptionCards.tsx",
+                    "type": "file",
+                    "loc": 133,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\controllers",
+                "type": "dir",
+                "loc": 73,
+                "file_count": 2,
+                "children": [
+                  {
+                    "path": "app\\components\\controllers\\CreateSetController.tsx",
+                    "type": "file",
+                    "loc": 36,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\controllers\\CreateStudyBuddyController.tsx",
+                    "type": "file",
+                    "loc": 37,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\lessons",
+                "type": "dir",
+                "loc": 88,
+                "file_count": 2,
+                "children": [
+                  {
+                    "path": "app\\components\\lessons\\LessonBubble.tsx",
+                    "type": "file",
+                    "loc": 45,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\lessons\\LessonChain.tsx",
+                    "type": "file",
+                    "loc": 43,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\misc",
+                "type": "dir",
+                "loc": 149,
+                "file_count": 3,
+                "children": [
+                  {
+                    "path": "app\\components\\misc\\Profile.tsx",
+                    "type": "file",
+                    "loc": 109,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\misc\\Progress.tsx",
+                    "type": "file",
+                    "loc": 21,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\misc\\SignInWithGoogle.tsx",
+                    "type": "file",
+                    "loc": 19,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\modals",
+                "type": "dir",
+                "loc": 1270,
+                "file_count": 7,
+                "children": [
+                  {
+                    "path": "app\\components\\modals\\CreateSetModal.tsx",
+                    "type": "file",
+                    "loc": 366,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\CreateStudyBuddyModal.tsx",
+                    "type": "file",
+                    "loc": 299,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\DeleteSetModal.tsx",
+                    "type": "file",
+                    "loc": 54,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\DocumentModal.tsx",
+                    "type": "file",
+                    "loc": 87,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\LessonQuizModal.tsx",
+                    "type": "file",
+                    "loc": 354,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\SetCompleteModal.tsx",
+                    "type": "file",
+                    "loc": 44,
+                    "language": "typescript"
+                  },
+                  {
+                    "path": "app\\components\\modals\\SetDropdown.tsx",
+                    "type": "file",
+                    "loc": 66,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\nav",
+                "type": "dir",
+                "loc": 74,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\components\\nav\\AuthNav.tsx",
+                    "type": "file",
+                    "loc": 74,
+                    "language": "typescript"
+                  }
+                ]
+              },
+              {
+                "path": "app\\components\\study-buddy",
+                "type": "dir",
+                "loc": 289,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\components\\study-buddy\\Chat.tsx",
+                    "type": "file",
+                    "loc": 289,
+                    "language": "typescript"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "app\\dashboard",
+            "type": "dir",
+            "loc": 415,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\dashboard\\page.tsx",
+                "type": "file",
+                "loc": 415,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\error",
+            "type": "dir",
+            "loc": 3,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\error\\page.tsx",
+                "type": "file",
+                "loc": 3,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\login",
+            "type": "dir",
+            "loc": 116,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\login\\page.tsx",
+                "type": "file",
+                "loc": 116,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\profile",
+            "type": "dir",
+            "loc": 402,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\profile\\page.tsx",
+                "type": "file",
+                "loc": 402,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\schema",
+            "type": "dir",
+            "loc": 25,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\schema\\OutputSchema.ts",
+                "type": "file",
+                "loc": 25,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\sets",
+            "type": "dir",
+            "loc": 351,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\sets\\[setId]",
+                "type": "dir",
+                "loc": 351,
+                "file_count": 1,
+                "children": [
+                  {
+                    "path": "app\\sets\\[setId]\\page.tsx",
+                    "type": "file",
+                    "loc": 351,
+                    "language": "typescript"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "path": "app\\signup",
+            "type": "dir",
+            "loc": 211,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\signup\\page.tsx",
+                "type": "file",
+                "loc": 211,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\subscriptions",
+            "type": "dir",
+            "loc": 62,
+            "file_count": 1,
+            "children": [
+              {
+                "path": "app\\subscriptions\\page.tsx",
+                "type": "file",
+                "loc": 62,
+                "language": "typescript"
+              }
+            ]
+          },
+          {
+            "path": "app\\favicon.ico",
+            "type": "file",
+            "loc": 77
+          },
+          {
+            "path": "app\\globals.css",
+            "type": "file",
+            "loc": 38,
+            "language": "css"
+          },
+          {
+            "path": "app\\layout.tsx",
+            "type": "file",
+            "loc": 35,
+            "language": "typescript"
+          },
+          {
+            "path": "app\\page.tsx",
+            "type": "file",
+            "loc": 475,
+            "language": "typescript"
+          },
+          {
+            "path": "app\\providers.tsx",
+            "type": "file",
+            "loc": 12,
+            "language": "typescript"
+          }
+        ]
+      },
+      {
+        "path": "lib",
+        "type": "dir",
+        "loc": 79,
+        "file_count": 4,
+        "children": [
+          {
+            "path": "lib\\admin.ts",
+            "type": "file",
+            "loc": 35,
+            "language": "typescript"
+          },
+          {
+            "path": "lib\\server.ts",
+            "type": "file",
+            "loc": 31,
+            "language": "typescript"
+          },
+          {
+            "path": "lib\\stripe.ts",
+            "type": "file",
+            "loc": 5,
+            "language": "typescript"
+          },
+          {
+            "path": "lib\\supabase.ts",
+            "type": "file",
+            "loc": 8,
+            "language": "typescript"
+          }
+        ]
+      },
+      {
+        "path": "public",
+        "type": "dir",
+        "loc": 58187,
+        "file_count": 12,
+        "children": [
+          {
+            "path": "public\\icons",
+            "type": "dir",
+            "loc": 57500,
+            "file_count": 6,
+            "children": [
+              {
+                "path": "public\\icons\\ai.png",
+                "type": "file",
+                "loc": 8939
+              },
+              {
+                "path": "public\\icons\\clock.png",
+                "type": "file",
+                "loc": 8917
+              },
+              {
+                "path": "public\\icons\\mobile.png",
+                "type": "file",
+                "loc": 8103
+              },
+              {
+                "path": "public\\icons\\step1.png",
+                "type": "file",
+                "loc": 8674
+              },
+              {
+                "path": "public\\icons\\step2.png",
+                "type": "file",
+                "loc": 8651
+              },
+              {
+                "path": "public\\icons\\step3.png",
+                "type": "file",
+                "loc": 14216
+              }
+            ]
+          },
+          {
+            "path": "public\\file.svg",
+            "type": "file",
+            "loc": 1
+          },
+          {
+            "path": "public\\globe.svg",
+            "type": "file",
+            "loc": 1
+          },
+          {
+            "path": "public\\google2.png",
+            "type": "file",
+            "loc": 682
+          },
+          {
+            "path": "public\\next.svg",
+            "type": "file",
+            "loc": 1
+          },
+          {
+            "path": "public\\vercel.svg",
+            "type": "file",
+            "loc": 1
+          },
+          {
+            "path": "public\\window.svg",
+            "type": "file",
+            "loc": 1
+          }
+        ]
+      },
+      {
+        "path": "rag",
+        "type": "dir",
+        "loc": 56574,
+        "file_count": 10,
+        "children": [
+          {
+            "path": "rag\\chroma_db",
+            "type": "dir",
+            "loc": 56196,
+            "file_count": 5,
+            "children": [
+              {
+                "path": "rag\\chroma_db\\efdebd7b-bf56-40a9-a13d-0d2cadb2adf4",
+                "type": "dir",
+                "loc": 3,
+                "file_count": 4,
+                "children": [
+                  {
+                    "path": "rag\\chroma_db\\efdebd7b-bf56-40a9-a13d-0d2cadb2adf4\\data_level0.bin",
+                    "type": "file",
+                    "loc": 1
+                  },
+                  {
+                    "path": "rag\\chroma_db\\efdebd7b-bf56-40a9-a13d-0d2cadb2adf4\\header.bin",
+                    "type": "file",
+                    "loc": 1
+                  },
+                  {
+                    "path": "rag\\chroma_db\\efdebd7b-bf56-40a9-a13d-0d2cadb2adf4\\length.bin",
+                    "type": "file",
+                    "loc": 1
+                  },
+                  {
+                    "path": "rag\\chroma_db\\efdebd7b-bf56-40a9-a13d-0d2cadb2adf4\\link_lists.bin",
+                    "type": "file",
+                    "loc": 0
+                  }
+                ]
+              },
+              {
+                "path": "rag\\chroma_db\\chroma.sqlite3",
+                "type": "file",
+                "loc": 56193
+              }
+            ]
+          },
+          {
+            "path": "rag\\Dockerfile",
+            "type": "file",
+            "loc": 26
+          },
+          {
+            "path": "rag\\envkeys.py",
+            "type": "file",
+            "loc": 11,
+            "language": "python"
+          },
+          {
+            "path": "rag\\main.py",
+            "type": "file",
+            "loc": 248,
+            "language": "python"
+          },
+          {
+            "path": "rag\\requirements.txt",
+            "type": "file",
+            "loc": 14
+          },
+          {
+            "path": "rag\\scache.py",
+            "type": "file",
+            "loc": 79,
+            "language": "python"
+          }
+        ]
+      },
+      {
+        "path": ".gitignore",
+        "type": "file",
+        "loc": 51
+      },
+      {
+        "path": "README.md",
+        "type": "file",
+        "loc": 36,
+        "language": "markdown"
+      },
+      {
+        "path": "eslint.config.mjs",
+        "type": "file",
+        "loc": 16,
+        "language": "javascript"
+      },
+      {
+        "path": "middleware.ts",
+        "type": "file",
+        "loc": 78,
+        "language": "typescript"
+      },
+      {
+        "path": "next.config.ts",
+        "type": "file",
+        "loc": 8,
+        "language": "typescript"
+      },
+      {
+        "path": "package-lock.json",
+        "type": "file",
+        "loc": 6629
+      },
+      {
+        "path": "package.json",
+        "type": "file",
+        "loc": 38
+      },
+      {
+        "path": "postcss.config.mjs",
+        "type": "file",
+        "loc": 5,
+        "language": "javascript"
+      },
+      {
+        "path": "tsconfig.json",
+        "type": "file",
+        "loc": 27
+      }
+    ]
+  },
+  "structures": {
+    "actions\\dbops.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "createSet",
+          "lineno": 4,
+          "signature": "export async function createSet(",
+          "docstring": null
+        },
+        {
+          "name": "createBuddy",
+          "lineno": 135,
+          "signature": "export async function createBuddy(",
+          "docstring": null
+        },
+        {
+          "name": "storeBuddyDocuments",
+          "lineno": 173,
+          "signature": "export async function storeBuddyDocuments(buddyId: number, files: File[]) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/app/schema/OutputSchema",
+        "@/lib/server"
+      ]
+    },
+    "app\\api\\create-buddy\\route.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "POST",
+          "lineno": 10,
+          "signature": "export async function POST(request: Request) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/actions/dbops",
+        "@/lib/server",
+        "next/server"
+      ]
+    },
+    "app\\api\\get-profile-data\\route.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "GET",
+          "lineno": 30,
+          "signature": "export async function GET() {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/actions/ProfileUpdates",
+        "@/lib/server",
+        "next/server"
+      ]
+    },
+    "app\\api\\get-set-data\\[setId]\\route.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "GET",
+          "lineno": 40,
+          "signature": "export async function GET(",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/lib/server",
+        "next/server"
+      ]
+    },
+    "app\\api\\input-check\\route.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "POST",
+          "lineno": 22,
+          "signature": "export async function POST(request: Request) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/actions/dbops",
+        "@/app/schema/OutputSchema",
+        "@/lib/server",
+        "console",
+        "franc",
+        "next/server",
+        "openai",
+        "openai/helpers/zod",
+        "zod"
+      ]
+    },
+    "app\\api\\send-chat\\route.ts": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "POST",
+          "lineno": 11,
+          "signature": "export async function POST(request: Request) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/lib/server",
+        "next/server"
+      ]
+    },
+    "app\\components\\modals\\CreateSetModal.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "CreateSetModal",
+          "lineno": 29,
+          "signature": "export default function CreateSetModal({",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/app/schema/OutputSchema",
+        "lucide-react",
+        "react",
+        "react-hot-toast",
+        "zod"
+      ]
+    },
+    "app\\components\\modals\\CreateStudyBuddyModal.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "CreateStudyBuddyModal",
+          "lineno": 17,
+          "signature": "export default function CreateStudyBuddyModal({",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "lucide-react",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\components\\modals\\LessonQuizModal.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LessonQuizModal",
+          "lineno": 151,
+          "signature": "export default function LessonQuizModal({",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "lucide-react",
+        "next",
+        "react"
+      ]
+    },
+    "app\\components\\study-buddy\\Chat.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "Bubble",
+          "lineno": 7,
+          "signature": "function Bubble({ role }: { role: boolean }) {",
+          "docstring": null
+        },
+        {
+          "name": "ChatMessage",
+          "lineno": 19,
+          "signature": "function ChatMessage({",
+          "docstring": null
+        },
+        {
+          "name": "Chat",
+          "lineno": 41,
+          "signature": "export default function Chat({ buddyId }: { buddyId: string }) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/app/buddy/[buddyId]/page",
+        "lucide-react",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\dashboard\\page.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "Dashboard",
+          "lineno": 59,
+          "signature": "export default function Dashboard() {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "../components/cards/SetCards",
+        "../components/cards/StatCards",
+        "../components/cards/StudyBuddyCards",
+        "../components/controllers/CreateSetController",
+        "../components/controllers/CreateStudyBuddyController",
+        "../components/nav/AuthNav",
+        "lucide-react",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\profile\\page.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "ProfilePage",
+          "lineno": 120,
+          "signature": "export default function ProfilePage() {",
+          "docstring": null
+        },
+        {
+          "name": "formatDate",
+          "lineno": 177,
+          "signature": "function formatDate(dateString: string | undefined): string {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "../components/misc/Progress",
+        "../components/nav/AuthNav",
+        "next/link",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\sets\\[setId]\\page.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "SetPage",
+          "lineno": 65,
+          "signature": "export default function SetPage({ params }: { params: { setId: string } }) {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "@/app/components/lessons/LessonBubble",
+        "@/app/components/lessons/LessonChain",
+        "@/app/components/modals/LessonQuizModal",
+        "@/app/components/modals/SetCompleteModal",
+        "@/app/components/nav/AuthNav",
+        "next/link",
+        "next/navigation",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\signup\\page.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "SignupPage",
+          "lineno": 11,
+          "signature": "export default function SignupPage() {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "../components/misc/SignInWithGoogle",
+        "lucide-react",
+        "next/link",
+        "next/navigation",
+        "react",
+        "react-hot-toast"
+      ]
+    },
+    "app\\page.tsx": {
+      "language": "typescript",
+      "classes": [],
+      "functions": [
+        {
+          "name": "Home",
+          "lineno": 4,
+          "signature": "export default function Home() {",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "next/image",
+        "next/link"
+      ]
+    },
+    "rag\\main.py": {
+      "language": "python",
+      "classes": [
+        {
+          "name": "ChatRequest",
+          "lineno": 166,
+          "methods": [],
+          "docstring": null
+        }
+      ],
+      "functions": [
+        {
+          "name": "root",
+          "lineno": 56,
+          "signature": "def root():",
+          "docstring": null
+        },
+        {
+          "name": "extract_text_from_pdf",
+          "lineno": 75,
+          "signature": "def extract_text_from_pdf(file_bytes):",
+          "docstring": null
+        },
+        {
+          "name": "extract_text_from_pptx",
+          "lineno": 88,
+          "signature": "def extract_text_from_pptx(file_bytes):",
+          "docstring": null
+        },
+        {
+          "name": "create_study_buddy",
+          "lineno": 104,
+          "signature": "def create_study_buddy(title: str=Form(...), description: str=Form(...), category: str=Form(...), files: List[UploadFile]=File(...), buddyId: str=Form(...)):",
+          "docstring": null
+        },
+        {
+          "name": "chat_request",
+          "lineno": 173,
+          "signature": "def chat_request(request: ChatRequest):",
+          "docstring": null
+        },
+        {
+          "name": "testing_post",
+          "lineno": 246,
+          "signature": "def testing_post(text: str=Body(...), number: int=Body(...)):",
+          "docstring": null
+        }
+      ],
+      "imports": [
+        "dotenv",
+        "fastapi",
+        "fastapi.middleware.cors",
+        "io",
+        "langchain_community.vectorstores",
+        "langchain_core.prompts",
+        "langchain_openai",
+        "langchain_text_splitters",
+        "os",
+        "pathlib",
+        "pdfplumber",
+        "pptx",
+        "pydantic",
+        "scache",
+        "sys",
+        "typing",
+        "urllib"
+      ]
+    }
+  },
+  "readmes": [
+    {
+      "path": "README.md",
+      "excerpt": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).\n\n## Getting Started\n\nFirst, run the development server:\n\n```bash\nnpm run dev\n# or\nyarn dev\n# or\npnpm dev\n# or\nbun dev\n```\n\nOpen [http://localhost:3000](http://localhost:3000) with your browser to see the result.\n\nYou can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.\n\nThis project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.\n\n## Learn More\n\nTo learn more about Next.js, take a look at the following resources:\n\n- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.\n- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.\n\nYou can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!\n\n## Deploy on Vercel\n\nThe easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.\n\nCheck out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.\n"
+    }
+  ]
+}
