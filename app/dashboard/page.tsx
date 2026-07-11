@@ -5,11 +5,19 @@ import StatCard from "../components/cards/StatCards";
 import SetCard from "../components/cards/SetCards";
 import StudyBuddyCard from "../components/cards/StudyBuddyCards";
 import CreateSetController from "../components/controllers/CreateSetController";
+import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
 
 import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
 import toast from "react-hot-toast";
-import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
+
+import {
+  SetData,
+  BuddyData,
+  ProfileData,
+} from "@/types/dashboard/DashboardTypes";
 
 type StatCards = {
   title: string;
@@ -168,7 +176,20 @@ export default function Dashboard() {
   };
 
   // load up the sets of the user and/or study buddies
-  useEffect(() => {
+  // getting the set data, gonna replace all of the fetching in useEffect with
+  // useSWR
+
+  // set data first
+  const { data: setData } = useSWR<SetData[]>("/api/get-sets", fetcher);
+  // buddy data 2nd
+  const { data: buddyData } = useSWR<BuddyData>("/api/get-buddies", fetcher);
+  // profile info last
+  const { data: profileInfo } = useSWR<ProfileData>(
+    "/api/get-profile-data",
+    fetcher,
+  );
+
+  /*useEffect(() => {
     const loadSets = async () => {
       try {
         const response = await fetch("/api/get-sets");
@@ -277,7 +298,7 @@ export default function Dashboard() {
     loadSets();
     loadBuddies();
     getProfInfo();
-  }, []);
+  }, []);*/
 
   return (
     <div className="min-h-screen bg-gray-50">

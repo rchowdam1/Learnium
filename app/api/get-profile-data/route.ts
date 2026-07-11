@@ -51,7 +51,7 @@ export async function GET() {
 
   if (userError) {
     console.log("User is not logged in");
-    return NextResponse.json({ success: false }, { status: 403 });
+    return NextResponse.json({ data: { success: false } }, { status: 403 });
   }
 
   // get the profile
@@ -64,7 +64,7 @@ export async function GET() {
 
   if (profileError) {
     console.log("Could not fetch profile data");
-    return NextResponse.json({ success: false }, { status: 400 });
+    return NextResponse.json({ data: { success: false } }, { status: 400 });
   }
 
   // username, email, requests remaining
@@ -110,7 +110,7 @@ export async function GET() {
 
   if (setError) {
     console.log("Could not retrieve sets");
-    return NextResponse.json({ success: false }, { status: 200 });
+    return NextResponse.json({ data: { success: false } }, { status: 200 });
   }
 
   // Sets created and sets completed
@@ -132,7 +132,7 @@ export async function GET() {
 
     if (lessonError) {
       console.log(`Could not retrieve lessons for set ${set.id}`);
-      return NextResponse.json({ success: false }, { status: 200 });
+      return NextResponse.json({ data: { success: false } }, { status: 200 });
     }
 
     totalLessons += lessonData.length;
@@ -148,7 +148,7 @@ export async function GET() {
 
       if (quizError) {
         console.log("Could not retrieve quizzes for a lesson");
-        return NextResponse.json({ success: false }, { status: 200 });
+        return NextResponse.json({ data: { success: false } }, { status: 200 });
       }
 
       // get the number of questions for this quiz
@@ -166,7 +166,10 @@ export async function GET() {
 
           if (questionError) {
             console.log("Could not retrieve questions for a quiz");
-            return NextResponse.json({ success: false }, { status: 200 });
+            return NextResponse.json(
+              { data: { success: false } },
+              { status: 200 },
+            );
           }
 
           if (questionData) {
@@ -202,16 +205,18 @@ export async function GET() {
   console.log("requests remaining: ", requestsRemaining);
   return NextResponse.json({
     success: true,
-    username: username,
-    email: email,
-    requestsRemaining: requestsRemaining,
-    setsCreated: setsCreated,
-    setsCompleted: setsCompleted,
-    isSubscribed: isSubscribed,
-    completedLessons: completedLessons,
-    overallProgress: overallProgress,
-    averageQuizScore: averageQuizScore,
-    topCategories: topCategories,
-    setData: setData,
+    data: {
+      username: username,
+      email: email,
+      requestsRemaining: requestsRemaining,
+      setsCreated: setsCreated,
+      setsCompleted: setsCompleted,
+      isSubscribed: isSubscribed,
+      completedLessons: completedLessons,
+      overallProgress: overallProgress,
+      averageQuizScore: averageQuizScore,
+      topCategories: topCategories,
+      setData: setData,
+    },
   });
 }

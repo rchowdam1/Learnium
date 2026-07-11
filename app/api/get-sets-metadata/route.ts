@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
-import { set } from "zod";
 
 export async function GET(request: Request) {
-  // will be used to get the progress which is dynamic data and shouldn't be cached
-  const supabase = await createClient();
+  const supabase = await createClient(); // 7/7: think about implementing SWR on the client side instead of the unstable_cache approach
 
   const {
     data: { user },
