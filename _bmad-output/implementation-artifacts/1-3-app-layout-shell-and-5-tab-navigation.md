@@ -261,7 +261,7 @@ Verify the `md:pt-16`/`pb-16` offsets actually match `AppNav`'s real rendered he
 
 ## Project Structure Notes
 
-- The project is a Next.js App Router app with `app/`, `actions/`, `lib/`, and `rag/`.
+- The project is a Next.js App Router app with `app/`, `actions/`, `lib/` (including `lib/ingest/` for Study Buddy). Legacy `rag/` Python sidecar is unused for create-buddy/chat (amended 2026-07-11).
 - This story introduces the first App Router **route group** (`app/(app)/`) — a routing-invisible folder used purely to share a layout across `/dashboard`, `/profile`, and the three new stub routes without altering their URLs.
 - `app/components/nav/` gains a second file (`AppNav.tsx`) alongside the existing `AuthNav.tsx`; both coexist until later stories (1.6, 1.8, or beyond) migrate the remaining unmigrated authenticated pages.
 - `/learn`, `/review`, `/leagues` are genuinely new routes with no prior implementation anywhere in the repo (confirmed: no `app/review`, `app/leagues` folders exist; `app/sets` has no index page).

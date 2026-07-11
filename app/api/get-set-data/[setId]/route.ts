@@ -152,9 +152,6 @@ export async function GET(
       };
 
       if (quizData) {
-        // to store the previous answers if quiz has been completed
-        const previousAnswers: string[] = [];
-
         // also get the quiz score
         if (quizData.completed) {
           quiz.quizScore = quizData.questions_correct;
@@ -163,7 +160,8 @@ export async function GET(
         const { data: questionData, error: questionError } = await supabase
           .from("questions")
           .select("*")
-          .eq("quiz_id", quizData.id);
+          .eq("quiz_id", quizData.id)
+          .order("position", { ascending: true });
 
         if (questionError) {
           console.log("Could not retrieve question data");
@@ -171,73 +169,42 @@ export async function GET(
         }
 
         if (questionData) {
-          /**
-           * Loop through the questions that belong to this quiz and assign the attributes
-           */
           const curQuestions: Question[] = [];
-          await Promise.all(
-            questionData.map(async (question) => {
+          for (const question of questionData) {
               const curQuestion: Question = {};
               curQuestion.question = question.question;
               curQuestion.correctAnswer = question.answer;
               curQuestion.id = question.id;
 
-              /**
-               * Loop through the options that belong to this question
-               */
-
               const { data: optionData, error: optionError } = await supabase
                 .from("options")
                 .select("*")
-                .eq("question_id", question.id);
+                .eq("question_id", question.id)
+                .order("position", { ascending: true });
 
               if (optionError) {
                 console.log("Could not retrieve options");
-                return;
+                continue;
               }
 
               if (optionData) {
-                // if the quiz has been completed, check which option is the answer
-                if (quizData.completed) {
-                  // check each option to see if it was selected
-                  optionData.forEach((option) => {
-                    if (option.user_answer) {
-                      previousAnswers.push(option.option);
-                    }
-                  });
-                }
-
-                // sort the questions in random order
-
-                const order: Option[] = [
-                  optionData[0] /*.option*/,
-                  optionData[1] /*.option*/,
-                  optionData[2] /*.option*/,
-                  optionData[3] /*.option*/,
-                ];
+                const order: Option[] = optionData.map((opt) => ({
+                  optionId: opt.id,
+                  option: opt.option,
+                }));
 
                 for (let i = 0; i < 10; i++) {
-                  const first = Math.floor(Math.random() * 4);
-                  const second = Math.floor(Math.random() * 4);
-
-                  //swap
+                  const first = Math.floor(Math.random() * order.length);
+                  const second = Math.floor(Math.random() * order.length);
                   const temp = order[first];
                   order[first] = order[second];
                   order[second] = temp;
                 }
                 curQuestion.options = order;
-                //console.log(curQuestion.options);
-                // once the question attributes have been filled, append it to curQuestions
                 curQuestions.push(curQuestion);
               }
-            })
-          );
+          }
           quiz.questions = curQuestions;
-        }
-
-        // since quiz.previousAnswers is optional
-        if (previousAnswers.length > 0) {
-          quiz.previousAnswers = previousAnswers;
         }
       }
 

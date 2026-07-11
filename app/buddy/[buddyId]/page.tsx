@@ -28,15 +28,16 @@ export default function BuddyPage() {
   const buddyId = param.buddyId;
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
+    <div className="relative min-h-screen bg-background">
       <AuthNav />
 
       {/*Back Home Page*/}
-      <Link href="/dashboard">
-        <div className="absolute top-26 left-10 flex justify-center gap-2 items-center rounded-2xl px-2 py-1 hover:bg-gray-200 transition-colors duration-350 cursor-pointer">
-          <Undo2 />
-          <span>Return to home</span>
-        </div>
+      <Link
+        href="/dashboard"
+        className="absolute top-26 left-10 flex justify-center gap-2 items-center rounded-xl px-2 py-1 text-primary hover:bg-surface focus-ring transition-colors duration-350"
+      >
+        <Undo2 />
+        <span>Return to home</span>
       </Link>
 
       {/*Main Content of the page*/}

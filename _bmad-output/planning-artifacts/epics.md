@@ -107,27 +107,29 @@ NFR16: Launch hardening must address the current lack of automated test framewor
 
 ### Additional Requirements
 
-- Architecture specifies a modular server-first layered monolith with a sidecar Python RAG service; no greenfield starter template is specified.
+> **Amendment 2026-07-11:** Stories and requirements that mandate the Python RAG sidecar, `RAG_SERVICE_URL`, Chroma, or LangCache as the **live** Study Buddy path are **superseded** by Next.js `lib/ingest/` + Supabase `document_chunks` (pgvector). See Architecture Spine amendment.
+
+- Architecture specifies a modular server-first layered monolith with ~~a sidecar Python RAG service~~ **in-process Study Buddy ingest + Supabase pgvector** (2026-07-11); no greenfield starter template is specified.
 - UI components may call server actions, API routes, or browser-safe Supabase reads only; all mutations with auth, billing, quota, progress, AI, or privacy impact must go through server actions or verb-style `app/api/<kebab-case-action>/route.ts` endpoints.
 - `middleware.ts` `protectedPaths` is the single authenticated route gate; every new protected surface for dashboard additions, Reviews, Leagues, Paths, profile, and settings must be registered precisely because matching is prefix-based.
 - Server code must use `lib/server.ts` `createClient()` for cookie-bound Supabase access; service-role Supabase access must stay isolated in privileged server-only modules.
 - User-owned object reads and writes must prove ownership through parent `profile_id` or explicit public/social projections; id-only mutation paths are invalid.
 - Quota counters must be mutated by database RPCs or a single quota domain service backed by atomic database writes.
 - Reward and progress changes must be server-authoritative idempotent events with dedupe keys; client animations display committed state only.
-- Next.js server code must call the RAG sidecar only through configured HTTP endpoints with service-to-service authentication; browser code must never call RAG directly.
-- RAG request/response payloads must be governed by a versioned contract artifact shared by Next.js and Python, and RAG endpoints must check semantic cache before model calls.
+- ~~Next.js server code must call the RAG sidecar only through configured HTTP endpoints…~~ **Superseded:** Study Buddy ingest/chat stay in Next.js (`/api/create-buddy`, `/api/send-chat`, `lib/ingest/`); browser never writes vectors or calls OpenRouter for buddy RAG.
+- ~~RAG request/response payloads must be governed by a versioned contract artifact shared by Next.js and Python…~~ **Superseded:** retrieval + prompt assembly live in `lib/ingest/`; embeddings are local 384-d feature-hash.
 - Stripe subscription entitlement must be mapped idempotently by Stripe event id and customer id from verified subscription lifecycle events.
 - Social reads must use privacy-limited projections only: display name, Level, Badges, current Streak, completed Sets count, and weekly XP.
 - Review Sessions must use persisted question banks and server-owned review schedule state, consuming no generation quota and no Study Buddy chat quota.
-- Environment variables must replace localhost-only or hardcoded provider configuration, including `RAG_SERVICE_URL`, server secrets, Stripe keys, model names, and service-role keys.
+- Environment variables must replace localhost-only or hardcoded provider configuration, including OpenRouter model slugs, server secrets, Stripe keys, and service-role keys. (`RAG_SERVICE_URL` is legacy/unused.)
 - Scheduled jobs must own reminders, League weekly cycles, quota resets, review scheduling, delayed account deletion/export, and related audit records.
-- Study Buddy chat must have one canonical transaction endpoint: authenticate, check chat quota, call RAG, persist user and assistant messages, consume quota, and return committed state.
-- Buddy creation and RAG ingestion must progress through server-owned lifecycle states, and only ready Buddies may answer chat.
+- Study Buddy chat must have one canonical transaction endpoint: authenticate, check chat quota, hybrid-retrieve chunks, call OpenRouter, persist user and assistant messages, consume quota, and return committed state.
+- Buddy creation and document ingestion must be server-mediated; only buddies with `chunks_count > 0` after ingest may answer chat.
 - Multi-table generated content writes must use transaction-first Postgres functions or equivalent atomic persistence before quota consumption.
 - Streak and Daily Goal boundaries use the user's stored timezone; League cycles use one global reset boundary; billing and quota reset dates follow Stripe or the server quota policy.
 - Signup must enforce the 16+ age gate before account creation, and AI provider calls must use privacy-approved settings while avoiding unnecessary personal data in prompts.
-- Deploy hardening must move the RAG URL out of `app/api/send-chat/route.ts`, provision the gitignored service-role client in deployment, add missing `NextRequest` import in the Stripe webhook route, pin Python dependencies including LangCache, and choose RAG/vector/cache hosting.
-- Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres, Stripe, a Python/FastAPI RAG microservice, quota plumbing for `sets_remaining` and `chats_remaining`, and Redis LangCache semantic caching as the baseline to preserve.
+- ~~Deploy hardening must move the RAG URL out of `app/api/send-chat/route.ts`, … pin Python dependencies including LangCache…~~ **Superseded 2026-07-11** for Study Buddy; remaining harden items: service-role provisioning, Stripe webhook import, CI.
+- Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres/**pgvector**, Stripe, OpenRouter, and quota plumbing for `sets_remaining` and `chats_remaining`. Python/FastAPI RAG + Redis LangCache are **legacy**.
 - OpenRouter is the default LLM provider gateway. Existing OpenAI-compatible SDK/client surfaces may remain where they enable a drop-in migration, but provider base URLs, API keys, model slugs, and optional OpenRouter attribution headers must be env-driven and server-only.
 - Launch phasing per PRD §7.1: Phase A (pre-launch harden and retain — Sets, Lessons, Buddy, Streaks/Daily Goals, XP/Levels/Badges, Review Sessions, billing/tiers), Phase B (Leagues and Learning Paths, launch or ≤4 weeks post-launch), Phase C (social layer — public profiles, share cards, friends leaderboard).
 
@@ -549,10 +551,12 @@ So that I can navigate and learn without barriers.
 **Then** cached read-only content (e.g. open Set) remains viewable where already loaded
 **And** an accessible offline toast explains actions will retry when connected — no `alert()` (UX-DR14)
 
-**Given** deploy hardening for RAG sidecar
+**Given** deploy hardening for Study Buddy vector path
 **When** CI and deploy docs are updated
-**Then** `langcache` and Python dependencies are pinned in `rag/requirements.txt`
-**And** deployment documents `RAG_SERVICE_URL`, service-role module provisioning, and RAG hosting selection (Architecture AD-10)
+**Then** Supabase migrations including `document_chunks` / pgvector RPCs are documented and applied
+**And** deployment documents OpenRouter model env vars, service-role module provisioning — **not** `RAG_SERVICE_URL` / Python LangCache (Architecture AD-10, amended 2026-07-11)
+
+> _Historical AC (superseded 2026-07-11): pin `langcache` in `rag/requirements.txt` and document `RAG_SERVICE_URL`._
 
 ---
 
@@ -855,20 +859,17 @@ So that explanations stay relevant and trustworthy.
 **Then** Nova refuses with educational framing and stays in tutor character (NFR1, PRD §6 Safety)
 **And** refusal does not consume chat quota if no successful assistant response is produced
 
-**Given** the Python RAG sidecar receives a lesson-grounded chat request
-**When** cache lookup runs first
-**Then** semantic cache keys include lesson/buddy scope (NFR7, Architecture AD-6)
-**And** semantically similar prior questions return cached responses when available
+**Given** `/api/send-chat` receives a lesson- or buddy-grounded chat request
+**When** retrieval runs
+**Then** hybrid Supabase RPCs (`match_document_chunks` + `keyword_document_chunks`) scope by `profile_id` and `study_bot_id` (Architecture AD-6, amended 2026-07-11)
+**And** OpenRouter answers using retrieved context — no Python RAG sidecar call
 
-**Given** RAG service URL configuration
-**When** Next.js calls the sidecar
-**Then** `RAG_SERVICE_URL` env var is used — not hardcoded localhost (Architecture AD-10)
-**And** browser code never calls RAG directly
+**Given** Study Buddy retrieval configuration
+**When** Next.js answers chat
+**Then** embeddings are local 384-d feature-hash vectors — not an external embeddings API
+**And** browser code never calls OpenRouter or writes `document_chunks` directly
 
-**Given** a versioned request/response contract between Next.js and Python
-**When** payloads are sent
-**Then** both sides validate against a shared schema artifact before rollout
-**And** contract violations return `{ success: false, code: 'validation' }` without persisting assistant messages
+> _Historical AC (superseded 2026-07-11): Python RAG sidecar, semantic LangCache, `RAG_SERVICE_URL`, shared Next/Python schema artifact._
 
 **Given** chat messages are persisted
 **When** a successful response returns
@@ -1022,28 +1023,30 @@ So that the migration does not change learning flows.
 
 ---
 
-### Story 2.15: Python RAG Chat Provider Swap
+### Story 2.15: Study Buddy Chat Provider Path _(amended 2026-07-11)_
 
 As a learner,
 I want Nova Study Buddy chat to keep grounded answers after the provider pivot,
-So that tutoring quality and cache behavior are preserved.
+So that tutoring quality is preserved.
 
 **Acceptance Criteria:**
 
-**Given** the Python RAG sidecar answers `/api/chat`
+**Given** `/api/send-chat` answers Study Buddy messages
 **When** OpenRouter is configured
-**Then** chat completion calls route through OpenRouter using OpenAI-compatible client settings
-**And** semantic cache lookup still occurs before model calls (NFR7)
+**Then** chat completion calls route through OpenRouter using `OPENROUTER_MODEL` (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`)
+**And** context comes from Supabase hybrid retrieval in `lib/ingest/` — **not** the Python `rag/` sidecar
 
 **Given** embeddings are needed for retrieval
-**When** OpenRouter does not provide the selected embedding path
-**Then** the implementation records an explicit embedding-provider decision: keep current embeddings temporarily, select an OpenRouter-compatible embedding model, or split chat vs embedding providers behind env vars
-**And** the decision is documented without changing the chat API contract
+**When** vectors are produced
+**Then** the implementation uses local 384-d feature-hash embeddings matching `document_chunks.embedding`
+**And** no OpenRouter/OpenAI embeddings API is required for the live path
 
-**Given** RAG returns an answer
+**Given** chat returns an answer
 **When** Next.js persists chat messages
-**Then** the canonical chat write path remains authenticate -> check quota -> call RAG -> persist user/assistant messages -> decrement quota -> return committed state
+**Then** the canonical chat write path remains authenticate -> check quota -> retrieve + OpenRouter -> persist user/assistant messages -> decrement quota -> return committed state
 **And** provider failure does not save orphan assistant messages or consume chat quota
+
+> _Historical title/AC referenced “Python RAG Chat Provider Swap” / `/api/chat` sidecar — superseded 2026-07-11._
 
 ---
 
@@ -1735,10 +1738,12 @@ So that I trust Learnium with my learning history.
 **Then** personal data cascade includes: profile, sets, lessons, chats, buddies, XP events, badges, review items, league memberships (FR23)
 **And** Stripe subscription is cancelled per policy
 
-**Given** RAG/Chroma data for user buddies
+**Given** `document_chunks` (pgvector) data for user buddies
 **When** deletion runs
-**Then** server triggers RAG cleanup for that user's vectors (Architecture AD-14)
+**Then** cascade/delete removes that user's chunk rows (Architecture AD-14, amended 2026-07-11)
 **And** cleanup status is logged for retry on failure
+
+> _Historical AC referenced RAG/Chroma cleanup via Python sidecar — superseded._
 
 **Given** soft-delete vs immediate hard-delete policy
 **When** implemented

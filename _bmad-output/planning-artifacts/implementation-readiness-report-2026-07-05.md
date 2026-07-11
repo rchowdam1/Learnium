@@ -22,6 +22,8 @@ filesIncluded:
 
 # Implementation Readiness Assessment Report
 
+> **Amendment 2026-07-11:** The FastAPI RAG microservice / `RAG_SERVICE_URL` / Chroma / LangCache requirement below is **superseded**. Study Buddy now uses Next.js `lib/ingest/` + Supabase `document_chunks` (pgvector, local 384-d feature-hash embeddings, hybrid retrieval). See `ARCHITECTURE-SPINE.md` amendment and `project-context.md`.
+
 **Date:** 2026-07-05
 **Project:** Learnium
 
@@ -105,7 +107,7 @@ Total NFRs: 12
 
 - **Stripe Integration:** Requires processing Stripe Webhooks for subscription upgrades/downgrades/cancellations, and redirection to the customer billing portal.
 - **Supabase Auth & Database:** Requires integrating Google OAuth and Email/Password sign-ins, and managing persistent user state (XP transactions, streaks, progress counters, custom quota balances).
-- **FastAPI RAG Microservice:** Requires Next.js API endpoints communicating with `RAG_SERVICE_URL`, sharing/mirroring schema definitions, and utilizing Redis LangCache and Chroma vector store.
+- **FastAPI RAG Microservice:** ~~Requires Next.js API endpoints communicating with `RAG_SERVICE_URL`, sharing/mirroring schema definitions, and utilizing Redis LangCache and Chroma vector store.~~ **Superseded 2026-07-11** by Next.js `lib/ingest/` + Supabase pgvector (`document_chunks`); Python `rag/` is legacy/unused for Study Buddy.
 - **Reporting Loop:** A feedback mechanism on every Lesson allows users to flag low-quality or hallucinated content, feeding a weekly human triage workflow.
 - **No accredited credentials or UGC:** Explicit non-goals for MVP (no PDF certificate generation, no user lesson editors/creators).
 
@@ -117,7 +119,7 @@ The PRD is exceptionally well-structured and detailed, mapping out precise behav
 3. **League Cohorting and Reset Timing (Q3):** Reset timing handling is assumed to be global UTC, but tier counts, promotion/demotion numbers, and cohort filling algorithms are not fully specified.
 4. **Lesson Interior Format (Q4):** Rich blocks vs. simple text with check questions remains unresolved, impacting the generation schema and front-end rendering engine.
 5. **Reminder Channel (Q5):** The choice of email-only vs. web push notification (PWA) affects the communication layer architecture and permissions prompts.
-6. **Hardcoded Configurations:** As highlighted in the Addendum, the Next.js app has hardcoded local RAG endpoints and direct-provider models that need to be migrated to standard, environment-driven configurations (e.g. OpenRouter variables) to prevent deployment failures.
+6. **Hardcoded Configurations:** ~~As highlighted in the Addendum, the Next.js app has hardcoded local RAG endpoints and direct-provider models that need to be migrated…~~ **Superseded 2026-07-11:** Study Buddy no longer calls localhost RAG; OpenRouter free model env vars and Supabase pgvector are the live contract (see `.env.example`).
 
 ## Epic Coverage Validation
 

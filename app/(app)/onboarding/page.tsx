@@ -245,10 +245,10 @@ export default function OnboardingPage() {
                       aria-pressed={isSelected}
                     >
                       <Pill
-                        variant={isSelected ? "xp" : "category"}
+                        variant="category"
                         className={`min-h-11 px-5 border ${
                           isSelected
-                            ? "border-accent shadow-sm"
+                            ? "border-brand bg-surface-raised text-primary"
                             : "border-border hover:bg-surface hover:text-primary transition-colors duration-200"
                         }`}
                       >
@@ -310,7 +310,7 @@ export default function OnboardingPage() {
                     onClick={() => handleTierSelect(tier.id)}
                     className={`focus-ring text-left w-full cursor-pointer rounded-xl p-6 border-2 transition-all duration-200 hover:bg-surface-raised hover:scale-[1.01] ${
                       isSelected
-                        ? "border-brand bg-surface-raised shadow-md"
+                        ? "border-brand bg-surface-raised"
                         : "border-border bg-surface-raised"
                     }`}
                     aria-pressed={isSelected}
@@ -345,7 +345,7 @@ export default function OnboardingPage() {
                 <span>Back</span>
               </Button>
               <Button
-                variant="progress"
+                variant="primary"
                 onClick={handleSubmit}
                 disabled={!dailyGoalTier || isSubmitting}
                 className="w-full flex items-center justify-center gap-2 min-h-11 flex-1"
@@ -380,7 +380,7 @@ export default function OnboardingPage() {
               </h1>
               <div className="max-w-[28rem] rounded-2xl border border-border bg-surface-raised p-6 text-left relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full -mr-8 -mt-8" />
-                <span className="text-xs font-bold text-accent uppercase tracking-wider block mb-2 select-none">
+                <span className="text-xs font-bold text-brand uppercase tracking-wider block mb-2 select-none">
                   Nova
                 </span>
                 <p className="text-body text-base italic text-primary leading-relaxed">
@@ -391,7 +391,7 @@ export default function OnboardingPage() {
 
             <div className="w-full pt-4">
               <Button
-                variant="progress"
+                variant="primary"
                 onClick={handleComplete}
                 className="w-full min-h-11 flex items-center justify-center gap-2"
               >

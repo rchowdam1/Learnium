@@ -83,7 +83,13 @@ export default function SetCard({
         </div>
 
         <Link href={`/sets/${id}`}>
-          <button className="focus-ring flex h-11 cursor-pointer items-center rounded-xl bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
+          <button
+            className={`focus-ring flex h-11 cursor-pointer items-center rounded-xl px-3 text-label ${
+              completedLessons === 0
+                ? "bg-cta text-cta-text hover:bg-cta-hover"
+                : "bg-accent text-on-accent"
+            }`}
+          >
             <Play className="mr-2 h-4 w-4" />
             <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
           </button>

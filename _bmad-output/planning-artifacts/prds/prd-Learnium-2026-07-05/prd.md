@@ -296,7 +296,9 @@ A user can delete their account, removing personal data and chat history within 
 
 **Cost.** Every LLM-touching action is Quota-gated, cache-checked (semantic cache before model calls), or generation-deferred (Paths generate Sets lazily, FR-17). LLM cost per weekly-active user is a tracked counter-metric (SM-C3). Free-tier Quotas are the cost throttle.
 
-**LLM Integration & OpenRouter.** All LLM calls (content generation, Study Buddy chat, quizzes) route through OpenRouter as the default gateway. This integration is entirely environment-driven and depends on the presence of `OPENROUTER_API_KEY` and `OPENROUTER_BASE_URL` variables. No hardcoded direct-provider endpoints are permitted in either the Next.js app or the FastAPI RAG service.
+**LLM Integration & OpenRouter.** All LLM calls (content generation, Study Buddy chat, quizzes) route through OpenRouter as the default gateway. This integration is entirely environment-driven and depends on the presence of `OPENROUTER_API_KEY` and server-only model env vars. No hardcoded direct-provider endpoints are permitted in the Next.js app.
+
+> **Amendment 2026-07-11:** Study Buddy retrieval is implemented in Next.js (`lib/ingest/`) with Supabase pgvector — not the FastAPI RAG service. Embeddings are local 384-d feature-hash vectors. All OpenRouter chat/vision/audio/transcription env vars use `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`.
 
 ## 7. MVP Scope
 

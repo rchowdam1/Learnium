@@ -4,6 +4,8 @@ Reviewer: subagent 3
 Date: 2026-07-05
 Scope: `_bmad-output/planning-artifacts/architecture/architecture-Learnium-2026-07-05/ARCHITECTURE-SPINE.md`
 
+> **Amendment 2026-07-11:** Findings below about Python RAG / `RAG_SERVICE_URL` / Chroma / LangCache / localhost:8000 are **historical**. Live Study Buddy path is Next.js `lib/ingest/` + Supabase pgvector. OpenRouter free model for all chat/vision/audio/transcription env vars: `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. See spine amendment.
+
 ## Verdict
 
 PASS WITH CAVEATS.

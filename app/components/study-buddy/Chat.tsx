@@ -8,10 +8,12 @@ function Bubble({ role }: { role: boolean }) {
   return (
     <div
       className={`inline-flex items-center justify-center px-2 py-2 rounded-full ${
-        role ? "bg-gray-300 text-black" : "bg-black text-white"
+        role
+          ? "bg-brand text-cta-text"
+          : "bg-surface border border-border text-primary"
       }`}
     >
-      {role ? <Bot className="w-5 h-5" /> : <User className="w-5 h-5" />}
+      {role ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
     </div>
   );
 }
@@ -19,18 +21,20 @@ function Bubble({ role }: { role: boolean }) {
 function ChatMessage({
   message,
   loading,
+  isUser,
 }: {
   message: string;
   loading?: boolean;
+  isUser?: boolean;
 }) {
   return (
     <div
-      className="px-3 py-3 mx-3 rounded-md bg-gray-200 max-w-[85%]
-        break-words
-        whitespace-pre-wrap"
+      className={`px-3 py-3 mx-3 rounded-xl max-w-[85%] break-words whitespace-pre-wrap text-body ${
+        isUser ? "bg-brand text-cta-text" : "bg-surface text-primary"
+      }`}
     >
       {loading ? (
-        <span className="text-black animate-pulse">Thinking...</span>
+        <span className="text-muted animate-pulse">Thinking...</span>
       ) : (
         message
       )}
@@ -194,14 +198,14 @@ export default function Chat({ buddyId }: { buddyId: string }) {
   };
 
   return (
-    <div className="w-200 h-135 bg-white rounded-lg shadow-sm">
+    <div className="w-200 h-135 bg-surface-raised border border-border rounded-xl">
       {/**Top Segment */}
-      <div className="flex items-center pl-5 pt-5 w-full border-b border-b-gray-300 pb-5">
+      <div className="flex items-center pl-5 pt-5 w-full border-b border-border pb-5 text-primary">
         <Bot className="w-10 h-10" />
-        <span className="pl-5 text-lg font-bold">
+        <span className="pl-5 text-heading">
           {" "}
           {!title && (
-            <div className="w-10 h-10 border-4 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-border border-t-transparent rounded-full animate-spin"></div>
           )}
           {title}
         </span>
@@ -210,8 +214,8 @@ export default function Chat({ buddyId }: { buddyId: string }) {
       {/**Chat Segment*/}
       <div
         ref={chatWindowRef}
-        className={`h-90 w-full border-b border-b-gray-300 pb-3 overflow-y-auto ${
-          messages === undefined && "bg-gray-400 animate-pulse"
+        className={`h-90 w-full border-b border-border pb-3 overflow-y-auto ${
+          messages === undefined && "bg-surface animate-pulse"
         }`}
       >
         {messages !== undefined && (
@@ -236,7 +240,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
               >
                 {message.is_user_message ? (
                   <>
-                    <ChatMessage message={message.message} />
+                    <ChatMessage message={message.message} isUser />
                     <Bubble role={message.is_user_message} />
                   </>
                 ) : (
@@ -261,7 +265,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           <textarea
             placeholder="Ask a question about your study material..."
             rows={3}
-            className="w-full px-2 py-1 border border-gray-300 rounded-lg"
+            className="w-full px-2 py-1 border border-border-interactive bg-surface-raised rounded-xl text-primary placeholder:text-muted focus-ring"
             onChange={(e) => setCurrentMessage(e.target.value)}
             value={currentMessage}
           />
@@ -272,11 +276,11 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           <button
             type="submit"
             disabled={!currentMessage}
-            className={`px-6 py-3 ${
+            className={`focus-ring px-6 py-3 rounded-xl ${
               !currentMessage
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-black cursor-pointer"
-            } text-white rounded-md`}
+                ? "bg-cta-disabled text-disabled cursor-not-allowed"
+                : "bg-cta text-cta-text cursor-pointer"
+            }`}
           >
             <SendHorizontal className="h-5 w-5" />
           </button>

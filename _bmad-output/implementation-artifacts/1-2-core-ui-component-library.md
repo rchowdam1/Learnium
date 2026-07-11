@@ -234,7 +234,7 @@ Verify in the browser (react-hot-toast's rendered DOM) that success/loading toas
 
 ## Project Structure Notes
 
-- The project is a Next.js App Router app with `app/`, `actions/`, `lib/`, and `rag/`.
+- The project is a Next.js App Router app with `app/`, `actions/`, `lib/` (including `lib/ingest/` for Study Buddy). Legacy `rag/` Python sidecar is unused for create-buddy/chat (amended 2026-07-11).
 - This story adds the first cross-feature, role-based component folder (`app/components/ui/`) alongside the existing `{cards,controllers,lessons,misc,modals,nav,study-buddy}` folders — it holds only generic primitives with no feature-specific data logic (no Supabase calls, no fetches inside these files).
 - There is no shadcn or third-party component-system dependency in this repo (`EXPERIENCE.md` explicitly states "No third-party UI system. Tailwind v4 + custom components") — these primitives are hand-built Tailwind components, not a wrapped external library.
 

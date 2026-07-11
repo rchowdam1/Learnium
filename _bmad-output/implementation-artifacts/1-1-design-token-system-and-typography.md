@@ -303,7 +303,7 @@ const bricolage = Bricolage_Grotesque({
 
 ## Project Structure Notes
 
-- The project is a Next.js App Router app with `app/`, `actions/`, `lib/`, and `rag/`.
+- The project is a Next.js App Router app with `app/`, `actions/`, `lib/` (including `lib/ingest/` for Study Buddy). Legacy `rag/` Python sidecar is unused for create-buddy/chat (amended 2026-07-11).
 - Styling is currently Tailwind utility classes plus `app/globals.css`; there is no shadcn or component-system dependency to align with.
 - This story should centralize design tokens in `app/globals.css` and consume them from existing pages/components rather than introducing a third-party UI library.
 - New shared helper classes in `globals.css` are acceptable when they directly represent the design roles, for example `.text-display`, `.text-heading-1`, `.text-label`, `.text-numeral`, `.focus-ring`, `.btn-primary-token`, but avoid building the full component library here.

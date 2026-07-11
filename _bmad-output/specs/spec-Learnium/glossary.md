@@ -3,7 +3,7 @@
 - **Set:** A generated course on one topic; contains ordered Lessons and is the unit counted by generation quota.
 - **Lesson:** One ordered learning unit within a Set; completable, persisted per user, and XP-awarding.
 - **Learning Path:** An ordered sequence of Sets toward a broader learning goal; Sets are generated lazily as the user reaches them.
-- **Study Buddy / Nova:** AI tutor chat attached to learning context; lesson-opened chats must ground answers in that Lesson.
+- **Study Buddy / Nova:** AI tutor chat attached to learning context; document-backed buddies ingest uploaded files via Next.js `lib/ingest/` into Supabase `document_chunks` (pgvector); chat retrieves hybrid context then answers via OpenRouter. Lesson-opened chats must ground answers in that Lesson.
 - **XP:** Server-awarded points from Lesson, Set, Review, and Daily Goal events; cumulative and monotonic.
 - **Level:** User-visible rank derived from cumulative XP thresholds.
 - **Streak:** Consecutive-day count for days where the user meets the Daily Goal.

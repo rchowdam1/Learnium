@@ -2,20 +2,19 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 
 type OptionData = {
-  id: number;
+  id?: number;
+  optionId?: number;
   option: string;
 };
 
 export async function POST(request: Request) {
   const supabase = await createClient();
 
-  // get the set id from request
   const body: { quizId: number; answers: string[]; options: OptionData[][] } =
     await request.json();
 
   const quizId = body.quizId;
 
-  // mark the quiz and lesson complete
   const { data: quizCheck, error: quizCheckError } = await supabase
     .from("quizzes")
     .select("*")
@@ -29,8 +28,13 @@ export async function POST(request: Request) {
 
   if (quizCheck.completed) {
     return NextResponse.json(
-      { message: "Quiz has already been completed" },
-      { status: 200 }
+      {
+        message: "Quiz has already been completed",
+        success: true,
+        alreadyCompleted: true,
+        quizScore: quizCheck.questions_correct ?? 0,
+      },
+      { status: 200 },
     );
   }
 
@@ -42,88 +46,67 @@ export async function POST(request: Request) {
     .single();
 
   if (quizUpdateError) {
-    console.log("Could not retrieve the quiz");
+    console.log("Could not update the quiz");
     return NextResponse.json({ success: false }, { status: 200 });
   }
 
-  let quizScore: number = 0;
-  // update the options (options.user_answer)
+  const { data: questionData, error: questionError } = await supabase
+    .from("questions")
+    .select("*")
+    .eq("quiz_id", quizId)
+    .order("position", { ascending: true });
+
+  if (questionError || !questionData) {
+    console.log("Could not retrieve questions for scoring");
+    return NextResponse.json({ success: false }, { status: 200 });
+  }
+
+  let quizScore = 0;
 
   for (let index = 0; index < body.answers.length; index++) {
     const answer = body.answers[index];
-    const quesOptions: OptionData[] = body.options[index];
+    const question = questionData[index];
+    if (!question) continue;
 
-    for (const option of quesOptions) {
-      if (option.option === answer) {
-        // this option was selected
-        const { data: optionData, error: optionError } = await supabase
-          .from("options")
-          .update({ user_answer: true })
-          .eq("id", option.id)
-          .select()
-          .single();
+    const isCorrect = question.answer === answer;
+    if (isCorrect) {
+      quizScore += 1;
+    }
 
-        if (optionError) {
-          console.log(optionError);
-        }
+    const { error: answerUpdateError } = await supabase
+      .from("questions")
+      .update({ user_answer: isCorrect })
+      .eq("id", question.id);
 
-        // then calculate the score of the quiz (quizzes.questions_correct)
-        const { data: questionData, error: questionError } = await supabase
-          .from("questions")
-          .select("*")
-          .eq("id", optionData.question_id)
-          .single();
-
-        if (questionError) {
-          console.log("There was an error trying to fetch the question");
-        }
-
-        if (questionData && questionData.answer === answer) {
-          quizScore += 1;
-        }
-      } else {
-        // this option was not selected
-        const { error: optionError } = await supabase
-          .from("options")
-          .update({ user_answer: false })
-          .eq("id", option.id)
-          .select()
-          .single();
-
-        if (optionError) {
-          console.log(optionError);
-        }
-      }
+    if (answerUpdateError) {
+      console.log("Could not update question user_answer", answerUpdateError);
     }
   }
 
   console.log(`The score on this quiz is ${quizScore}`);
 
-  // update quizzes.questions_correct
   const { error: quizScoreUpdateError } = await supabase
     .from("quizzes")
     .update({ questions_correct: quizScore })
     .eq("id", quizId);
-  // works, now send to frontend and display on quiz completion
 
   if (quizScoreUpdateError) {
     console.log("Could not update the score of the quiz");
     return NextResponse.json({ success: false }, { status: 200 });
   }
 
-  // update the lesson
   const { error: lessonUpdateError } = await supabase
     .from("lessons")
     .update({ completed: true })
     .eq("id", quizData.lesson_id);
 
   if (lessonUpdateError) {
-    console.log("Could not retrieve the lesson");
+    console.log("Could not update the lesson");
     return NextResponse.json({ success: false }, { status: 200 });
   }
 
   return NextResponse.json(
-    { success: true, quizScore: quizScore },
-    { status: 200 }
+    { success: true, quizScore },
+    { status: 200 },
   );
 }

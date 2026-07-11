@@ -2,6 +2,7 @@
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Button } from "@/app/components/ui/Button";
 
 export default function SubscriptionCards({
   free,
@@ -26,14 +27,26 @@ export default function SubscriptionCards({
     "Active recall sessions for every lesson",
     "View completed set contents",
   ];
+
+  const isDisabled = (free && !isSubscribed) || (!free && isSubscribed);
+  const buttonLabel = free
+    ? isSubscribed
+      ? "Switch to Free"
+      : "Active"
+    : isSubscribed
+      ? "Active"
+      : "Subscribe";
+
   return (
-    <div className="flex flex-col justify-center gap-y-2 border border-gray-300 rounded-xl w-115 py-10 px-2 items-center bg-white transition-colors transition-transform duration-400 transform hover:scale-101 hover:border-2 hover:border-blue-400">
-      <span className="text-3xl font-semibold">{free ? "Free" : "Pro"}</span>
-      <span className="text-gray-600">
+    <div className="flex flex-col justify-center gap-y-2 border border-border rounded-xl w-115 py-10 px-2 items-center bg-surface-raised">
+      <span className="text-heading text-3xl text-primary">
+        {free ? "Free" : "Pro"}
+      </span>
+      <span className="text-body text-muted">
         {free ? "For Everyday Learning" : "For Next Level Learning"}
       </span>
-      <span className="text-gray-600">
-        <span className="text-4xl font-bold text-black">
+      <span className="text-body text-muted">
+        <span className="text-numeral text-4xl text-primary">
           ${free ? "0" : "9.99"}
         </span>
         /month
@@ -43,16 +56,22 @@ export default function SubscriptionCards({
         {free
           ? freeFeatures.map((feature, index) => {
               return (
-                <span key={index} className="flex gap-4 text-xl text-gray-600">
-                  <Check className="w-9 h-9 text-green-400" />
+                <span
+                  key={index}
+                  className="flex gap-4 text-xl text-body text-muted"
+                >
+                  <Check className="w-9 h-9 text-accent-progress" />
                   {feature}
                 </span>
               );
             })
           : paidFeatures.map((feature, index) => {
               return (
-                <span key={index} className="flex gap-4 text-xl text-gray-600">
-                  <Check className="w-9 h-9 text-green-400" />
+                <span
+                  key={index}
+                  className="flex gap-4 text-xl text-body text-muted"
+                >
+                  <Check className="w-9 h-9 text-accent-progress" />
                   {feature}
                 </span>
               );
@@ -60,16 +79,10 @@ export default function SubscriptionCards({
       </div>
 
       {/**Action button */}
-      <button
-        className={`px-2 w-75 py-2 font-medium transition-colors duration-200 rounded-lg ${
-          free
-            ? isSubscribed
-              ? "bg-gray-200 hover:bg-gray-100 cursor-pointer"
-              : "bg-gray-100 cursor-not-allowed"
-            : isSubscribed
-            ? "bg-blue-400 hover:bg-blue-300 cursor-not-allowed"
-            : "bg-black hover:bg-gray-600 cursor-pointer"
-        } ${free ? "text-gray-600" : "text-white"}`}
+      <Button
+        variant={free && isSubscribed ? "secondary" : "primary"}
+        disabled={isDisabled}
+        className="w-75 mt-2"
         onClick={async () => {
           if ((free && !isSubscribed) || (!free && isSubscribed)) {
             return;
@@ -120,14 +133,8 @@ export default function SubscriptionCards({
           router.push(data.url);
         }}
       >
-        {free
-          ? isSubscribed
-            ? "Switch to Free"
-            : "Active"
-          : isSubscribed
-          ? "Active"
-          : "Subscribe"}
-      </button>
+        {buttonLabel}
+      </Button>
     </div>
   );
 }

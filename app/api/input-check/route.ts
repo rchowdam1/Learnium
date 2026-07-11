@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { zOutputSchema } from "@/app/schema/OutputSchema";
+import { zOutputSchema, type OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
 import { createSet } from "@/actions/dbops";
 import {
@@ -8,6 +8,7 @@ import {
   resetSets,
   updateSetResetDate,
 } from "@/actions/ProfileUpdates";
+import { normalizeSetOutput } from "@/lib/normalize-set-output";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -19,7 +20,100 @@ const openai = new OpenAI({
 });
 
 // Default to a free model; override via env for production
-const MODEL = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.2-3b-instruct:free";
+const MODEL =
+  process.env.OPENROUTER_MODEL ||
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+
+const SYSTEM_PROMPT = `You are a knowledgeable teacher specializing in microlearning sets.
+Generate a set of 3-5 lessons with quizzes based on the user's topic description.
+
+Return ONLY valid JSON (no markdown fences) matching this exact shape:
+
+{
+  "flagged": false,
+  "lessons": [
+    {
+      "title": "Lesson title",
+      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
+    }
+  ],
+  "quizzes": [
+    {
+      "title": "Same as lesson title",
+      "questions": [
+        {
+          "question": "Question text?",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "answer": "Option A"
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Each lesson must have a title and 3-5 non-empty paragraph strings.
+- There must be exactly one quiz per lesson (same length arrays), quiz title matching the lesson.
+- Each quiz has 3-5 questions; each question has exactly 4 options.
+- "answer" is REQUIRED and MUST be the exact string of one of the options (not an index or letter).
+- If the topic is unsafe, illegal, unethical, or nonsensical, set "flagged" to true and use empty lessons/quizzes arrays.`;
+
+const RETRY_PROMPT = `Your previous JSON was invalid. Return corrected JSON only.
+Every question MUST include an "answer" field whose value is exactly one of that question's "options" strings.
+Do not use correct_answer, indexes, or letters like "A". Use the key name "answer".`;
+
+async function generateSetJson(
+  description: string,
+  extraUserMessage?: string,
+): Promise<{ parsed: unknown; usageTokens?: number }> {
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+    { role: "system", content: SYSTEM_PROMPT },
+    {
+      role: "user",
+      content: `The description given is "${description}". Generate the microlearning set as JSON.`,
+    },
+  ];
+
+  if (extraUserMessage) {
+    messages.push({ role: "user", content: extraUserMessage });
+  }
+
+  const completion = await openai.chat.completions.create({
+    model: MODEL,
+    messages,
+    response_format: { type: "json_object" },
+    temperature: 0.7,
+    max_tokens: 4096,
+  });
+
+  const content = completion.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error("Empty response from model");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    console.error("Failed to parse model JSON:", content.slice(0, 200));
+    throw new Error("Failed to parse generated content");
+  }
+
+  return {
+    parsed,
+    usageTokens: completion.usage?.total_tokens,
+  };
+}
+
+function validateSetOutput(raw: unknown): OutputSchema | null {
+  const normalized = normalizeSetOutput(raw);
+  const validation = zOutputSchema.safeParse(normalized);
+  if (!validation.success) {
+    console.error("Schema validation failed:", validation.error.issues);
+    return null;
+  }
+  return validation.data;
+}
 
 export async function POST(request: Request) {
   const data = await request.json();
@@ -118,62 +212,28 @@ export async function POST(request: Request) {
     );
   }
 
-  // System prompt
-  const systemPrompt = `You are a knowledgeable teacher specializing in microlearning sets.
-Generate a set of 3-5 lessons with quizzes based on the user's topic description.
-Each lesson must have a title and 3-5 paragraphs (non-empty strings).
-Each quiz shares its title with the corresponding lesson and contains 3-5 questions.
-Each question has 4 options and one correct answer (the answer string must match exactly one option).
-If the topic is unsafe, illegal, unethical, or nonsensical, set "flagged" to true and leave all arrays empty.
-Return ONLY valid JSON matching this schema — no extra text, no markdown fences.`;
-
   try {
-    const completion = await openai.chat.completions.create({
-      model: MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
+    let { parsed, usageTokens } = await generateSetJson(description);
+    let parsedResponse = validateSetOutput(parsed);
+
+    // One retry with a stricter correction prompt if schema still fails
+    if (!parsedResponse) {
+      console.warn("Retrying set generation after schema validation failure");
+      const retry = await generateSetJson(description, RETRY_PROMPT);
+      parsed = retry.parsed;
+      usageTokens = retry.usageTokens;
+      parsedResponse = validateSetOutput(parsed);
+    }
+
+    if (!parsedResponse) {
+      return NextResponse.json(
         {
-          role: "user",
-          content: `The description given is "${data.description}". Generate the microlearning set as JSON.`,
+          error:
+            "Generated content failed quality validation — please try again",
         },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      max_tokens: 4096,
-    });
-
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content) {
-      console.error("Empty response from model");
-      return NextResponse.json(
-        { error: "Failed to generate content — empty response" },
         { status: 500 },
       );
     }
-
-    // Parse JSON response
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      console.error("Failed to parse model JSON:", content.slice(0, 200));
-      return NextResponse.json(
-        { error: "Failed to parse generated content" },
-        { status: 500 },
-      );
-    }
-
-    // Validate against Zod schema
-    const validation = zOutputSchema.safeParse(parsed);
-    if (!validation.success) {
-      console.error("Schema validation failed:", validation.error.issues);
-      return NextResponse.json(
-        { error: "Generated content failed quality validation" },
-        { status: 500 },
-      );
-    }
-
-    const parsedResponse = validation.data;
 
     if (parsedResponse.flagged) {
       const { error } = await supabase.from("flagged").insert({
@@ -202,13 +262,16 @@ Return ONLY valid JSON matching this schema — no extra text, no markdown fence
 
     if (createResult === false) {
       return NextResponse.json(
-        { success: false, message: "Set creation in the database was unsuccessful" },
+        {
+          success: false,
+          message: "Set creation in the database was unsuccessful",
+        },
         { status: 400 },
       );
     }
 
     console.log(
-      `Set generated with model ${MODEL}: ${completion.usage?.total_tokens} tokens used`,
+      `Set generated with model ${MODEL}: ${usageTokens} tokens used`,
     );
 
     return NextResponse.json({

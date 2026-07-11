@@ -3,11 +3,11 @@ name: Learnium
 type: architecture-spine
 purpose: build-substrate
 altitude: feature
-paradigm: Modular server-first layered monolith with sidecar RAG service
-scope: Learnium public-launch implementation across Next.js app, Supabase data/auth, Stripe billing, and Python RAG service
+paradigm: Modular server-first layered monolith with in-process Study Buddy ingest (Supabase pgvector)
+scope: Learnium public-launch implementation across Next.js app, Supabase data/auth/pgvector, Stripe billing, and OpenRouter
 status: final
 created: 2026-07-05
-updated: 2026-07-05
+updated: 2026-07-11
 binds:
   - PRD FR-1..FR-23
   - EXPERIENCE.md
@@ -23,24 +23,26 @@ companions: []
 
 # Architecture Spine - Learnium
 
+> **Amendment 2026-07-11 — Study Buddy ingest + pgvector pivot.**  
+> Study Buddy create/chat no longer use the Python FastAPI + Chroma + LangCache sidecar (`rag/`). Browser multipart uploads go to Next.js `/api/create-buddy`; `lib/ingest/` extracts multi-type documents, chunks, embeds with **local 384-d feature-hash** vectors, and stores rows in Supabase `document_chunks` (pgvector + FTS, RLS by `profile_id` / `study_bot_id`). Chat via `/api/send-chat` uses hybrid retrieval (`match_document_chunks` + `keyword_document_chunks`) then OpenRouter. `RAG_SERVICE_URL` is unused for the live path. AD-6, AD-10, AD-13, and AD-14 below are amended accordingly; historical Python-sidecar wording is superseded.
+
 ## Design Paradigm
 
-Learnium uses a **modular server-first layered monolith with a sidecar RAG service**.
+Learnium uses a **modular server-first layered monolith** with **in-process Study Buddy document ingest and retrieval** (Supabase pgvector).
 
 ```mermaid
 flowchart LR
   UI[App Router pages and components] --> Actions[Server actions and API routes]
   Actions --> Domain[Server-owned domain mutations]
-  Domain --> Supabase[(Supabase Auth and Postgres)]
+  Domain --> Supabase[(Supabase Auth Postgres pgvector)]
   Actions --> Stripe[Stripe]
-  Actions --> RAG[Python RAG sidecar]
-  RAG --> Cache[(Semantic cache)]
-  RAG --> Vector[(Chroma vector store)]
-  RAG --> OpenRouter[OpenRouter]
+  Actions --> Ingest[lib/ingest extract chunk embed]
+  Ingest --> Supabase
+  Actions --> OpenRouter[OpenRouter chat vision audio]
   Middleware[Next middleware] --> UI
 ```
 
-Dependency direction is inward to server authority. Components display state and request work; API routes and server actions enforce auth, quota, validation, persistence, and provider calls. The Python RAG service owns retrieval, semantic cache checks, and tutor response generation behind a configured service URL.
+Dependency direction is inward to server authority. Components display state and request work; API routes and server actions enforce auth, quota, validation, persistence, and provider calls. Study Buddy retrieval and tutor answers are owned by Next.js server routes plus Supabase vector/FTS RPCs — not a separate Python process.
 
 ## Invariants & Rules
 
@@ -74,11 +76,11 @@ Dependency direction is inward to server authority. Components display state and
 - **Prevents:** Malformed, shallow, wrong-language, unsafe, or untraceable AI output becoming learning state.
 - **Rule:** Generated learning content must pass schema validation, minimum quality checks, safety checks, and input-language checks before being shown or persisted as user progress. Persisted Lessons keep reportable identity and every generated Set carries the AI-generated disclosure.
 
-### AD-6 - RAG Sidecar Contract [ADOPTED]
+### AD-6 - Study Buddy Ingest And Retrieval Contract [ADOPTED] _(amended 2026-07-11)_
 
-- **Binds:** Study Buddy, uploaded Buddy documents, future grounded tutor endpoints.
-- **Prevents:** UI/API routes bypassing retrieval/cache, divergent chat schemas, and ungrounded general assistant behavior.
-- **Rule:** Next.js server code communicates with the Python RAG service only through configured HTTP endpoints using service-to-service authentication (via `RAG_SERVICE_URL` and `RAG_SERVICE_API_KEY` environment variables); browser code never calls RAG directly with arbitrary `buddyId`. RAG does not trust raw object ids without a signed/server-authenticated request. Request/response payloads are governed by a versioned contract artifact shared by Next.js and Python, and RAG endpoints check semantic cache before model calls.
+- **Binds:** Study Buddy, uploaded Buddy documents, grounded tutor chat.
+- **Prevents:** Browser-direct provider/DB vector writes, ungrounded general assistant behavior, and reintroducing the legacy Python sidecar as the live path.
+- **Rule:** Browser uploads documents only via authenticated multipart to `/api/create-buddy`. Server code in `lib/ingest/` extracts, chunks, embeds (local 384-d feature-hash), and writes `document_chunks` scoped by `profile_id` + `study_bot_id`. Chat goes through `/api/send-chat`, which hybrid-retrieves via Supabase RPCs then calls OpenRouter. Browser never calls OpenRouter or writes chunks for arbitrary `buddyId`. The legacy `rag/` Python service and `RAG_SERVICE_URL` are not part of the live contract.
 
 ### AD-7 - Stripe As Billing Source Of Truth [ADOPTED]
 
@@ -98,11 +100,11 @@ Dependency direction is inward to server authority. Components display state and
 - **Prevents:** Daily streak retention depending on live LLM calls, generation quota, or paid chat quota.
 - **Rule:** Review Sessions use persisted question banks and server-owned review schedule state. Completing a Review consumes no generation quota and no Study Buddy chat quota.
 
-### AD-10 - Deployable Service Configuration
+### AD-10 - Deployable Service Configuration _(amended 2026-07-11)_
 
-- **Binds:** Next.js deployment, Python RAG deployment, Supabase service role, Stripe webhooks, OpenRouter keys and model routing.
+- **Binds:** Next.js deployment, Supabase (including pgvector), Stripe webhooks, OpenRouter keys and model routing.
 - **Prevents:** Localhost-only production, secrets in browser bundles, service-role leakage, and environment drift.
-- **Rule:** Provider keys and service URLs live in environment variables scoped to the deployed service. Next.js calls RAG through `RAG_SERVICE_URL` authenticated with `RAG_SERVICE_API_KEY`; LLM calls route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and server-only model-name env vars (e.g. `OPENROUTER_MODEL_GENERATION`, `OPENROUTER_MODEL_CHAT`). Service-role Supabase access is restricted to server-only privileged modules and never used for regular user-facing queries.
+- **Rule:** Provider keys live in environment variables scoped to the deployed service. LLM and multimodal ingest route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`) — all defaulting to the free multimodal slug `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. Study Buddy vectors require Supabase with the `document_chunks` migration applied — no separate RAG host. Service-role Supabase access is restricted to server-only privileged modules and never used for regular user-facing queries. `RAG_SERVICE_URL` is legacy/unused.
 
 ### AD-11 - Scheduled Work Authority
 
@@ -116,17 +118,17 @@ Dependency direction is inward to server authority. Components display state and
 - **Prevents:** Client-supplied ids crossing tenants or mutating another user's learning state.
 - **Rule:** Any route/action that receives an object id proves ownership through a parent `profile_id` or an explicit public/social projection before returning or mutating data. Id-only reads/writes are invalid even when the route is behind middleware.
 
-### AD-13 - Canonical Chat Write Path
+### AD-13 - Canonical Chat Write Path _(amended 2026-07-11)_
 
-- **Binds:** Study Buddy messages, chat quota, semantic cache/RAG calls.
+- **Binds:** Study Buddy messages, chat quota, hybrid retrieval + OpenRouter.
 - **Prevents:** Alternate endpoints bypassing quota, creating orphan messages, or saving assistant messages not produced by the canonical tutor path.
-- **Rule:** One server endpoint owns the chat transaction: authenticate, check chat quota, call RAG, persist user and assistant messages, consume quota, return committed state. Any legacy or helper endpoint may only delegate to that owner or be limited to migration/admin use.
+- **Rule:** One server endpoint (`/api/send-chat`) owns the chat transaction: authenticate, check chat quota, retrieve buddy-scoped chunks, call OpenRouter, persist user and assistant messages, consume quota, return committed state. Any legacy or helper endpoint may only delegate to that owner or be limited to migration/admin use.
 
-### AD-14 - Buddy RAG Ingestion Lifecycle
+### AD-14 - Buddy Document Ingestion Lifecycle _(amended 2026-07-11)_
 
-- **Binds:** Study Buddy creation, uploaded documents, Chroma/vector ingestion, Buddy readiness.
-- **Prevents:** Supabase showing a Buddy as usable while RAG ingestion failed, or RAG accepting poisoned chunks for another user's Buddy.
-- **Rule:** Buddy creation progresses through server-owned lifecycle states: `pending_db -> pending_rag -> ready` or `failed`. Only `ready` Buddies can answer chat. Retries use an idempotency key for the Buddy/document set, failed ingestion records cleanup status, and the server mediates every document upload to RAG.
+- **Binds:** Study Buddy creation, uploaded documents, Supabase `document_chunks` ingestion, Buddy readiness.
+- **Prevents:** UI showing a Buddy as usable while ingest failed/empty, or writing chunks for another user's Buddy.
+- **Rule:** Buddy creation is server-mediated: create `study_bots` row → `ingestBuddyDocuments` → success only when `chunks_count > 0`. Failed or empty ingest must not present the Buddy as chat-ready. Every upload is mediated by `/api/create-buddy`; RLS and RPC filters enforce `profile_id` + `study_bot_id` ownership. (Earlier `pending_db` / `pending_rag` / Chroma wording is superseded by this in-process path.)
 
 ### AD-15 - Generated Content Atomicity
 
@@ -156,10 +158,10 @@ Dependency direction is inward to server authority. Components display state and
 | Expected failures | Do not throw for expected Supabase/provider failures; return the existing envelope and preserve user input/quota. |
 | Protected surfaces | New authenticated top-level routes must be added to `middleware.ts` `protectedPaths`; be precise because matching is prefix-based. |
 | Ownership paths | `lessonId` and `quizId` authorize through Lesson -> Set -> profile; `buddyId` and chat authorize through Study Buddy -> profile; Review items authorize through profile; Path Sets authorize through Path owner or standalone Set owner. |
-| AI schemas | Shared AI/RAG payloads are versioned in a contract artifact checked by both Next.js and Python before rollout. |
+| AI schemas | Generated Set/Lesson payloads stay schema-validated in Next.js (zod). Study Buddy chat uses server-owned retrieve + prompt assembly in `lib/ingest/`. |
 | Accessibility | Real controls, visible focus, `aria-live` feedback, reduced motion, persistent-chrome focus protection, and 44px targets are implementation constraints, not visual polish. |
-| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, RAG URL, model names, and service-role keys stay server-only. |
-| LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure base URL, API key, model slugs, and optional attribution headers through env vars so provider swaps do not alter product/domain code. |
+| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, OpenRouter model names, and service-role keys stay server-only. |
+| LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure API key, model slugs (chat/vision/audio/transcription), and optional attribution headers through env vars so provider swaps do not alter product/domain code. Embeddings for buddy RAG are local (384-d), not OpenRouter. |
 | Service-role boundary | Service-role Supabase access is limited to named server-only privileged modules for account deletion, profile bootstrap/repair, and admin reconciliation; regular user-facing reads/writes cannot import it. |
 | API errors | API failures keep `{ success: false, message, code, retryable }`; `code` distinguishes auth, authorization, validation, quota, provider, readiness, billing, and unknown failures. |
 
@@ -175,7 +177,8 @@ Dependency direction is inward to server authority. Components display state and
 | Stripe Node | 18.4.0 manifest baseline; npm latest checked as 22.3.0 on 2026-07-05 |
 | Tailwind CSS | 4.x manifest baseline; npm latest checked as 4.3.2 on 2026-07-05 |
 | OpenAI-compatible JS client | `openai` 5.3.0 manifest baseline used as compatibility client; npm latest checked as 6.45.0 on 2026-07-05; runtime provider target is OpenRouter |
-| Python RAG | FastAPI, LangChain, Chroma, OpenRouter/OpenAI-compatible clients, Pydantic, Redis LangCache pattern |
+| Study Buddy ingest | `lib/ingest/` (pdf-parse, mammoth, JSZip, OpenRouter vision/transcription) + local 384-d feature-hash embeddings + Supabase pgvector |
+| Python `rag/` | **Legacy / unused** for Study Buddy (FastAPI + Chroma + LangCache) — retained for reference only |
 
 ## Structural Seed
 
@@ -188,7 +191,9 @@ Learnium/
     buddy/[buddyId]/      # Study Buddy surfaces
   actions/                # Server action mutations and DB operation helpers
   lib/                    # Supabase, Stripe, server-only provider clients
-  rag/                    # Python RAG sidecar, vector store, semantic cache integration
+    ingest/               # Study Buddy extract/chunk/embed/retrieve (live path)
+  supabase/migrations/    # Includes document_chunks + hybrid retrieval RPCs
+  rag/                    # DEPRECATED Python sidecar — not used for create-buddy/chat
   _bmad-output/           # Planning artifacts, PRD, UX, architecture
 ```
 
@@ -232,7 +237,7 @@ sequenceDiagram
 | --- | --- | --- |
 | FR-1..FR-3 Set generation and content quality | `app/api/input-check`, generation routes/actions, Supabase Sets/Lessons | AD-3, AD-5, AD-10, AD-15 |
 | FR-4..FR-5 Lessons and progression | `app/sets/[setId]`, lesson components, progress actions | AD-4, AD-5, AD-12, AD-15 |
-| FR-6 Study Buddy | `app/api/send-chat`, `rag/main.py`, `rag/scache.py` | AD-3, AD-6, AD-10, AD-13, AD-14 |
+| FR-6 Study Buddy | `app/api/create-buddy`, `app/api/send-chat`, `lib/ingest/`, `document_chunks` | AD-3, AD-6, AD-10, AD-13, AD-14 |
 | FR-7..FR-9 Daily Goals, Streaks, reminders | profile/settings, scheduled jobs | AD-4, AD-11, AD-16 |
 | FR-10..FR-12 XP, Levels, Badges | server event handlers, Supabase reward tables | AD-4 |
 | FR-13..FR-14 Leagues | league routes/views, scheduled cycle jobs, privacy projections | AD-4, AD-8, AD-11, AD-16 |
@@ -250,7 +255,7 @@ sequenceDiagram
 | League tier count and promotion/demotion counts | Resolved: 5 tiers (Bronze-Diamond), cohorts of 30, top/bottom 5 promote/demote. |
 | Fixed interval vs SM-2 Review algorithm | Deferred: V1 starts with fixed intervals; recurrence state is server-owned so the algorithm can evolve. |
 | Email vs web push reminders | Resolved: email-only for v1. |
-| RAG production host and vector/cache managed services | Deferred: Deploy hardening must select hosting for Python, Chroma persistence, and Redis/LangCache before launch. |
+| RAG production host and vector/cache managed services | **Resolved 2026-07-11:** Study Buddy vectors live in Supabase pgvector (`document_chunks`); no separate Python/Chroma/LangCache host for the live path. |
 | Test framework and CI shape | Deferred: Required for launch hardening, but exact Vitest/Playwright composition belongs to test architecture setup. |
 | Next 16 / React 19.2 upgrade | Deferred: Local stack is valid but upgrade should be assessed separately. |
 | Python dependency pinning and model config | Resolved: Configured via environment variables (`OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and environment-selected model slugs). |

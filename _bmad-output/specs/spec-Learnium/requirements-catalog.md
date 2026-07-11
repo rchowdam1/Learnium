@@ -6,7 +6,7 @@ This catalog preserves the PRD's line-item requirements while `SPEC.md` carries 
 | --- | --- |
 | CAP-1 Topic-to-Set generation | FR-1 Generate a Set from a topic; FR-2 reject invalid/unsafe topics without cost; FR-3 generated Lesson quality floor and report control. |
 | CAP-2 Lesson progression | FR-4 complete Lessons in order with persistent state; FR-5 exact-once Set completion, celebration, Badge check, and next action. |
-| CAP-3 Study Buddy tutoring | FR-6 context-aware Study Buddy chat, quota ordering, out-of-quota continuation, persisted history, semantic cache where available. |
+| CAP-3 Study Buddy tutoring | FR-6 context-aware Study Buddy chat, quota ordering, out-of-quota continuation, persisted history; document ingest via `lib/ingest/` + Supabase pgvector hybrid retrieval (Python RAG/Chroma/LangCache superseded 2026-07-11). |
 | CAP-4 Daily Goal and Streak loop | FR-7 Daily Goal selection/tracking; FR-8 Streak accrual/loss; FR-9 daily reminder at user-chosen time with deep link. |
 | CAP-5 Rewards | FR-10 server-side XP awards; FR-11 threshold-derived Levels; FR-12 one-time Badges with profile display. |
 | CAP-6 Review Sessions | FR-15 per-user review queue from completed Lessons; FR-16 5-10 question Review Session under about 3 minutes, zero quota, XP, schedule update. |

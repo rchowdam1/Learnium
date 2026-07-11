@@ -4,7 +4,9 @@ Personalized microlearning powered by AI.
 
 ## Getting Started
 
-First, copy `.env.example` to `.env` or `.env.local` and set the required variables. Then, run the development server:
+1. Copy `.env.example` to `.env.local` and fill in the required variables (no secrets in `.env.example`).
+2. Start local Supabase (Postgres + Auth + pgvector) if you develop against the local stack — apply migrations under `supabase/migrations/` (includes Study Buddy `document_chunks` + hybrid retrieval RPCs).
+3. Run the Next.js app:
 
 ```bash
 npm run dev
@@ -12,15 +14,35 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Study Buddy document ingest and chat run entirely in Next.js (`lib/ingest/` + Supabase pgvector). The legacy Python service under `rag/` is **not** required for local development or Study Buddy.
+
 ## Environment Variables
-The application uses the following environment variables:
-- `NEXT_PUBLIC_SITE_URL`: The base URL of the site (default: `http://localhost:3000`).
-- `SUPABASE_URL`: The URL of your Supabase database instance.
-- `SUPABASE_API_KEY`: The Supabase public/anonymous API key.
-- `STRIPE_SECRET_KEY`: Stripe API key for payments.
-- `OPENROUTER_API_KEY`: OpenRouter API key for AI course/lesson generation (required).
-- `OPENROUTER_MODEL`: OpenRouter model ID (default: `meta-llama/llama-3.2-3b-instruct:free`).
-- `RAG_SERVICE_URL`: URL of the Python RAG microservice (default: `http://localhost:8000`).
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_URL` | Site base URL (default `http://localhost:3000`) |
+| `SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_API_KEY` | Supabase anon/public key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only service-role key (privileged ops) |
+| `OPENROUTER_API_KEY` | OpenRouter API key (required for AI) |
+| `OPENROUTER_MODEL` | Chat / set generation / buddy answers — `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` |
+| `OPENROUTER_VISION_MODEL` | Image text extraction during ingest — same Nemotron Omni free slug |
+| `OPENROUTER_AUDIO_MODEL` | Audio/video understanding during ingest — same Nemotron Omni free slug |
+| `OPENROUTER_TRANSCRIPTION_MODEL` | Audio/video transcription during ingest — same Nemotron Omni free slug |
+| `STRIPE_SECRET_KEY` | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `STRIPE_PRICE_ID` | Plus plan price id |
+
+Embeddings for Study Buddy retrieval are **local** feature-hash vectors (384-d) in `lib/ingest/embed.ts` — not an OpenRouter/OpenAI embeddings API.
+
+Legacy (unused for Study Buddy): `RAG_SERVICE_URL` / `NEXT_PUBLIC_RAG_SERVICE_URL` pointed at the old Python FastAPI + Chroma sidecar. Leave them unset.
+
+## Study Buddy ingest (current)
+
+- Browser uploads files (multipart) to `/api/create-buddy` — PDF, Office, text/code, images, audio/video (max 8 files).
+- Server extracts text via `lib/ingest/`, chunks, embeds locally (384-d), stores rows in Supabase `document_chunks` (pgvector + FTS), RLS by `profile_id` + `study_bot_id`.
+- Chat via `/api/send-chat`: hybrid retrieval (`match_document_chunks` + `keyword_document_chunks`) then OpenRouter chat.
+- Buddy is usable when ingest returns `chunks_count > 0`.
 
 ## Testing
 

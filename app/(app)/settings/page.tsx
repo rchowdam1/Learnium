@@ -327,7 +327,7 @@ export default function SettingsPage() {
                     disabled
                     className="sr-only peer cursor-not-allowed"
                   />
-                  <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand" />
+                  <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-border after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-raised after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand" />
                 </label>
                 <span className="text-xs font-semibold text-muted bg-surface border border-border px-2 py-0.5 rounded-full whitespace-nowrap">
                   Coming soon
@@ -378,7 +378,7 @@ export default function SettingsPage() {
                     defaultChecked
                     className="sr-only peer cursor-not-allowed"
                   />
-                  <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand" />
+                  <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-border after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-raised after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand" />
                 </label>
                 <span className="text-xs font-semibold text-muted bg-surface border border-border px-2 py-0.5 rounded-full whitespace-nowrap">
                   Coming in a future update

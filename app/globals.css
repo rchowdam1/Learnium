@@ -56,6 +56,8 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
   --color-info: var(--info);
+  --color-overlay: var(--overlay);
+  --color-selection: var(--selection);
   --font-display: var(--font-bricolage);
   --font-heading: var(--font-space-grotesk);
   --font-body: var(--font-inter);
@@ -99,6 +101,12 @@
     letter-spacing: -0.02em;
   }
 
+  .text-display-sm {
+    font-family: var(--font-bricolage);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
   .text-heading {
     font-family: var(--font-space-grotesk);
     font-weight: 700;
@@ -112,6 +120,12 @@
   .text-body {
     font-family: var(--font-inter);
     line-height: 1.6;
+  }
+
+  .text-caption {
+    font-family: var(--font-inter);
+    font-size: 0.8125rem;
+    line-height: 1.4;
   }
 
   .text-numeral {

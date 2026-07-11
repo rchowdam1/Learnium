@@ -1,11 +1,12 @@
 "use client";
+
 import toast from "react-hot-toast";
 import LessonBubble from "./LessonBubble";
 
 type LessonChainProps = {
-  lessons: number; // the number of lessons in the chain
-  active: number; // the index of the active lesson starting from 0
-  completed: number; // the number of completed lessons starting from the first lesson
+  lessons: number;
+  active: number;
+  completed: number;
   onLessonClick: (index: number) => void;
 };
 
@@ -16,7 +17,10 @@ export default function LessonChain({
   onLessonClick,
 }: LessonChainProps) {
   return (
-    <div className="flex flex-col items-center gap-24">
+    <nav
+      aria-label="Lesson path"
+      className="flex flex-row items-center justify-center lg:flex-col"
+    >
       {Array(lessons)
         .fill(0)
         .map((_, index) => {
@@ -37,6 +41,6 @@ export default function LessonChain({
             />
           );
         })}
-    </div>
+    </nav>
   );
 }

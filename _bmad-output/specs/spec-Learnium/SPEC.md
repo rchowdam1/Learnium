@@ -30,7 +30,7 @@ Learnium captures the market gap between AI chat tutors and fixed-catalog gamifi
   - **success:** Lesson completion persists across sessions/devices, re-completion awards no duplicate XP, progress is always visible as n-of-m, and Set completion fires exactly once per user per Set.
 - **CAP-3**
   - **intent:** Users can ask Nova, the Study Buddy, for private lesson-grounded tutoring help.
-  - **success:** Lesson-opened chat answers are grounded in that Lesson, chat history persists, quota is checked before model work and decremented only after a successful response, semantic cache is used where available, and out-of-quota users can continue the Lesson without Nova.
+  - **success:** Lesson-opened chat answers are grounded in that Lesson (or buddy document chunks via Supabase pgvector hybrid retrieval), chat history persists, quota is checked before model work and decremented only after a successful response, and out-of-quota users can continue the Lesson without Nova. Document-backed buddies are ready when ingest stores `chunks_count > 0`.
 - **CAP-4**
   - **intent:** Users can select a Daily Goal, receive reminders, and maintain a Streak through quick daily learning.
   - **success:** Daily XP progress is visible, day boundaries use the user's local timezone, meeting the goal updates the Streak in-session once per day, earned streak freezes protect missed days, misses without a freeze hard-reset with soft restart copy, and email plus web push/PWA reminders deep-link to the fastest goal-meeting action.

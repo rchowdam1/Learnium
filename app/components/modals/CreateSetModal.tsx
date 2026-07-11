@@ -197,13 +197,18 @@ export default function CreateSetModal({
         }),
       });
 
+      const data = (await response
+        .json()
+        .catch(() => ({}))) as CreateSetResponse;
+
       if (!response.ok) {
-        toast.error("Could not validate this set input.");
+        toast.error(
+          data.error ||
+            "Could not generate this set. Please try again in a moment.",
+        );
         setIsLoading(false);
         return;
       }
-
-      const data: CreateSetResponse = await response.json();
 
       if (data.error) {
         if (data.error === "Could not process your request")

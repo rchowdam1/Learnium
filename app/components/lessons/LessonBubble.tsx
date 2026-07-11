@@ -1,3 +1,7 @@
+"use client";
+
+import { Check, Lock, Play } from "lucide-react";
+
 export default function LessonBubble({
   number,
   active,
@@ -8,40 +12,64 @@ export default function LessonBubble({
   number: number;
   active: boolean;
   complete: boolean;
-  last: boolean; // last determines if there should be a vertical line extending from the bubble
-  clickedLesson: () => void; // function to handle click events on the bubble
+  last: boolean;
+  clickedLesson: () => void;
 }) {
+  const nodeFill = active
+    ? "bg-brand"
+    : complete
+      ? "bg-accent"
+      : "bg-surface border border-border";
+
+  const nodeText = active
+    ? "text-cta-text"
+    : complete
+      ? "text-on-accent"
+      : "text-disabled";
+
+  const connectorFill = complete
+    ? "bg-accent-progress"
+    : "bg-accent-progress-track";
+
   return (
-    <button
-      type="button"
-      className={`focus-ring relative h-2 w-40 ${
-        active ? "bg-blue-500" : complete ? "bg-green-500" : "bg-gray-200"
-      } shadow-lg cursor-pointer transition-colors duration-300 border-0 p-0 block`}
-      onClick={clickedLesson}
-      aria-label={`Lesson ${number}`}
-    >
-      {/*Vertical Line*/}
+    <div className="flex flex-row items-center lg:flex-col">
+      <button
+        type="button"
+        className={`focus-ring flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 hover:scale-105 ${nodeFill} ${
+          active
+            ? "ring-2 ring-accent-glow ring-offset-2 ring-offset-background"
+            : ""
+        }`}
+        onClick={clickedLesson}
+        aria-label={
+          complete
+            ? `Lesson ${number}, completed`
+            : active
+              ? `Lesson ${number}, current`
+              : `Lesson ${number}, locked`
+        }
+        aria-current={active ? "step" : undefined}
+      >
+        {complete ? (
+          <Check className={`h-6 w-6 ${nodeText}`} aria-hidden="true" />
+        ) : active ? (
+          <span className={`flex flex-col items-center leading-none ${nodeText}`}>
+            <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+            <span className="text-numeral text-xs">{number}</span>
+          </span>
+        ) : (
+          <span className={`flex flex-col items-center leading-none ${nodeText}`}>
+            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="text-numeral text-xs">{number}</span>
+          </span>
+        )}
+      </button>
       {!last && (
         <span
-          className={`absolute w-2 h-19 ${
-            complete ? "bg-green-500" : "bg-gray-200"
-          } left-9 shadow-lg`}
-        ></span>
+          className={`rounded-full ${connectorFill} h-1 w-6 lg:h-8 lg:w-1`}
+          aria-hidden="true"
+        />
       )}
-      {/* Circle centered on the line */}
-      <span
-        className={`absolute left-0 top-1/2 -translate-y-1/2 ${
-          active ? "bg-blue-500" : complete ? "bg-green-500" : "bg-gray-200"
-        } w-20 h-20 rounded-full flex items-center justify-center shadow-lg`}
-      >
-        <span
-          className={`text-4xl font-bold ${
-            active || complete ? "text-white" : "text-black"
-          }`}
-        >
-          {number}
-        </span>
-      </span>
-    </button>
+    </div>
   );
 }
