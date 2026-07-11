@@ -19,10 +19,11 @@ export default function CreateSetController({
   return (
     <div>
       <button
-        className="focus-ring flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-cta p-3 text-label text-cta-text hover:bg-cta-hover"
+        type="button"
+        className="focus-ring flex min-h-11 cursor-pointer items-center justify-center rounded-xl bg-cta px-4 py-2.5 text-label text-cta-text transition-colors hover:bg-cta-hover"
         onClick={() => setCreateModalOpen(true)}
       >
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="mr-2 h-4 w-4" />
         Create New Set
       </button>
 

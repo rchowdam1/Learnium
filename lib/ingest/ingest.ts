@@ -22,6 +22,12 @@ export type IngestBuddyResult = {
 
 const MAX_FILE_BYTES = 40 * 1024 * 1024; // 40 MB
 const MAX_FILES = 8;
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain", "text/markdown", "text/csv", "image/png", "image/jpeg",
+]);
 
 /**
  * Extract, chunk, embed, and store uploaded files under a study buddy + user.
@@ -33,7 +39,10 @@ export async function ingestBuddyDocuments(options: {
   files: File[];
 }): Promise<IngestBuddyResult> {
   const { supabase, profileId, studyBotId, files } = options;
-  const limited = files.slice(0, MAX_FILES);
+  if (files.length === 0 || files.length > MAX_FILES) {
+    return { success: false, chunksCount: 0, files: [], errors: [`Upload between 1 and ${MAX_FILES} files.`] };
+  }
+  const limited = files;
   const results: IngestFileResult[] = [];
   const errors: string[] = [];
   let chunksCount = 0;
@@ -49,6 +58,12 @@ export async function ingestBuddyDocuments(options: {
 
     if (file.size > MAX_FILE_BYTES) {
       fileResult.error = `File too large (max ${MAX_FILE_BYTES / (1024 * 1024)}MB)`;
+      errors.push(`${file.name}: ${fileResult.error}`);
+      results.push(fileResult);
+      continue;
+    }
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      fileResult.error = "Unsupported file type";
       errors.push(`${file.name}: ${fileResult.error}`);
       results.push(fileResult);
       continue;
@@ -74,7 +89,16 @@ export async function ingestBuddyDocuments(options: {
 
     fileResult.documentId = docRow.id;
 
-    const extracted = await extractFromFile(file);
+    let extracted;
+    try {
+      extracted = await extractFromFile(file);
+    } catch (error) {
+      fileResult.error = error instanceof Error ? error.message : "Extraction failed";
+      errors.push(`${file.name}: ${fileResult.error}`);
+      await supabase.from("study_bot_documents").delete().eq("id", docRow.id);
+      results.push(fileResult);
+      continue;
+    }
     fileResult.sourceType = extracted.sourceType;
     fileResult.warnings.push(...extracted.warnings);
 
@@ -84,6 +108,7 @@ export async function ingestBuddyDocuments(options: {
         extracted.warnings[0] || "No extractable content from file";
       errors.push(`${file.name}: ${fileResult.error}`);
       results.push(fileResult);
+      await supabase.from("study_bot_documents").delete().eq("id", docRow.id);
       continue;
     }
 

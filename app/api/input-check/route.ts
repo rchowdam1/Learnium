@@ -4,6 +4,7 @@ import { zOutputSchema, type OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
 import { updateSetResetDate } from "@/actions/ProfileUpdates";
 import { normalizeSetOutput } from "@/lib/normalize-set-output";
+import { freeOpenRouterModel } from "@/lib/openrouter";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -14,9 +15,7 @@ const openai = new OpenAI({
   },
 });
 
-const MODEL =
-  process.env.OPENROUTER_MODEL ||
-  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+const MODEL = freeOpenRouterModel("OPENROUTER_MODEL");
 
 const SYSTEM_PROMPT = `You are a knowledgeable teacher specializing in microlearning sets.
 Generate a set of 4-12 lessons with quizzes based on the user's topic description.
@@ -336,11 +335,14 @@ export async function POST(request: Request) {
   };
 
   const { data: setId, error: graphError } = await supabase.rpc(
-    "create_set_graph",
+    "create_set_graph_with_quota",
     { graph_data: graphData },
   );
 
   if (graphError || !setId) {
+    if (graphError?.message.includes("QUOTA_EXHAUSTED")) {
+      return NextResponse.json({ success: false, message: "No set generation quota remaining for today", code: "QUOTA_EXHAUSTED", retryable: true }, { status: 429 });
+    }
     console.error("create_set_graph failed:", graphError?.message);
     return NextResponse.json(
       {
@@ -353,25 +355,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // ─── Step 9: Consume quota atomically ─────────────────────────────
-  const { data: quotaConsumed, error: quotaError } = await supabase.rpc(
-    "consume_set_quota",
-  );
-
-  if (quotaError) {
-    console.error("consume_set_quota error:", quotaError.message);
-    // Set was persisted but quota wasn't consumed — log and continue.
-    // The user got a free set this time; better than losing their quota.
-    console.warn(
-      `Set ${setId} persisted but quota not consumed for user ${user.id}`,
-    );
-  } else if (!quotaConsumed) {
-    console.warn(
-      `Set ${setId} persisted but quota was already exhausted for user ${user.id}`,
-    );
-  }
-
-  // ─── Step 10: Return success ───────────────────────────────────────
+  // Quota decrement and graph persistence are one database transaction.
   console.log(
     `Set ${setId} generated with model ${MODEL}: ${usageTokens ?? "?"} tokens used`,
   );

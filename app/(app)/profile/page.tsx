@@ -1,20 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import Progress from "@/app/components/misc/Progress";
 
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
-  Settings,
-  Undo2,
-  Trophy,
-  ChartLine,
-  Star,
-  CheckCircle,
-  Lock,
-  Eye,
+  ArrowLeft,
+  BookCheck,
+  ChartNoAxesCombined,
+  CheckCircle2,
+  ChevronDown,
   Crown,
+  Eye,
+  Lock,
+  Settings,
+  Sparkles,
+  Star,
+  Target,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import Progress from "@/app/components/misc/Progress";
 
 type SetData = {
   id: number;
@@ -25,380 +28,316 @@ type SetData = {
   completed_at?: string;
 };
 
-/**
- * icon values:
- * 1 - Trophy (completed lessons)
- * 2 - Rising Graph (overall progress)
- * 3 - Star (average quiz score)
- */
+function safeNumber(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
-const SetCard = ({
+function CompletedSetCard({
+  id,
   title,
   description,
   date,
   isSubscribed,
 }: {
+  id: number;
   title: string;
   description: string;
   date: string;
   isSubscribed: boolean;
-}) => {
+}) {
   return (
-    <div className="flex min-h-40 w-full flex-col rounded-xl border border-border bg-surface-raised px-4 py-3 text-primary">
-      {/** Title and Completed Badge */}
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-heading text-lg">{title}</span>
-        <span className="inline-flex items-center justify-center gap-1 rounded-full bg-accent px-2 py-1 text-caption text-on-accent">
-          <CheckCircle className="h-3 w-3" /> Complete
+    <article className="flex min-h-44 flex-col rounded-xl border border-border bg-surface-raised p-5 text-left text-primary">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="min-w-0 text-heading text-lg break-words">{title}</h3>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-caption font-medium text-on-accent">
+          <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+          Complete
         </span>
       </div>
-
-      {/** Description and Date */}
-      <div className="mt-2 text-left text-body text-sm text-muted">
-        <span className="line-clamp-1">{description}</span> <br />
-        <span className="mt-1 text-caption">Completed on {date}</span>
-      </div>
-
-      <hr className="mt-3 border-border" />
-
-      {/**View Set Contents */}
-      <div className="mt-3 flex items-center">
-        <button
-          disabled={!isSubscribed}
-          className={`focus-ring flex cursor-pointer items-center gap-2 rounded-full border border-border-interactive px-2 py-1 transition-colors duration-200 disabled:cursor-not-allowed disabled:border-border disabled:text-disabled ${
-            isSubscribed ? "hover:bg-surface" : ""
-          }`}
+      <p className="mt-3 line-clamp-2 text-body text-sm text-muted">{description}</p>
+      <p className="mt-2 text-caption text-muted">Completed {date}</p>
+      <div className="mt-auto border-t border-border pt-4">
+        <Link
+          href={isSubscribed ? `/sets/${id}` : "/subscriptions"}
+          className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-interactive px-3 text-label text-sm text-primary transition-colors hover:bg-surface"
         >
           {isSubscribed ? (
-            <Eye className="h-5 w-5 text-muted" />
+            <Eye className="h-4 w-4" aria-hidden="true" />
           ) : (
-            <Lock className="h-5 w-5 text-disabled" />
+            <Lock className="h-4 w-4" aria-hidden="true" />
           )}
-          <span className="text-label text-muted">View Set</span>
-        </button>
-        <div className="ml-2 flex items-center gap-1">
-          {!isSubscribed && (
-            <>
-              <Crown className="h-5 w-5 text-brand" />
-              <span className="text-caption text-muted">Pro Only</span>
-            </>
-          )}
+          View set
+          {!isSubscribed && <span className="text-caption">· Pro</span>}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof BookCheck;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-raised p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <span className="text-label text-sm text-muted">{label}</span>
+          <div className="mt-3 text-numeral text-3xl leading-none text-primary">{value}</div>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-brand">
+          <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
       </div>
     </div>
   );
-};
-
-const StatCard = ({
-  icon,
-  title,
-  data,
-}: {
-  icon: number;
-  title: string;
-  data: string;
-}) => {
-  return (
-    <div className="relative h-27 w-full rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary">
-      {icon === 1 ? (
-        <Trophy className="absolute top-4 right-4 h-5 w-5 text-muted" />
-      ) : icon === 2 ? (
-        <ChartLine className="absolute top-4 right-4 h-5 w-5 text-muted" />
-      ) : (
-        <Star className="absolute top-4 right-4 h-5 w-5 text-muted" />
-      )}
-      <span className="absolute top-4 left-3 text-label text-lg">{title}</span>
-      <span className="absolute bottom-5 left-3 text-numeral text-xl">{data}</span>
-    </div>
-  );
-};
+}
 
 export default function ProfilePage() {
-  // state for skeleton loading
-  const [loading, setLoading] = useState<boolean>(true);
-  // state for profile data
-  const [username, setUsername] = useState<string>();
-  const [email, setEmail] = useState<string>();
-  const [requestsRemaining, setRequestsRemaining] = useState<number>();
-  const [setsCreated, setSetsCreated] = useState<number>();
-  const [setsCompleted, setSetsCompleted] = useState<number>();
-  const [topCategories, setTopCategories] = useState<string[]>();
-  const [isSubscribed, setIsSubscribed] = useState<boolean>();
-  const [completedLessons, setCompletedLessons] = useState<number>();
-  const [overallProgress, setOverallProgress] = useState<number>();
-  const [averageQuizScore, setAverageQuizScore] = useState<number>();
-  const [setData, setSetData] = useState<SetData[]>();
-
-  // state to display completed sets
-  const [displayCompletedSets, setDisplayCompletedSets] =
-    useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [requestsRemaining, setRequestsRemaining] = useState(0);
+  const [setsCreated, setSetsCreated] = useState(0);
+  const [topCategories, setTopCategories] = useState<string[]>([]);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [completedLessons, setCompletedLessons] = useState(0);
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [averageQuizScore, setAverageQuizScore] = useState(0);
+  const [setData, setSetData] = useState<SetData[]>([]);
+  const [displayCompletedSets, setDisplayCompletedSets] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const response = await fetch("/api/get-profile-data");
+        const data = await response.json();
 
-        if (response.ok) {
-          const data = await response.json();
-
-          if (data.success) {
-            toast.success("Requests remaining: ", data.requestsRemaining);
-            setLoading(false);
-            setUsername(data.username);
-            setEmail(data.email);
-            setRequestsRemaining(data.requestsRemaining);
-            setSetsCreated(data.setsCreated);
-            setSetsCompleted(data.setsCompleted);
-            setTopCategories(data.topCategories);
-            setIsSubscribed(data.isSubscribed);
-            setCompletedLessons(data.completedLessons);
-            setOverallProgress(data.overallProgress);
-            setAverageQuizScore(data.averageQuizScore);
-            setSetData(data.setData || []);
-            console.log(data.setData);
-          } else {
-            setLoading(false);
-            toast.error("Could not fetch profile data");
-          }
+        if (!response.ok || !data.success) {
+          setLoadError(true);
+          toast.error("Could not fetch profile data");
+          return;
         }
+
+        setUsername(data.username ?? "Learner");
+        setEmail(data.email ?? "");
+        setRequestsRemaining(Math.max(0, safeNumber(data.requestsRemaining)));
+        setSetsCreated(Math.max(0, safeNumber(data.setsCreated)));
+        const normalizedCategories = Array.isArray(data.topCategories)
+          ? data.topCategories
+              .filter((category: unknown): category is string => typeof category === "string")
+              .map((category: string) => category.trim())
+              .filter(Boolean)
+          : [];
+        const uniqueCategories = new Map<string, string>();
+        normalizedCategories.forEach((category: string) => {
+          uniqueCategories.set(category.toLocaleLowerCase(), category);
+        });
+        setTopCategories(Array.from(uniqueCategories.values()).slice(0, 3));
+        setIsSubscribed(data.isSubscribed === true);
+        setCompletedLessons(Math.max(0, safeNumber(data.completedLessons)));
+        setOverallProgress(Math.min(100, Math.max(0, safeNumber(data.overallProgress))));
+        setAverageQuizScore(Math.min(100, Math.max(0, safeNumber(data.averageQuizScore))));
+        setSetData(
+          Array.isArray(data.setData)
+            ? data.setData.filter((set: unknown): set is SetData => {
+                if (!set || typeof set !== "object") return false;
+                const candidate = set as Partial<SetData>;
+                return typeof candidate.id === "number"
+                  && typeof candidate.title === "string"
+                  && typeof candidate.description === "string"
+                  && typeof candidate.category === "string"
+                  && typeof candidate.completed === "boolean";
+              })
+            : [],
+        );
       } catch {
+        setLoadError(true);
+        toast.error("Could not fetch profile data");
+      } finally {
         setLoading(false);
-        toast.error("Couln't fetch profile data");
       }
     };
 
-    fetchProfileData();
+    void fetchProfileData();
   }, []);
 
-  function formatDate(dateString: string | undefined): string {
-    if (dateString === undefined) {
-      return "";
-    }
-    const [year, month, day] = dateString.split("-");
-    return `${parseInt(month, 10)}/${parseInt(day, 10)}/${year}`;
+  const completedSets = useMemo(
+    () => setData.filter((set) => set.completed),
+    [setData],
+  );
+  const completionPercentage = setsCreated > 0
+    ? Math.min(100, Math.max(0, (completedSets.length / setsCreated) * 100))
+    : 0;
+
+  function formatDate(dateString?: string): string {
+    if (!dateString) return "N/A";
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+    const date = dateOnlyMatch
+      ? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
+      : new Date(dateString);
+    return Number.isNaN(date.getTime())
+      ? "N/A"
+      : date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-[72rem] px-4 py-8 sm:px-6 md:py-10 lg:px-8" role="status" aria-live="polite" aria-busy="true" aria-label="Loading profile">
+        <div className="h-8 w-56 animate-pulse rounded-xl bg-surface" />
+        <div className="mt-8 h-40 animate-pulse rounded-2xl border border-border bg-surface" />
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="h-28 animate-pulse rounded-xl border border-border bg-surface" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="mx-auto grid min-h-[65vh] max-w-[42rem] place-items-center px-4 py-12 text-center">
+        <div>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface text-brand"><Sparkles className="h-7 w-7" aria-hidden="true" /></div>
+          <h1 className="mt-5 text-display-sm text-3xl text-primary">We couldn’t load your profile.</h1>
+          <p className="mt-3 text-body text-muted">Your learning data is safe. Try the request again in a moment.</p>
+          <button type="button" className="focus-ring mt-6 min-h-11 rounded-xl bg-cta px-5 text-label text-cta-text hover:bg-cta-hover" onClick={() => window.location.reload()}>Try again</button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="relative mx-auto max-w-7xl pt-8 text-center">
-        <span className="text-display text-5xl text-primary">My Profile</span>
-
-        {/*Back Home Page*/}
-        <Link href="/dashboard">
-          <div className="absolute top-26 left-10 flex cursor-pointer items-center justify-center gap-2 rounded-xl px-2 py-1 text-body text-primary transition-colors duration-350 hover:bg-surface">
-            <Undo2 className="h-5 w-5 text-muted" />
-            <span>Return to home</span>
-          </div>
+    <div className="min-h-screen bg-background pb-28 md:pb-12">
+      <div className="mx-auto max-w-[72rem] px-4 py-8 sm:px-6 md:py-10 lg:px-8">
+        <Link href="/dashboard" className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl text-label text-sm text-muted transition-colors hover:text-primary">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Dashboard
         </Link>
 
-        {/* profile content (will include a card for each component) */}
-        {loading && (
-          <div className="mx-auto mt-6 grid max-w-5xl grid-cols-1 gap-10 p-6 md:grid-cols-2">
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
-            <div className="h-90 w-90 animate-pulse rounded-xl bg-surface" />
+        <header className="mt-4 overflow-hidden rounded-2xl border border-border bg-surface p-6 sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-5">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-raised text-display-sm text-2xl uppercase text-brand">
+                {username.charAt(0) || "L"}
+              </div>
+              <div className="min-w-0">
+                <span className="text-label text-xs font-semibold uppercase tracking-[0.16em] text-brand">Learning profile</span>
+                <h1 className="mt-1 truncate text-display-sm text-3xl text-primary sm:text-4xl">{username}</h1>
+                <p className="mt-1 truncate text-body text-sm text-muted">{email}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-label text-sm ${isSubscribed ? "border-accent-progress bg-accent-progress-track text-primary" : "border-border bg-surface-raised text-muted"}`}>
+                {isSubscribed && <Crown className="h-4 w-4 text-brand" aria-hidden="true" />}
+                {isSubscribed ? "Pro member" : "Free plan"}
+              </span>
+              <Link href="/subscriptions" className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-xl border border-border-interactive bg-surface-raised px-4 text-label text-sm text-primary transition-colors hover:bg-surface">
+                <Settings className="h-4 w-4" aria-hidden="true" />
+                Manage plan
+              </Link>
+            </div>
           </div>
-        )}
-        {!loading && (
-          <div className="mx-auto mt-6 grid max-w-5xl grid-cols-1 gap-10 p-6 md:grid-cols-2">
-            {/**Profile Card */}
-            <div className="h-full w-full rounded-xl border border-border bg-surface-raised pb-3 text-primary">
-              <div className="flex justify-around pt-10">
-                {/*<CircleUser className="w-20 h-20 relative bottom-3" />*/}
-                {/*User Circle*/}
-                <div className="relative bottom-3 flex h-20 w-20 items-center justify-center rounded-full bg-surface text-display-sm text-2xl text-primary">
-                  {username?.charAt(0)}
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-heading text-xl">
-                    {username}
-                    <button className="focus-ring ml-2 rounded-xl border border-border-interactive bg-surface px-2 py-1 text-caption font-normal text-primary transition-colors duration-200 hover:bg-surface-raised">
-                      Change Username
-                    </button>
-                  </span>
-                  <span className="text-body text-md text-muted">{email}</span>
-                  {/**User's Current Plan*/}
-                  <div className="mt-2 flex items-center">
-                    <span
-                      className={`rounded-l-full py-2 pr-2 pl-4 text-label ${
-                        isSubscribed
-                          ? "bg-surface text-muted"
-                          : "bg-brand text-cta-text"
-                      }`}
-                    >
-                      Free
-                    </span>
-                    <span
-                      className={`rounded-r-full py-2 pr-4 pl-3 text-label ${
-                        isSubscribed
-                          ? "bg-brand text-cta-text"
-                          : "bg-surface text-muted"
-                      }`}
-                    >
-                      Pro
-                    </span>
-                    <div className="relative group">
-                      {/**Tooltip: "Change Plan"*/}
-                      <Link href="/subscriptions">
-                        <Settings className="ml-2 h-6 w-6 cursor-pointer text-muted transition-colors duration-200 hover:text-primary" />
-                      </Link>
-                      {/* Tooltip */}
-                      <div className="pointer-events-none absolute top-full left-1/2 z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-xl border border-border bg-surface-raised px-2 py-1 text-caption text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        Change Plan
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/**Requests Remaining*/}
-              <div className="mt-6 flex flex-col items-center">
-                <span className="text-body text-primary">
-                  Requests Remaining:{" "}
-                  <span className="text-numeral">{requestsRemaining}</span>
-                </span>
-                <Progress
-                  width={400}
-                  percentage={requestsRemaining ? 100 : 0}
-                />
-              </div>
+        </header>
 
-              {/**Sets Created and Completed */}
-              <div className="mt-6 flex flex-col items-center">
-                <span className="text-body text-primary">
-                  Sets Completed:{" "}
-                  <span className="text-numeral">
-                    {setsCompleted}/{setsCreated}
-                  </span>
-                </span>
-                {setsCompleted !== undefined && setsCreated !== undefined && (
-                  <Progress
-                    width={400}
-                    percentage={
-                      setsCompleted > 0
-                        ? (setsCompleted / setsCreated) * 100
-                        : 0
-                    }
-                  />
+        <section aria-label="Learning statistics" className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <MetricCard icon={BookCheck} label="Lessons completed" value={`${completedLessons}`} />
+          <MetricCard icon={ChartNoAxesCombined} label="Overall progress" value={`${Math.round(overallProgress)}%`} />
+          <MetricCard icon={Star} label="Average quiz score" value={`${Math.round(averageQuizScore)}%`} />
+        </section>
+
+        <div className="mt-8">
+          <section aria-labelledby="progress-heading" className="rounded-2xl border border-border bg-surface-raised p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface text-brand"><Target className="h-5 w-5" aria-hidden="true" /></div>
+              <div>
+                <h2 id="progress-heading" className="text-heading text-xl text-primary">Progress overview</h2>
+                <p className="text-caption text-muted">A clear view of your current learning capacity.</p>
+              </div>
+            </div>
+            <div className="mt-6 space-y-6">
+              <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-4">
+                <div>
+                  <span className="text-label text-sm text-primary">Set requests remaining</span>
+                  <p className="mt-1 text-caption text-muted">Available for new AI learning paths.</p>
+                </div>
+                <span className="text-numeral text-2xl text-primary">{requestsRemaining}</span>
+              </div>
+              <div>
+                <div className="mb-2 flex items-end justify-between gap-3">
+                  <span className="text-label text-sm text-muted">Sets completed</span>
+                  <span className="text-numeral text-xl text-primary">{completedSets.length}/{setsCreated}</span>
+                </div>
+                <Progress width={640} percentage={completionPercentage} ariaLabel="Completed sets progress" />
+              </div>
+            </div>
+
+            <div className="mt-7 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-brand"><Sparkles className="h-5 w-5" aria-hidden="true" /></div>
+                <div>
+                  <h3 className="text-heading text-base text-primary">Frequent categories</h3>
+                  <p className="mt-1 text-caption text-muted">The subjects represented most often in your learning sets.</p>
+                </div>
+              </div>
+              <ul className="flex max-w-xl flex-wrap gap-2 sm:justify-end" aria-label="Frequent learning categories">
+                {topCategories.length > 0 ? topCategories.map((category) => (
+                  <li key={category.toLocaleLowerCase()} className="max-w-52 truncate rounded-full border border-border bg-surface px-3 py-1 text-label text-sm text-muted" title={category}>{category}</li>
+                )) : (
+                  <li className="list-none text-body text-sm text-muted sm:text-right">Create learning sets and their most common categories will appear here.</li>
                 )}
-              </div>
-
-              {/**Top Categories */}
-              <div className="pt-5">
-                <span className="text-heading text-lg">Top Categories</span>
-                <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-                  {topCategories && topCategories.length > 0 ? (
-                    topCategories.map((category, index) => {
-                      return (
-                        <div
-                          className="inline-block rounded-full border border-border bg-surface px-2"
-                          key={index}
-                        >
-                          <span className="text-label text-sm text-muted">
-                            {category}
-                          </span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <span className="text-body text-md text-muted">
-                      No categories found
-                    </span>
-                  )}
-                </div>
-              </div>
+              </ul>
             </div>
+          </section>
+        </div>
 
-            {/*Stat Cards*/}
-            <div className="flex flex-col gap-6">
-              {completedLessons && overallProgress && averageQuizScore ? (
-                Array(3)
-                  .fill(0)
-                  .map((_, index) => {
-                    return (
-                      <StatCard
-                        key={index}
-                        icon={index + 1}
-                        title={
-                          index === 0
-                            ? "Completed Lessons"
-                            : index === 1
-                              ? "Overall Progress"
-                              : "Average Quiz Score"
-                        }
-                        data={
-                          index === 0
-                            ? `${completedLessons}`
-                            : index === 1
-                              ? `${overallProgress}%`
-                              : `${averageQuizScore}%`
-                        }
-                      />
-                    );
-                  })
+        <section aria-labelledby="completed-heading" className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface">
+          <button
+            type="button"
+            className="focus-ring flex min-h-20 w-full items-center justify-between gap-4 px-6 text-left transition-colors hover:bg-surface-raised"
+            aria-expanded={displayCompletedSets}
+            aria-controls="completed-sets-content"
+            onClick={() => setDisplayCompletedSets((visible) => !visible)}
+          >
+            <div>
+              <h2 id="completed-heading" className="text-heading text-xl text-primary">Completed sets</h2>
+              <p className="mt-1 text-caption text-muted">Your finished learning paths, kept as a record of progress.</p>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <span className="rounded-full border border-border bg-surface-raised px-3 py-1 text-numeral text-sm text-primary">{completedSets.length}</span>
+              <ChevronDown className={`h-5 w-5 text-muted transition-transform ${displayCompletedSets ? "rotate-180" : ""}`} aria-hidden="true" />
+            </div>
+          </button>
+
+          <div id="completed-sets-content" hidden={!displayCompletedSets} className="border-t border-border p-6">
+            {displayCompletedSets && (
+              <>
+              {completedSets.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {completedSets.map((set) => (
+                    <CompletedSetCard key={set.id} id={set.id} title={set.title} description={set.description} date={formatDate(set.completed_at)} isSubscribed={isSubscribed} />
+                  ))}
+                </div>
               ) : (
-                <span className="text-body text-md text-muted">
-                  No Statistics Available
-                </span>
-              )}
-            </div>
-
-            {/**Completed Sets */}
-            <div
-              className={`relative col-span-full mx-auto rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary transition-all duration-300 ${
-                displayCompletedSets ? "w-full" : "w-fit min-w-[400px]"
-              }`}
-            >
-              <div className="relative flex items-center justify-between gap-8">
-                <div className="flex items-center">
-                  <CheckCircle className="h-7 w-7 text-accent" />
-                  <span className="ml-3 text-heading text-2xl">
-                    Completed Sets
-                  </span>
-                </div>
-
-                <button
-                  className="focus-ring cursor-pointer whitespace-nowrap rounded-full border border-border-interactive px-2 py-1 text-label transition-colors duration-200 hover:bg-surface"
-                  onClick={() => setDisplayCompletedSets(!displayCompletedSets)}
-                >
-                  {displayCompletedSets ? "Hide" : `View (${setsCompleted})`}
-                </button>
-              </div>
-
-              {/**The actual sets */}
-              {displayCompletedSets && (
-                <div className="mt-4 grid w-full grid-cols-1 gap-8 px-5 py-5 md:grid-cols-2">
-                  {setData &&
-                  setData.filter((set) => set.completed).length > 0 ? (
-                    setData
-                      .filter((set) => set.completed)
-                      .map((set, index) => {
-                        return (
-                          <SetCard
-                            key={index}
-                            title={set.title}
-                            description={set.description}
-                            date={
-                              set.completed_at
-                                ? formatDate(set.completed_at)
-                                : "N/A"
-                            }
-                            isSubscribed={isSubscribed || false}
-                          />
-                        );
-                      })
-                  ) : (
-                    <span className="mt-3 text-heading text-xl text-muted">
-                      You haven&apos;t completed any sets
-                    </span>
-                  )}
+                <div className="py-8 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-surface-raised text-brand"><BookCheck className="h-6 w-6" aria-hidden="true" /></div>
+                  <h3 className="mt-4 text-heading text-lg text-primary">Your first finish line is waiting.</h3>
+                  <p className="mx-auto mt-2 max-w-md text-body text-sm text-muted">Complete a learning set and it will become part of your history here.</p>
+                  <Link href="/learn" className="focus-ring mt-5 inline-flex min-h-11 items-center rounded-xl bg-cta px-4 text-label text-sm text-cta-text hover:bg-cta-hover">Browse learning sets</Link>
                 </div>
               )}
-            </div>
+              </>
+            )}
           </div>
-        )}
+        </section>
       </div>
     </div>
   );

@@ -51,11 +51,11 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
 
   const xpDisplay = xp !== null ? `${xp} XP` : "0 XP";
   const streakDisplay = streak !== null ? `${streak}` : "—";
-  const levelDisplay = level !== null ? `Lv ${level}` : "Lv —";
+  const levelDisplay = level !== null ? `L${level}` : "L—";
   const goalTarget = dailyGoalTier === "Serious" ? 50 : dailyGoalTier === "Regular" ? 20 : dailyGoalTier === "Casual" ? 10 : null;
   const goalCurrent = dailyGoalXp ?? 0;
-  const goalDisplay = goalTarget ? `${goalCurrent}/${goalTarget} XP` : "Goal: —";
-  const quotaDisplay = quota !== null ? `Sets: ${quota} left` : "Sets: —";
+  const goalDisplay = goalTarget ? `Goal ${goalCurrent}/${goalTarget}` : "Goal —";
+  const quotaDisplay = quota !== null ? `${quota} sets` : "— sets";
 
   // ARIA Labels
   const xpAria = xp !== null ? `${xp} Experience Points` : "0 Experience Points";
@@ -64,17 +64,17 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
   const goalAria = goalTarget
     ? `Daily goal progress: ${goalCurrent} of ${goalTarget} Experience Points for ${dailyGoalTier}`
     : "Daily goal not set";
-  const quotaAria = quota !== null ? `${quota} sets remaining` : "No quota remaining";
+  const quotaAria = quota !== null ? `${quota} sets remaining` : "Set quota unavailable";
 
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={`flex items-center gap-2 ${className}`}>
       {/* XP Pill */}
       <Pill
         variant="xp"
         aria-label={xpAria}
         title={xpAria}
       >
-        {xpDisplay}
+        <span className="whitespace-nowrap">{xpDisplay}</span>
       </Pill>
 
       <Pill variant="level" aria-label={levelAria} title={levelAria}>
@@ -83,7 +83,7 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
 
       {/* Streak Flame */}
       <div
-        className="flex items-center gap-1 text-sm select-none"
+        className="flex min-h-9 items-center gap-1 rounded-full border border-border bg-surface px-2.5 text-sm select-none"
         aria-label={streakAria}
         title={streakAria}
       >
@@ -93,7 +93,7 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
 
       {/* Daily Goal Progress */}
       <span
-        className="rounded-full border border-accent-progress bg-accent-progress-track px-2.5 py-0.5 text-xs font-semibold text-primary select-none"
+        className="hidden min-h-9 items-center rounded-full border border-border bg-surface px-2.5 text-xs font-semibold text-primary select-none xl:inline-flex"
         aria-label={goalAria}
         title={goalAria}
       >
@@ -102,7 +102,7 @@ export function StatusChrome({ className = "" }: StatusChromeProps) {
 
       {/* Quota Remaining */}
       <span
-        className="text-sm text-muted font-medium text-numeral select-none"
+        className="hidden whitespace-nowrap text-sm text-muted font-medium text-numeral select-none 2xl:inline"
         aria-label={quotaAria}
         title={quotaAria}
       >

@@ -61,8 +61,8 @@ export function AppNav() {
   return (
     <>
       {/* Desktop sticky top bar */}
-      <header className="hidden md:flex sticky top-0 z-40 h-16 w-full items-center justify-between border-b border-border bg-background px-6">
-        <div className="flex items-center space-x-8">
+      <header className="hidden md:flex sticky top-0 z-40 h-16 w-full items-center justify-between gap-4 border-b border-border bg-background px-4 lg:px-6">
+        <div className="flex min-w-0 items-center gap-4 lg:gap-7">
           <Link
             href="/dashboard"
             className="focus-ring flex items-center space-x-3 rounded-xl"
@@ -72,15 +72,16 @@ export function AppNav() {
               Learnium
             </span>
           </Link>
-          <nav aria-label="Primary" className="flex items-center space-x-2">
+          <nav aria-label="Primary" className="flex items-center gap-1">
             {TABS.map(({ label, href, icon: Icon }) => {
               const active = pathname.startsWith(href);
               return (
                 <Link
                   key={href}
                   href={href}
+                  aria-label={label}
                   aria-current={active ? "page" : undefined}
-                  className={`focus-ring flex items-center gap-2 rounded-xl px-4 py-2 text-label text-sm transition-all duration-200 ${
+                  className={`focus-ring flex items-center gap-2 rounded-xl px-3 py-2 text-label text-sm transition-all duration-200 ${
                     active
                       ? "bg-surface font-semibold text-primary"
                       : "text-muted hover:bg-surface hover:text-primary"
@@ -90,16 +91,16 @@ export function AppNav() {
                     className={`h-5 w-5 ${active ? "text-brand" : "text-muted"}`}
                     aria-hidden="true"
                   />
-                  <span>{label}</span>
+                  <span className="hidden lg:inline">{label}</span>
                 </Link>
               );
             })}
           </nav>
         </div>
-        <div id="chrome-slot" className="flex items-center gap-3">
+        <div id="chrome-slot" className="flex shrink-0 items-center gap-3">
           <StatusChrome className="hidden md:flex" />
           {username && (
-            <span className="hidden lg:inline text-body text-sm text-muted">
+            <span className="hidden 2xl:inline text-body text-sm text-muted">
               Welcome, {username}
             </span>
           )}

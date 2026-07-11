@@ -35,7 +35,7 @@ export async function createSet(
   };
 
   const { data: setId, error: rpcError } = await supabase.rpc(
-    "create_set_graph",
+    "create_set_graph_with_quota",
     { graph_data: graphData },
   );
 

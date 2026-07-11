@@ -28,12 +28,12 @@ export default function StudyBuddyCard({
   const [documentModalOpen, setDocumentModalOpen] = useState<boolean>(false);
 
   return (
-    <div className="flex h-70 w-100 flex-col justify-between rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex">
-          <span className="text-heading text-lg">{title}</span>
+    <div className="flex min-h-70 w-full flex-col justify-between rounded-xl border border-border bg-surface-raised px-5 py-5 text-primary">
+      <div className="flex min-w-0 items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="min-w-0 text-heading text-lg break-words">{title}</span>
 
-          <div className="ml-2 rounded-full bg-surface px-2">
+          <div className="shrink-0 rounded-full bg-surface px-2">
             <span className="text-label text-xs text-muted">{category}</span>
           </div>
         </div>
@@ -44,11 +44,9 @@ export default function StudyBuddyCard({
       </div>
 
       <div className="mt-12 flex items-center gap-2">
-        <Link href={`/buddy/${id}`}>
-          <button className="focus-ring flex h-11 cursor-pointer items-center rounded-xl bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
-            <Play className="mr-2 h-4 w-4" />
-            <span>Chat</span>
-          </button>
+        <Link href={`/buddy/${id}`} className="focus-ring flex h-11 cursor-pointer items-center rounded-xl bg-cta px-3 text-label text-cta-text hover:bg-cta-hover">
+          <Play className="mr-2 h-4 w-4" />
+          <span>Chat</span>
         </Link>
 
         <button

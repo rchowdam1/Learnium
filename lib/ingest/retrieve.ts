@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { embedText } from "./embed";
 import { detectLanguage } from "../detect-language";
+import { freeOpenRouterModel } from "../openrouter";
 
 export type RetrievedChunk = {
   id: number;
@@ -155,9 +156,7 @@ export async function answerWithContext(options: {
     },
   });
 
-  const model =
-    process.env.OPENROUTER_MODEL ||
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+  const model = freeOpenRouterModel("OPENROUTER_MODEL");
 
   const system = `You are a helpful study buddy AI named "${options.buddyName || "Study Buddy"}".
 ${options.buddyDescription ? `Your purpose: ${options.buddyDescription}` : ""}

@@ -2,6 +2,7 @@ import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 import JSZip from "jszip";
 import OpenAI from "openai";
+import { freeOpenRouterModel } from "../openrouter";
 
 export type ExtractedDocument = {
   text: string;
@@ -321,10 +322,7 @@ async function extractImage(
     return `[Image: ${fileName}] Vision extraction unavailable (missing OPENROUTER_API_KEY).`;
   }
 
-  const model =
-    process.env.OPENROUTER_VISION_MODEL ||
-    process.env.OPENROUTER_MODEL ||
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+  const model = freeOpenRouterModel("OPENROUTER_VISION_MODEL");
 
   const b64 = buffer.toString("base64");
   const dataUrl = `data:${mimeType};base64,${b64}`;
@@ -369,9 +367,7 @@ async function extractAudio(
   }
 
   // Prefer OpenAI-compatible audio transcriptions via OpenRouter when available
-  const transcriptionModel =
-    process.env.OPENROUTER_TRANSCRIPTION_MODEL ||
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+  const transcriptionModel = freeOpenRouterModel("OPENROUTER_TRANSCRIPTION_MODEL");
 
   try {
     const file = new File([buffer], fileName, { type: mimeType });
@@ -385,10 +381,7 @@ async function extractAudio(
     // Fall through to multimodal chat if transcription endpoint fails
   }
 
-  const chatModel =
-    process.env.OPENROUTER_AUDIO_MODEL ||
-    process.env.OPENROUTER_MODEL ||
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+  const chatModel = freeOpenRouterModel("OPENROUTER_AUDIO_MODEL");
 
   try {
     const b64 = buffer.toString("base64");

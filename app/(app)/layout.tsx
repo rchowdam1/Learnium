@@ -7,7 +7,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <AppNav />
-      <main id="main-content" className="pb-[6.5rem] md:pb-0 md:pt-16">
+      <main id="main-content" className="pb-[6.5rem] md:pb-0">
         {children}
       </main>
     </>

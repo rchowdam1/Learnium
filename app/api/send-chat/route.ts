@@ -102,6 +102,7 @@ export async function POST(request: Request) {
 
   // ─── Step 5: RAG retrieval ─────────────────────────────────────────
   let assistantMessage: string;
+  let citations: { documentName: string; chunkIndex: number; sourceLocator?: string | null }[] = [];
 
   try {
     const chunks = await retrieveBuddyContext({
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
     });
 
     const context = buildContextPrompt(chunks);
+    citations = chunks.map((chunk) => ({ documentName: chunk.document_name, chunkIndex: chunk.chunk_index }));
     assistantMessage = await answerWithContext({
       question: messageToSend,
       context,
@@ -158,7 +160,7 @@ export async function POST(request: Request) {
 
   // ─── Step 7: Return success ────────────────────────────────────────
   return NextResponse.json(
-    { success: true, assistantMessage },
+    { success: true, assistantMessage, citations },
     { status: 200 },
   );
 }

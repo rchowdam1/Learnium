@@ -44,12 +44,12 @@ export default function SetCard({
   };
 
   return (
-    <div className="flex h-70 w-100 flex-col justify-between rounded-xl border border-border bg-surface-raised px-4 py-5 text-primary">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex">
-          <span className="text-heading text-lg">{title}</span>
+    <div className="flex min-h-70 w-full flex-col justify-between rounded-xl border border-border bg-surface-raised px-5 py-5 text-primary">
+      <div className="flex min-w-0 items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="min-w-0 text-heading text-lg break-words">{title}</span>
 
-          <div className="ml-2 rounded-full bg-surface px-2">
+          <div className="shrink-0 rounded-full bg-surface px-2">
             <span className="text-label text-xs text-muted">{category}</span>
           </div>
         </div>
@@ -70,8 +70,12 @@ export default function SetCard({
         </div>
         <div className="mt-1">
           <Progress
-            width={365}
-            percentage={(completedLessons / totalLessons) * 100}
+            width={320}
+            percentage={
+              totalLessons > 0
+                ? Math.min(100, Math.max(0, (completedLessons / totalLessons) * 100))
+                : 0
+            }
           />
         </div>
       </div>
@@ -82,17 +86,16 @@ export default function SetCard({
           <span className="text-body">Created at {dateString}</span>
         </div>
 
-        <Link href={`/sets/${id}`}>
-          <button
-            className={`focus-ring flex h-11 cursor-pointer items-center rounded-xl px-3 text-label ${
+        <Link
+          href={`/sets/${id}`}
+          className={`focus-ring flex h-11 cursor-pointer items-center rounded-xl px-3 text-label ${
               completedLessons === 0
                 ? "bg-cta text-cta-text hover:bg-cta-hover"
                 : "bg-accent text-on-accent"
             }`}
-          >
-            <Play className="mr-2 h-4 w-4" />
-            <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
-          </button>
+        >
+          <Play className="mr-2 h-4 w-4" />
+          <span>{completedLessons === 0 ? "Start" : "Continue"}</span>
         </Link>
       </div>
     </div>

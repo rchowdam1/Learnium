@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import CreateStudyBuddyController from "@/app/components/controllers/CreateStudyBuddyController";
+import { BookOpen, Sparkles } from "lucide-react";
 
 type StatCards = {
   title: string;
@@ -59,8 +60,8 @@ type BuddyApiItem = {
 
 export default function Dashboard() {
   const router = useRouter();
-  // state for skeleton loading
-  const [loading, setLoading] = useState<boolean>(true);
+  const [setsLoading, setSetsLoading] = useState(true);
+  const [buddiesLoading, setBuddiesLoading] = useState(true);
 
   const [setCards, setSetCards] = useState<SetCards[]>([
     /*{
@@ -181,11 +182,12 @@ export default function Dashboard() {
                 date: set.date,
               })),
           );
-          setLoading(false);
           toast.success("Fetched sets");
         }
       } catch {
         toast.error("Could not fetch sets - 124");
+      } finally {
+        setSetsLoading(false);
       }
     };
 
@@ -217,10 +219,11 @@ export default function Dashboard() {
             );
             toast.success("Fetched study buddies.");
           }
-          setLoading(false);
         }
       } catch {
         toast.error("Could not fetch study buddies");
+      } finally {
+        setBuddiesLoading(false);
       }
     };
 
@@ -240,21 +243,30 @@ export default function Dashboard() {
             router.replace("/onboarding");
             return;
           }
+          const safeNumber = (value: unknown) => {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : 0;
+          };
+          const activeSets = Math.max(
+            0,
+            safeNumber(data.setsCreated) - safeNumber(data.setsCompleted),
+          );
+          const progress = Math.min(100, Math.max(0, safeNumber(data.overallProgress)));
           setProfileData([
             {
               title: "Total Sets",
               icon: 1,
-              content: (data.setsCreated - data.setsCompleted).toString(),
+              content: activeSets.toString(),
             },
             {
               title: "Completed Lessons",
               icon: 2,
-              content: data.completedLessons.toString(),
+              content: safeNumber(data.completedLessons).toString(),
             },
             {
               title: "Overall Progress",
               icon: 3,
-              content: data.overallProgress.toString() + "%",
+              content: `${Math.round(progress)}%`,
             },
           ]);
         }
@@ -269,10 +281,24 @@ export default function Dashboard() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[72rem] px-4 pt-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background pb-28 md:pb-12">
+      <div className="mx-auto max-w-[72rem] px-4 py-8 sm:px-6 md:py-10 lg:px-8">
+        <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="text-label text-xs font-semibold uppercase tracking-[0.16em] text-brand">
+              Your workspace
+            </span>
+            <h1 className="mt-2 text-display-sm text-3xl text-primary sm:text-4xl">
+              Keep your momentum.
+            </h1>
+            <p className="mt-2 max-w-xl text-body text-muted">
+              Pick up a lesson, build a new learning path, or ask a Study Buddy.
+            </p>
+          </div>
+        </header>
+
         {/*Stat Cards*/}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
+        <section aria-label="Learning overview" className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {profileData.length === 0 &&
             Array(3)
               .fill(0)
@@ -280,7 +306,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={index}
-                    className="h-30 w-100 animate-pulse rounded-xl border border-border bg-surface"
+                    className="h-[114px] animate-pulse rounded-xl border border-border bg-surface"
                   />
                 );
               })}
@@ -295,16 +321,21 @@ export default function Dashboard() {
                 />
               );
             })}
-        </div>
+        </section>
 
         {/* Learning Sets */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex rounded-2xl border border-border bg-surface p-1" role="tablist" aria-label="Dashboard views">
+        <section aria-labelledby="dashboard-library-title">
+        <div className="mb-6 flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 id="dashboard-library-title" className="text-heading text-xl text-primary">Your library</h2>
+            <p className="mt-1 text-caption text-muted">Everything you are actively learning, in one place.</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex rounded-xl border border-border bg-surface p-1" role="group" aria-label="Dashboard views">
             <button
               type="button"
-              role="tab"
-              aria-selected={isLearningSetsActive}
-              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
+              aria-pressed={isLearningSetsActive}
+              className={`focus-ring min-h-11 rounded-xl px-4 py-2 text-label text-sm transition-colors ${
                 isLearningSetsActive
                   ? "bg-surface-raised text-primary"
                   : "text-muted"
@@ -315,9 +346,8 @@ export default function Dashboard() {
             </button>
             <button
               type="button"
-              role="tab"
-              aria-selected={!isLearningSetsActive}
-              className={`focus-ring rounded-xl px-3 py-2 text-heading text-xl ${
+              aria-pressed={!isLearningSetsActive}
+              className={`focus-ring min-h-11 rounded-xl px-4 py-2 text-label text-sm transition-colors ${
                 isLearningSetsActive
                   ? "text-muted"
                   : "bg-surface-raised text-primary"
@@ -328,34 +358,34 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {isLearningSetsActive && (
+          {isLearningSetsActive && (setsLoading || setCards.length > 0) && (
             <CreateSetController onCreateSet={createSet} />
           )}
-          {!isLearningSetsActive && (
+          {!isLearningSetsActive && studyBuddySets.length > 0 && (
             <CreateStudyBuddyController onCreateStudyBuddy={createStudyBuddy} />
           )}
+          </div>
         </div>
 
         {/*Learning Set Cards*/}
-        <br />
         {isLearningSetsActive && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
-            {loading &&
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {setsLoading &&
               Array(3)
                 .fill(0)
                 .map((_, index) => {
                   return (
                     <div
-                      className="h-70 w-100 animate-pulse rounded-2xl border border-border bg-surface"
+                      className="h-70 animate-pulse rounded-xl border border-border bg-surface"
                       key={index}
                     />
                   );
                 })}
-            {!loading &&
-              setCards.map((setCard, index) => {
+            {!setsLoading &&
+              setCards.map((setCard) => {
                 return (
                   <SetCard
-                    key={index}
+                    key={setCard.id}
                     id={setCard.id}
                     title={setCard.title}
                     category={setCard.category}
@@ -367,31 +397,46 @@ export default function Dashboard() {
                   />
                 );
               })}
+            {!setsLoading && setCards.length === 0 && (
+              <div className="col-span-full grid min-h-[300px] place-items-center rounded-2xl border border-border bg-surface px-6 py-12 text-center">
+                <div className="max-w-md">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface-raised text-brand">
+                    <BookOpen className="h-7 w-7" aria-hidden="true" />
+                  </div>
+                  <span className="mt-6 block text-label text-xs font-semibold uppercase tracking-[0.16em] text-brand">Nova</span>
+                  <h3 className="mt-2 text-display-sm text-2xl text-primary">Start with one useful thing.</h3>
+                  <p className="mt-3 text-body text-muted">
+                    Tell me what you want to understand. I’ll turn it into a focused path you can finish in small sessions.
+                  </p>
+                  <div className="mt-6 flex justify-center"><CreateSetController onCreateSet={createSet} /></div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {!isLearningSetsActive && (
           <div>
-            <span className="text-body text-md text-muted">
-              Upload your study materials and chat with AI to enhance your
-              learning
-            </span>
-            <br />
-            {!studyBuddySets.length && (
-              <span className="text-heading text-lg text-primary">
-                No Study Buddies created yet. Upload study materials to get
-                started!
-              </span>
+            {!buddiesLoading && !studyBuddySets.length && (
+              <div className="grid min-h-[300px] place-items-center rounded-2xl border border-border bg-surface px-6 py-12 text-center">
+                <div className="max-w-md">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-surface-raised text-brand">
+                    <Sparkles className="h-7 w-7" aria-hidden="true" />
+                  </div>
+                  <span className="mt-6 block text-label text-xs font-semibold uppercase tracking-[0.16em] text-brand">Study Buddy</span>
+                  <h3 className="mt-2 text-display-sm text-2xl text-primary">Bring your own material.</h3>
+                  <p className="mt-3 text-body text-muted">Upload notes, documents, images, or audio and get a focused AI partner grounded in your sources.</p>
+                  <div className="mt-6 flex justify-center"><CreateStudyBuddyController onCreateStudyBuddy={createStudyBuddy} /></div>
+                </div>
+              </div>
             )}
-            <br />
-            <br />
             {/* Study Buddy UI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
-              {studyBuddySets.map((buddy, index) => {
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {studyBuddySets.map((buddy) => {
                 //console.log("buddy.title: ", buddy.title);
                 return (
                   <StudyBuddyCard
-                    key={index}
+                    key={buddy.id}
                     id={buddy.id}
                     title={buddy.title}
                     category={buddy.category}
@@ -403,9 +448,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
-
-        <br />
-        <br />
+        </section>
       </div>
     </div>
   );
