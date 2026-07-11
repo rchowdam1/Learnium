@@ -19,28 +19,35 @@ export default function LessonChain({
   return (
     <nav
       aria-label="Lesson path"
-      className="flex flex-row items-center justify-center lg:flex-col"
+      className="flex flex-row items-center justify-center gap-0 py-1 lg:flex-col"
     >
-      {Array(lessons)
-        .fill(0)
-        .map((_, index) => {
-          return (
-            <LessonBubble
-              key={index}
-              number={index + 1}
-              active={index === active}
-              complete={index < completed}
-              last={index === lessons - 1}
-              clickedLesson={() => {
-                if (index <= completed) {
-                  onLessonClick(index);
-                } else {
-                  toast.error(`Complete lesson ${completed + 1} first!`);
-                }
-              }}
-            />
-          );
-        })}
+      <ol className="m-0 flex list-none flex-row items-center p-0 lg:flex-col">
+        {Array(lessons)
+          .fill(0)
+          .map((_, index) => {
+            const isComplete = index < completed;
+            const isActive = index === active;
+            const isUnlocked = index <= completed;
+
+            return (
+              <li key={index} className="flex flex-row items-center lg:flex-col">
+                <LessonBubble
+                  number={index + 1}
+                  active={isActive}
+                  complete={isComplete}
+                  last={index === lessons - 1}
+                  clickedLesson={() => {
+                    if (isUnlocked) {
+                      onLessonClick(index);
+                    } else {
+                      toast.error(`Complete lesson ${completed + 1} first!`);
+                    }
+                  }}
+                />
+              </li>
+            );
+          })}
+      </ol>
     </nav>
   );
 }

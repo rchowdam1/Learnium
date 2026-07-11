@@ -1,10 +1,18 @@
 "use client";
 
-import AuthNav from "@/app/components/nav/AuthNav";
+import { AppNav } from "@/app/components/nav/AppNav";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Undo2 } from "lucide-react";
 import Chat from "@/app/components/study-buddy/Chat";
+
+export type ChatCitation = {
+  index: number;
+  documentName: string;
+  chunkIndex: number;
+  preview: string;
+  chunkId?: number;
+};
 
 export type Message = {
   id?: number;
@@ -14,6 +22,8 @@ export type Message = {
   is_user_message: boolean;
   message: string;
   loading?: boolean;
+  /** Structured RAG sources for assistant messages (chip + preview panel). */
+  citations?: ChatCitation[] | null;
 };
 
 export type APIResponse = {
@@ -29,7 +39,7 @@ export default function BuddyPage() {
 
   return (
     <div className="relative min-h-screen bg-background">
-      <AuthNav />
+      <AppNav />
 
       {/*Back Home Page*/}
       <Link

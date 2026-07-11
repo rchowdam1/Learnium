@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/app/components/ui/Button";
+import { PASS_THRESHOLD } from "@/lib/sets/pass";
 
 type OptionData = {
   id?: number;
@@ -176,6 +177,7 @@ export default function LessonQuizModal({
   const [displayCorrectAnswers, setDisplayCorrectAnswers] = useState(false);
   const [quizScore, setQuizScore] = useState<number | undefined>(undefined);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [passed, setPassed] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const wasOpenRef = useRef(false);
 
@@ -184,6 +186,7 @@ export default function LessonQuizModal({
     if (open && !wasOpenRef.current) {
       if (quizSubmitted) {
         setHasSubmitted(true);
+        setPassed(true);
         setDisplayCorrectAnswers(true);
         setQuizScore(
           typeof fetchedQuizScore === "number" ? fetchedQuizScore : undefined,
@@ -195,6 +198,7 @@ export default function LessonQuizModal({
         );
       } else {
         setHasSubmitted(false);
+        setPassed(null);
         setDisplayCorrectAnswers(false);
         setQuizScore(undefined);
         setCurrentAnswers(questions.map(() => ""));
@@ -205,6 +209,7 @@ export default function LessonQuizModal({
 
     if (!open && wasOpenRef.current) {
       setHasSubmitted(false);
+      setPassed(null);
       setDisplayCorrectAnswers(false);
       setQuizScore(undefined);
       setIsSubmitting(false);
@@ -218,6 +223,7 @@ export default function LessonQuizModal({
   useEffect(() => {
     if (open && quizSubmitted) {
       setHasSubmitted(true);
+      setPassed(true);
       setDisplayCorrectAnswers(true);
       if (typeof fetchedQuizScore === "number") {
         setQuizScore(fetchedQuizScore);
@@ -226,9 +232,10 @@ export default function LessonQuizModal({
   }, [open, quizSubmitted, fetchedQuizScore]);
 
   const submitted = hasSubmitted || quizSubmitted;
+  const failedAttempt = hasSubmitted && passed === false;
 
   const answersFilled = (): boolean => {
-    if (submitted) return true;
+    if (submitted && !failedAttempt) return true;
     return currentAnswers.every((answer) => Boolean(answer));
   };
 
@@ -238,6 +245,7 @@ export default function LessonQuizModal({
     setDisplayCorrectAnswers(false);
     setQuizScore(undefined);
     setHasSubmitted(false);
+    setPassed(null);
     setIsSubmitting(false);
 
     if (lastLesson) {
@@ -246,14 +254,30 @@ export default function LessonQuizModal({
     onClose();
   };
 
+  const handleRetry = () => {
+    setCurrentAnswers(questions.map(() => ""));
+    setCurrentQuestion(0);
+    setDisplayCorrectAnswers(false);
+    setQuizScore(undefined);
+    setHasSubmitted(false);
+    setPassed(null);
+    setIsSubmitting(false);
+  };
+
   if (!open) {
     return null;
   }
 
   const score = fetchedQuizScore ?? quizScore;
   const perfect = score === questions.length;
+  const requiredPctLabel = Math.round(PASS_THRESHOLD * 100);
 
   const handleSubmit = async () => {
+    if (failedAttempt) {
+      handleRetry();
+      return;
+    }
+
     if (submitted) {
       finishAndClose();
       return;
@@ -284,14 +308,16 @@ export default function LessonQuizModal({
 
       if (!response.ok) {
         setIsSubmitting(false);
+        setDisplayCorrectAnswers(false);
         return;
       }
 
       const data = await response.json();
 
       // Already completed in DB — keep modal open and show results
-      if (data.message || data.alreadyCompleted) {
+      if (data.alreadyCompleted) {
         setHasSubmitted(true);
+        setPassed(true);
         if (typeof data.quizScore === "number") {
           setQuizScore(data.quizScore);
         } else if (typeof fetchedQuizScore === "number") {
@@ -307,14 +333,30 @@ export default function LessonQuizModal({
           setQuizScore(data.quizScore);
         }
         setHasSubmitted(true);
-        onComplete();
+
+        if (data.passed) {
+          setPassed(true);
+          onComplete();
+        } else {
+          setPassed(false);
+          // Do not unlock the next lesson on a failed attempt
+        }
       }
     } catch {
       console.error("Could not complete quiz");
+      setDisplayCorrectAnswers(false);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const primaryLabel = isSubmitting
+    ? "Submitting..."
+    : failedAttempt
+      ? "Retry"
+      : submitted
+        ? "Continue"
+        : "Submit";
 
   return (
     <div
@@ -322,8 +364,9 @@ export default function LessonQuizModal({
       style={{ backgroundColor: "var(--overlay)" }}
       onClick={(e) => {
         if (e.target === e.currentTarget && !isSubmitting) {
-          // Backdrop dismiss only before submit; after submit require Continue
-          if (!submitted) onClose();
+          // Backdrop dismiss only before submit; after pass require Continue
+          // Failed attempts may dismiss so the user can re-read the lesson
+          if (!submitted || failedAttempt) onClose();
         }
       }}
     >
@@ -346,7 +389,8 @@ export default function LessonQuizModal({
           correct={correctAnswers[currentQuestion]}
           selected={currentAnswers[currentQuestion]}
           onSelectAnswer={(select: string) => {
-            if (submitted) return;
+            if (submitted && !failedAttempt) return;
+            if (displayCorrectAnswers) return;
             setCurrentAnswers((prevCurrentAnswers) => {
               const updated = [...prevCurrentAnswers];
               updated[currentQuestion] = select;
@@ -365,7 +409,7 @@ export default function LessonQuizModal({
               setCurrentQuestion(currentQuestion - 1);
             }
           }}
-          displayCorrectAnswers={displayCorrectAnswers || submitted}
+          displayCorrectAnswers={displayCorrectAnswers}
           previousAnswer={
             previousAnswers ? previousAnswers[currentQuestion] : ""
           }
@@ -374,27 +418,41 @@ export default function LessonQuizModal({
         {submitted && typeof score === "number" && (
           <div
             className={`mx-auto mb-4 w-[80%] rounded-xl border px-3 py-2 ${
-              perfect ? "border-accent bg-surface" : "border-error bg-surface"
+              failedAttempt
+                ? "border-error bg-surface"
+                : perfect
+                  ? "border-accent bg-surface"
+                  : "border-border bg-surface"
             }`}
           >
             <span className="text-body text-primary">
-              {perfect && "Nice Job! "}
+              {!failedAttempt && perfect && "Nice Job! "}
               You got{" "}
               <span className="text-numeral">
                 {score}/{questions.length}
               </span>{" "}
               questions correct.
             </span>
+            {failedAttempt && (
+              <p className="text-body mt-1 text-error">
+                Need {requiredPctLabel}% to unlock the next lesson
+              </p>
+            )}
           </div>
         )}
 
         <div className="flex justify-center">
           <Button
-            variant={submitted ? "progress" : "primary"}
-            disabled={!answersFilled() || isSubmitting}
+            variant={
+              failedAttempt ? "secondary" : submitted ? "progress" : "primary"
+            }
+            disabled={
+              isSubmitting ||
+              (!failedAttempt && !submitted && !answersFilled())
+            }
             onClick={handleSubmit}
           >
-            {isSubmitting ? "Submitting..." : submitted ? "Continue" : "Submit"}
+            {primaryLabel}
           </Button>
         </div>
       </div>

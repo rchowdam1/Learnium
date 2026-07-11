@@ -1,6 +1,6 @@
 "use client";
 
-import AuthNav from "../components/nav/AuthNav";
+import { AppNav } from "@/app/components/nav/AppNav";
 import SubscriptionCards from "../components/cards/SubscriptionCards";
 import { Undo2 } from "lucide-react";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="min-h-screen relative bg-background">
-      <AuthNav />
+      <AppNav />
 
       {/*Back Home Page*/}
       <Link

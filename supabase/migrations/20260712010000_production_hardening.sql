@@ -17,6 +17,8 @@ create table if not exists public.document_chunks (
   created_at timestamptz not null default now(),
   unique (document_id, chunk_index)
 );
+-- Brownfield: earlier migration created document_chunks without source_locator.
+alter table public.document_chunks add column if not exists source_locator text;
 alter table public.document_chunks enable row level security;
 drop policy if exists document_chunks_select_own on public.document_chunks;
 create policy document_chunks_select_own on public.document_chunks for select to authenticated using (profile_id = (select auth.uid()));
@@ -85,15 +87,43 @@ $$;
 revoke all on function public.create_set_graph_with_quota(jsonb) from public, anon;
 grant execute on function public.create_set_graph_with_quota(jsonb) to authenticated;
 
-create or replace function public.match_document_chunks(query_embedding extensions.vector(384), filter_study_bot_id bigint, match_count integer default 8)
-returns table(id bigint, document_name text, content text, chunk_index integer, source_locator text, similarity float)
-language sql stable security invoker set search_path = public,extensions as $$
- select id,document_name,content,chunk_index,source_locator,(1-(embedding <=> query_embedding))::float from public.document_chunks
- where profile_id=(select auth.uid()) and study_bot_id=filter_study_bot_id and embedding is not null
- order by embedding <=> query_embedding limit least(greatest(match_count,1),20);
+-- Keep the app-compatible signature (filter_profile_id + match_threshold) from
+-- 20260711043419. The alternate 3-arg form would break lib/ingest/retrieve.ts.
+create or replace function public.match_document_chunks(
+  query_embedding extensions.vector(384),
+  filter_study_bot_id bigint,
+  filter_profile_id uuid,
+  match_count integer default 8,
+  match_threshold float default 0.15
+)
+returns table(
+  id bigint,
+  document_name text,
+  content text,
+  chunk_index integer,
+  similarity float
+)
+language sql
+stable
+security invoker
+set search_path = public, extensions
+as $$
+  select
+    dc.id,
+    dc.document_name,
+    dc.content,
+    dc.chunk_index,
+    (1 - (dc.embedding <=> query_embedding))::float as similarity
+  from public.document_chunks dc
+  where dc.study_bot_id = filter_study_bot_id
+    and dc.profile_id = filter_profile_id
+    and dc.embedding is not null
+    and 1 - (dc.embedding <=> query_embedding) > match_threshold
+  order by dc.embedding <=> query_embedding asc
+  limit least(match_count, 50);
 $$;
-revoke all on function public.match_document_chunks(extensions.vector,bigint,integer) from public, anon;
-grant execute on function public.match_document_chunks(extensions.vector,bigint,integer) to authenticated;
+grant execute on function public.match_document_chunks(extensions.vector, bigint, uuid, integer, float)
+  to authenticated, service_role;
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 values('study-documents','study-documents',false,41943040,array['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.openxmlformats-officedocument.presentationml.presentation','text/plain','text/markdown','text/csv','image/png','image/jpeg'])

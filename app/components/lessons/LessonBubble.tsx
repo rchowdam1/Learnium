@@ -2,6 +2,12 @@
 
 import { Check, Lock, Play } from "lucide-react";
 
+const RING_SIZE = 64;
+const RING_RADIUS = 28;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+/** Partial arc on the active node — reads as “in progress”, not 100%. */
+const ACTIVE_RING_PROGRESS = 0.38;
+
 export default function LessonBubble({
   number,
   active,
@@ -15,58 +21,89 @@ export default function LessonBubble({
   last: boolean;
   clickedLesson: () => void;
 }) {
-  const nodeFill = active
-    ? "bg-brand"
-    : complete
-      ? "bg-accent"
-      : "bg-surface border border-border";
+  const locked = !active && !complete;
+  const dashOffset = RING_CIRCUMFERENCE * (1 - ACTIVE_RING_PROGRESS);
 
-  const nodeText = active
-    ? "text-cta-text"
-    : complete
-      ? "text-on-accent"
-      : "text-disabled";
-
-  const connectorFill = complete
-    ? "bg-accent-progress"
-    : "bg-accent-progress-track";
+  const label = complete
+    ? `Lesson ${number}, completed`
+    : active
+      ? `Lesson ${number}, current`
+      : `Lesson ${number}, locked`;
 
   return (
-    <div className="flex flex-row items-center lg:flex-col">
-      <button
-        type="button"
-        className={`focus-ring flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 hover:scale-105 ${nodeFill} ${
-          active
-            ? "ring-2 ring-accent-glow ring-offset-2 ring-offset-background"
-            : ""
+    <div className="relative flex flex-row items-center lg:flex-col">
+      <div
+        className={`relative flex shrink-0 items-center justify-center ${
+          active ? "h-16 w-16" : "h-12 w-12"
         }`}
-        onClick={clickedLesson}
-        aria-label={
-          complete
-            ? `Lesson ${number}, completed`
-            : active
-              ? `Lesson ${number}, current`
-              : `Lesson ${number}, locked`
-        }
-        aria-current={active ? "step" : undefined}
       >
-        {complete ? (
-          <Check className={`h-6 w-6 ${nodeText}`} aria-hidden="true" />
-        ) : active ? (
-          <span className={`flex flex-col items-center leading-none ${nodeText}`}>
-            <Play className="h-4 w-4 fill-current" aria-hidden="true" />
-            <span className="text-numeral text-xs">{number}</span>
-          </span>
-        ) : (
-          <span className={`flex flex-col items-center leading-none ${nodeText}`}>
-            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="text-numeral text-xs">{number}</span>
-          </span>
+        {/* Progress ring — active lesson only (DESIGN: lesson-node.active-ring) */}
+        {active && (
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
+            viewBox={`0 0 ${RING_SIZE} ${RING_SIZE}`}
+            aria-hidden="true"
+          >
+            <circle
+              cx={RING_SIZE / 2}
+              cy={RING_SIZE / 2}
+              r={RING_RADIUS}
+              fill="none"
+              stroke="var(--accent-progress-track)"
+              strokeWidth="3"
+            />
+            <circle
+              cx={RING_SIZE / 2}
+              cy={RING_SIZE / 2}
+              r={RING_RADIUS}
+              fill="none"
+              stroke="var(--accent-progress)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeDasharray={RING_CIRCUMFERENCE}
+              strokeDashoffset={dashOffset}
+              className="lesson-node-ring-glow"
+            />
+          </svg>
         )}
-      </button>
+
+        <button
+          type="button"
+          onClick={clickedLesson}
+          aria-label={label}
+          aria-current={active ? "step" : undefined}
+          aria-disabled={locked || undefined}
+          className={[
+            "focus-ring relative z-[1] flex items-center justify-center rounded-full transition-transform duration-200",
+            active
+              ? "h-12 w-12 bg-brand text-cta-text shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent-glow)_35%,transparent)] hover:scale-105"
+              : complete
+                ? "h-11 w-11 bg-accent text-on-accent hover:scale-105"
+                : "h-11 w-11 cursor-not-allowed border border-border-strong bg-surface text-disabled",
+          ].join(" ")}
+        >
+          {complete && !active ? (
+            <Check className="h-5 w-5" strokeWidth={2.75} aria-hidden="true" />
+          ) : active ? (
+            <Play
+              className="h-5 w-5 translate-x-px fill-current"
+              strokeWidth={0}
+              aria-hidden="true"
+            />
+          ) : (
+            <Lock className="h-4 w-4" strokeWidth={2.25} aria-hidden="true" />
+          )}
+        </button>
+      </div>
+
       {!last && (
         <span
-          className={`rounded-full ${connectorFill} h-1 w-6 lg:h-8 lg:w-1`}
+          className={[
+            "rounded-full",
+            complete ? "bg-accent-progress" : "bg-accent-progress-track",
+            // Horizontal rail (mobile) / vertical rail (desktop)
+            "h-1 w-7 lg:h-7 lg:w-1",
+          ].join(" ")}
           aria-hidden="true"
         />
       )}

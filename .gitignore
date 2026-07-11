@@ -51,3 +51,4 @@ logic.txt
 /lib/admin.ts
 .bmad-loop/runs/
 .bmad-loop/cache/
+/.swc

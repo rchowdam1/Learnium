@@ -35,7 +35,7 @@ FR4: A user can open a Lesson in an owned Set, consume its content, and mark it 
 
 FR5: When all Lessons in a Set are complete, the Set is marked complete exactly once per user per Set, with a celebration state, Badge check, and suggested next action.
 
-FR6: A user with chat quota remaining can converse with a context-aware Study Buddy; when opened from a Lesson, responses are grounded in that Lesson, chat history persists, quota is checked before model calls and decremented only after successful response, and out-of-quota users see a Plus upsell while continuing the Lesson.
+FR6: A user with chat quota remaining can converse with a context-aware Study Buddy; chat history persists; out-of-quota users see a Plus upsell while continuing the Lesson. **Live:** `/api/send-chat` claims quota before LLM (`consume_chat_quota`) and returns citations; document-buddy RAG via client MiniLM + `ingest-document`. **Planned:** lesson-grounded chat (`lessonId` / Lesson paragraph context) and strict decrement-only-after-successful-response refund semantics.
 
 FR7: A user selects a Daily Goal from preset XP tiers during onboarding, can change it in profile settings, and sees daily XP progress toward the goal on the dashboard using the user's local timezone for day boundaries.
 
@@ -103,34 +103,34 @@ NFR14: Subscription entitlement must be derived from verified Stripe lifecycle e
 
 NFR15: Scheduled and delayed work for reminders, League cycles, quota resets, review scheduling, and account deletion must be server-owned, idempotent, and auditable.
 
-NFR16: Launch hardening must address the current lack of automated test framework and CI before public release.
+NFR16: ~~Launch hardening must address the current lack of automated test framework and CI before public release.~~ **Resolved:** Vitest, Playwright, and GitHub Actions CI exist; expand coverage as launch hardening continues.
 
 ### Additional Requirements
 
-> **Amendment 2026-07-11:** Stories and requirements that mandate the Python RAG sidecar, `RAG_SERVICE_URL`, Chroma, or LangCache as the **live** Study Buddy path are **superseded** by Next.js `lib/ingest/` + Supabase `document_chunks` (pgvector). See Architecture Spine amendment.
+> **Amendment 2026-07-11 (revised — client MiniLM + DeepSeek):** Python RAG / `RAG_SERVICE_URL` / Chroma / LangCache / Nemotron-for-all / multipart create-buddy / server feature-hash-only embeddings are **superseded**. Live path: JSON `create-buddy` shell → client MiniLM embed (feature-hash fallback) → `ingest-document` + `extract-media` + `storage-usage` + `delete-buddy` → Supabase Storage + `document_chunks`. OpenRouter models: **`deepseek/deepseek-v4-flash`**. No `OPENROUTER_BASE_URL` env (hardcoded `openrouter.ai`). See PRD addendum.
 
-- Architecture specifies a modular server-first layered monolith with ~~a sidecar Python RAG service~~ **in-process Study Buddy ingest + Supabase pgvector** (2026-07-11); no greenfield starter template is specified.
+- Architecture specifies a modular server-first layered monolith with ~~a sidecar Python RAG service~~ **client-embed Study Buddy ingest + server-mediated persistence + Supabase pgvector** (2026-07-11 revised); no greenfield starter template is specified; **no live Python `rag/` folder requirement**.
 - UI components may call server actions, API routes, or browser-safe Supabase reads only; all mutations with auth, billing, quota, progress, AI, or privacy impact must go through server actions or verb-style `app/api/<kebab-case-action>/route.ts` endpoints.
 - `middleware.ts` `protectedPaths` is the single authenticated route gate; every new protected surface for dashboard additions, Reviews, Leagues, Paths, profile, and settings must be registered precisely because matching is prefix-based.
 - Server code must use `lib/server.ts` `createClient()` for cookie-bound Supabase access; service-role Supabase access must stay isolated in privileged server-only modules.
 - User-owned object reads and writes must prove ownership through parent `profile_id` or explicit public/social projections; id-only mutation paths are invalid.
 - Quota counters must be mutated by database RPCs or a single quota domain service backed by atomic database writes.
 - Reward and progress changes must be server-authoritative idempotent events with dedupe keys; client animations display committed state only.
-- ~~Next.js server code must call the RAG sidecar only through configured HTTP endpoints…~~ **Superseded:** Study Buddy ingest/chat stay in Next.js (`/api/create-buddy`, `/api/send-chat`, `lib/ingest/`); browser never writes vectors or calls OpenRouter for buddy RAG.
-- ~~RAG request/response payloads must be governed by a versioned contract artifact shared by Next.js and Python…~~ **Superseded:** retrieval + prompt assembly live in `lib/ingest/`; embeddings are local 384-d feature-hash.
+- ~~Next.js server code must call the RAG sidecar only through configured HTTP endpoints…~~ **Superseded:** Study Buddy routes live in Next.js. Browser **embeds** with MiniLM (feature-hash fallback) and posts chunks to **`/api/ingest-document`**; browser never calls OpenRouter for embeddings and never inserts `document_chunks` via a direct Supabase client. Server claims storage and writes vectors after ownership checks.
+- ~~RAG request/response payloads must be governed by a versioned contract artifact shared by Next.js and Python…~~ **Superseded:** retrieval + prompt assembly live in `lib/ingest/`; embeddings are **client MiniLM 384-d primary**, feature-hash fallback (not an OpenRouter embeddings API).
 - Stripe subscription entitlement must be mapped idempotently by Stripe event id and customer id from verified subscription lifecycle events.
 - Social reads must use privacy-limited projections only: display name, Level, Badges, current Streak, completed Sets count, and weekly XP.
 - Review Sessions must use persisted question banks and server-owned review schedule state, consuming no generation quota and no Study Buddy chat quota.
-- Environment variables must replace localhost-only or hardcoded provider configuration, including OpenRouter model slugs, server secrets, Stripe keys, and service-role keys. (`RAG_SERVICE_URL` is legacy/unused.)
+- Environment variables must replace localhost-only or hardcoded **provider keys and model slugs**, including OpenRouter model env vars, server secrets, Stripe keys, and service-role keys. (`RAG_SERVICE_URL` is legacy/unused. **`OPENROUTER_BASE_URL` is not an env var** — clients hardcode `https://openrouter.ai/api/v1`.)
 - Scheduled jobs must own reminders, League weekly cycles, quota resets, review scheduling, delayed account deletion/export, and related audit records.
-- Study Buddy chat must have one canonical transaction endpoint: authenticate, check chat quota, hybrid-retrieve chunks, call OpenRouter, persist user and assistant messages, consume quota, and return committed state.
-- Buddy creation and document ingestion must be server-mediated; only buddies with `chunks_count > 0` after ingest may answer chat.
+- Study Buddy chat must have one canonical transaction endpoint (`/api/send-chat`): authenticate, **claim chat quota before LLM** (`consume_chat_quota`), hybrid-retrieve chunks, call OpenRouter, persist user and assistant messages (with **citations**), and return committed state.
+- Buddy creation is **JSON shell only** (`/api/create-buddy`); document ingestion is server-mediated via `/api/ingest-document` (plus `/api/extract-media`). Storage caps: Free **750MB** / Plus **5GB**; **100MB**/file; **8** files. Full buddy-level `pending_db`→`pending_rag` readiness machine is **remaining/planned** (document `status` exists; chat readiness gate not fully productized).
 - Multi-table generated content writes must use transaction-first Postgres functions or equivalent atomic persistence before quota consumption.
 - Streak and Daily Goal boundaries use the user's stored timezone; League cycles use one global reset boundary; billing and quota reset dates follow Stripe or the server quota policy.
 - Signup must enforce the 16+ age gate before account creation, and AI provider calls must use privacy-approved settings while avoiding unnecessary personal data in prompts.
-- ~~Deploy hardening must move the RAG URL out of `app/api/send-chat/route.ts`, … pin Python dependencies including LangCache…~~ **Superseded 2026-07-11** for Study Buddy; remaining harden items: service-role provisioning, Stripe webhook import, CI.
-- Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres/**pgvector**, Stripe, OpenRouter, and quota plumbing for `sets_remaining` and `chats_remaining`. Python/FastAPI RAG + Redis LangCache are **legacy**.
-- OpenRouter is the default LLM provider gateway. Existing OpenAI-compatible SDK/client surfaces may remain where they enable a drop-in migration, but provider base URLs, API keys, model slugs, and optional OpenRouter attribution headers must be env-driven and server-only.
+- ~~Deploy hardening must move the RAG URL out of `app/api/send-chat/route.ts`, … pin Python dependencies including LangCache…~~ **Superseded 2026-07-11** for Study Buddy; remaining harden items: service-role provisioning, Stripe webhook import, broader CI coverage.
+- Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres/**pgvector**/Storage, Stripe, OpenRouter (**DeepSeek V4 Flash** model env contract), and quota plumbing for `sets_remaining` and chat (`consume_chat_quota`). Python/FastAPI RAG + Redis LangCache are **legacy / not required**.
+- OpenRouter is the default LLM provider gateway. OpenAI-compatible SDK/client surfaces remain; **API key and model slugs** are env-driven and server-only; base URL is hardcoded to OpenRouter.
 - Launch phasing per PRD §7.1: Phase A (pre-launch harden and retain — Sets, Lessons, Buddy, Streaks/Daily Goals, XP/Levels/Badges, Review Sessions, billing/tiers), Phase B (Leagues and Learning Paths, launch or ≤4 weeks post-launch), Phase C (social layer — public profiles, share cards, friends leaderboard).
 
 ### UX Design Requirements
@@ -536,15 +536,15 @@ So that I can navigate and learn without barriers.
 **Then** motion is reduced or replaced with static states per `EXPERIENCE.md`
 **And** essential state changes remain perceivable without animation
 
-**Given** no automated test framework exists today (NFR16)
-**When** this story ships
-**Then** Vitest (or agreed unit runner) and Playwright are configured with at least one smoke test per critical path: landing load, auth page render, protected route redirect
-**And** a GitHub Actions workflow runs lint, build, and tests on pull requests
+**Given** ~~no automated test framework exists today (NFR16)~~ **tests/CI already exist in repo**
+**When** this story is verified
+**Then** Vitest and Playwright remain configured with smoke coverage for critical paths: landing load, auth page render, protected route redirect (expand as needed)
+**And** GitHub Actions (`.github/workflows/ci.yml`) runs lint, build, unit, and e2e on pull requests / main
 
 **Given** CI runs on a clean checkout
 **When** tests execute
 **Then** they pass without manual local setup beyond documented env vars
-**And** test commands are documented in `README` or project-context
+**And** test commands are documented in `README` (`npm run test`, `npm run test:e2e`)
 
 **Given** the user goes offline during app use
 **When** connectivity is lost
@@ -553,10 +553,10 @@ So that I can navigate and learn without barriers.
 
 **Given** deploy hardening for Study Buddy vector path
 **When** CI and deploy docs are updated
-**Then** Supabase migrations including `document_chunks` / pgvector RPCs are documented and applied
-**And** deployment documents OpenRouter model env vars, service-role module provisioning — **not** `RAG_SERVICE_URL` / Python LangCache (Architecture AD-10, amended 2026-07-11)
+**Then** Supabase migrations including `document_chunks` / pgvector RPCs / study storage quota are documented and applied
+**And** deployment documents OpenRouter model env vars (`deepseek/deepseek-v4-flash`), service-role module provisioning — **not** `RAG_SERVICE_URL` / Python LangCache / `OPENROUTER_BASE_URL` (Architecture AD-10, amended 2026-07-11 revised)
 
-> _Historical AC (superseded 2026-07-11): pin `langcache` in `rag/requirements.txt` and document `RAG_SERVICE_URL`._
+> _Historical AC (superseded 2026-07-11): pin `langcache` in `rag/requirements.txt` and document `RAG_SERVICE_URL`. “No test framework” is also superseded — Vitest/Playwright/CI ship in repo._
 
 ---
 
@@ -851,30 +851,31 @@ So that explanations stay relevant and trustworthy.
 
 **Given** Nova is opened from a Lesson
 **When** the user sends a message
-**Then** `send-chat` includes `lessonId` / `setId` and server loads lesson paragraph content for grounding (FR6)
-**And** the RAG or tutor prompt instructs answers to use lesson content, not general knowledge alone (NFR1)
+**Then** ~~`send-chat` includes `lessonId` / `setId` and server loads lesson paragraph content for grounding (FR6)~~ — **PLANNED / remaining:** live `/api/send-chat` accepts `buddyId`, `userMessage`, optional `queryEmbedding` only; **no `lessonId` grounding today**
+**And** when lesson grounding ships, the tutor prompt must instruct answers to use lesson content, not general knowledge alone (NFR1)
 
 **Given** user asks for out-of-scope assistant behavior (code execution, medical/legal/financial advice beyond educational framing)
 **When** the tutor processes the message
 **Then** Nova refuses with educational framing and stays in tutor character (NFR1, PRD §6 Safety)
-**And** refusal does not consume chat quota if no successful assistant response is produced
+**And** ~~refusal does not consume chat quota if no successful assistant response is produced~~ — **note live truth:** chat quota is **claimed before LLM** via `consume_chat_quota`; failed provider after claim still consumes (refund path **remaining/planned** if product requires it)
 
-**Given** `/api/send-chat` receives a lesson- or buddy-grounded chat request
+**Given** `/api/send-chat` receives a buddy-grounded chat request
 **When** retrieval runs
-**Then** hybrid Supabase RPCs (`match_document_chunks` + `keyword_document_chunks`) scope by `profile_id` and `study_bot_id` (Architecture AD-6, amended 2026-07-11)
+**Then** hybrid Supabase RPCs (`match_document_chunks` + `keyword_document_chunks`) scope by `profile_id` and `study_bot_id` (Architecture AD-6, amended 2026-07-11 revised)
 **And** OpenRouter answers using retrieved context — no Python RAG sidecar call
+**And** successful responses return **citations** derived from retrieved chunks
 
 **Given** Study Buddy retrieval configuration
-**When** Next.js answers chat
-**Then** embeddings are local 384-d feature-hash vectors — not an external embeddings API
-**And** browser code never calls OpenRouter or writes `document_chunks` directly
+**When** embeddings are produced for ingest or query
+**Then** primary path is **client MiniLM** (`Xenova/all-MiniLM-L6-v2`, 384-d); **feature-hash is fallback only** — not an OpenRouter/OpenAI embeddings API
+**And** browser never calls OpenRouter for embeddings; browser never inserts `document_chunks` via direct Supabase client (server `/api/ingest-document` writes after ownership + storage claim)
 
-> _Historical AC (superseded 2026-07-11): Python RAG sidecar, semantic LangCache, `RAG_SERVICE_URL`, shared Next/Python schema artifact._
+> _Historical AC (superseded 2026-07-11 revised): Python RAG sidecar, semantic LangCache, `RAG_SERVICE_URL`, shared Next/Python schema, server-only feature-hash-as-primary, multipart create-buddy ingest._
 
 **Given** chat messages are persisted
 **When** a successful response returns
-**Then** user and assistant messages are stored with lesson/buddy association
-**And** history reloads when the user reopens Nova from the same Lesson (FR6)
+**Then** user and assistant messages are stored with buddy association (assistant may store citations)
+**And** history reloads when the user reopens the same Buddy; lesson-scoped history association remains **planned** with lesson grounding (FR6)
 
 ---
 
@@ -887,9 +888,10 @@ So that I can keep learning even when Nova is unavailable.
 **Acceptance Criteria:**
 
 **Given** a user with chat quota remaining
-**When** they send a Nova message from the in-lesson panel
-**Then** quota is checked before any model/RAG call and decremented only after a successful assistant response (FR6, NFR12)
-**And** failed provider or persistence errors do not consume quota
+**When** they send a Nova message
+**Then** chat quota is **claimed atomically before any model/RAG call** via `consume_chat_quota` (live `/api/send-chat` ordering) (FR6)
+**And** out-of-quota returns `429` with `code: 'QUOTA_EXHAUSTED'` without calling the LLM
+**And** ~~failed provider does not consume quota~~ — **live:** claim is pre-LLM; provider-failure refund is **remaining/planned** if product requires strict decrement-after-success
 
 **Given** a user with zero chat quota
 **When** they attempt to send a message
@@ -904,7 +906,7 @@ So that I can keep learning even when Nova is unavailable.
 **Given** buddy ownership validation
 **When** `send-chat` or `get-buddy-data` receives a `buddyId`
 **Then** server verifies `study_bots.profile_id` matches the authenticated user
-**And** cross-tenant buddy access returns 403
+**And** cross-tenant buddy access is denied (404/403)
 
 **Given** chat quota refresh for monthly model (full logic in Epic 5)
 **When** this story ships
@@ -915,6 +917,7 @@ So that I can keep learning even when Nova is unavailable.
 **When** user views a response
 **Then** report-content control is available per message and reports store message identity for triage (NFR2)
 **And** chat surfaces include AI-generated disclosure consistent with lesson content (NFR2)
+**And** citations from retrieval are available on the assistant message when present (live)
 
 ---
 
@@ -928,23 +931,29 @@ So that I never chat with a Buddy whose knowledge base failed to load.
 
 **Given** a user creates a document-upload Buddy
 **When** creation starts
-**Then** Buddy progresses through server-owned states: `pending_db` → `pending_rag` → `ready` | `failed` (Architecture AD-14)
-**And** only `ready` Buddies accept chat requests
+**Then** **`POST /api/create-buddy` creates a JSON shell only** (`title`, `description`, `category`) and returns `buddyId` + storage quota snapshot — **no multipart, no server extract/embed on create**
+**And** client then extract/chunks/embeds and calls **`POST /api/ingest-document`** (raw file + pre-embedded chunks); media types use **`POST /api/extract-media`**
+**And** supporting routes: **`GET /api/storage-usage`**, **`POST /api/delete-buddy`**
+**And** storage limits: Free **750MB** / Plus **5GB** total; **100MB**/file; **8** files per buddy create flow
 
-**Given** RAG ingestion is in progress
+**Given** ~~Buddy progresses through server-owned states: `pending_db` → `pending_rag` → `ready` | `failed`~~ (Architecture AD-14 historical)
+**When** this story is compared to live code
+**Then** full buddy-level readiness machine is **remaining/planned** — document rows may have `status` (default `ready`); product may still require UI disable + `send-chat` readiness gate
+**And** only buddies with usable chunks should answer chat once readiness gate ships; **live send-chat does not yet return `code: 'readiness'`**
+
+**Given** RAG ingestion is in progress (client pipeline)
 **When** user views Buddy card or opens chat
-**Then** UI shows thinking/ingesting state with Nova voice copy
-**And** chat composer is disabled until `ready`
+**Then** UI should show ingesting state with Nova voice copy (**remaining/planned** polish if not fully wired)
+**And** chat composer disabled until ready is **remaining/planned** product behavior
 
 **Given** ingestion fails
-**When** retries are exhausted
-**Then** Buddy is marked `failed` with cleanup status and retry key recorded
-**And** user sees actionable retry or support message without orphan vectors
+**When** client or server reports failure
+**Then** user sees actionable retry; orphan storage/chunks cleaned on delete-buddy
+**And** storage claim failures surface quota-exceeded (750MB free messaging)
 
-**Given** `send-chat` receives a non-ready `buddyId`
-**When** request is processed
-**Then** API returns `{ success: false, code: 'readiness' }` without consuming chat quota
-**And** server mediates all document uploads to RAG — browser never uploads directly to vector store
+**Given** vector writes
+**When** chunks are stored
+**Then** server `/api/ingest-document` mediates insert after ownership + `claim_study_storage` — browser never writes vectors via direct Supabase client for arbitrary `buddyId`
 
 ---
 
@@ -956,10 +965,10 @@ So that personal learning data is never used to train third-party models.
 
 **Acceptance Criteria:**
 
-**Given** OpenRouter and RAG provider configuration
+**Given** OpenRouter provider configuration (no separate RAG provider host)
 **When** deployed to any environment
 **Then** provider calls use product-approved privacy settings (no training on customer data) (NFR4, AD-17)
-**And** configuration is env-driven and documented in deploy checklist
+**And** configuration is env-driven (API key + model slugs) and documented in deploy checklist
 
 **Given** prompts sent to generation or tutor endpoints
 **When** payloads are constructed
@@ -969,7 +978,7 @@ So that personal learning data is never used to train third-party models.
 **Given** chat logs and uploaded documents
 **When** sent to providers
 **Then** data handling complies with PRD §6 Privacy — not used for third-party model training (NFR4)
-**And** integration tests verify privacy flags are set on provider client initialization
+**And** integration tests verify privacy flags are set on provider client initialization where applicable
 
 ---
 
@@ -983,18 +992,20 @@ So that every LLM-touching endpoint can be configured without code changes.
 
 **Given** any deployed environment
 **When** provider configuration is loaded
-**Then** server-only env vars define `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, generation model, tutor/chat model, embedding model decision, and optional OpenRouter attribution headers
+**Then** server-only env vars define `OPENROUTER_API_KEY`, model slugs (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL` — live contract **`deepseek/deepseek-v4-flash`**), and optional OpenRouter attribution headers
+**And** ~~`OPENROUTER_BASE_URL` env~~ is **not used** — clients hardcode `https://openrouter.ai/api/v1`
+**And** embeddings are **not** env model slugs for OpenRouter; client MiniLM id is `Xenova/all-MiniLM-L6-v2` (feature-hash fallback in code)
 **And** no browser-exposed `NEXT_PUBLIC_*` variable contains provider secrets
 
 **Given** existing OpenAI-compatible SDK usage
 **When** the provider client is initialized
-**Then** the base URL and API key point to OpenRouter
-**And** model names are read from env, not hardcoded as direct-provider model ids
+**Then** the base URL is OpenRouter (`https://openrouter.ai/api/v1`) and the API key is from env
+**And** generation/chat/vision/audio model names are read from env (DeepSeek V4 Flash contract)
 
 **Given** configuration is missing or invalid
 **When** an LLM-touching route starts
-**Then** it fails fast with a server log and user-safe `{ success: false, code: 'provider' }` response
-**And** no quota is consumed
+**Then** it fails fast with a server log and user-safe error response
+**And** chat path does not call the LLM when quota claim fails; missing key surfaces as provider error after claim (refund **planned** if required)
 
 ---
 
@@ -1007,14 +1018,14 @@ So that the migration does not change learning flows.
 **Acceptance Criteria:**
 
 **Given** `/api/input-check` or any Set/Path generation endpoint calls the model
-**When** OpenRouter is configured
+**When** OpenRouter is configured with `OPENROUTER_MODEL` (`deepseek/deepseek-v4-flash`)
 **Then** the existing schema validation, zod parsing, safety checks, and input-language checks still run before persistence
-**And** quota is checked before provider work and decremented only after durable success (NFR12)
+**And** quota is checked before provider work and decremented only after durable success for **generation** flows (NFR12)
 
 **Given** OpenAI-compatible response parsing differs for the selected OpenRouter model
 **When** structured output is requested
 **Then** the route either uses a compatible structured-output path or normalizes the response before existing schema validation
-**And** malformed output fails cleanly without consuming quota
+**And** malformed output fails cleanly without consuming generation quota
 
 **Given** provider errors, rate limits, or model routing failures
 **When** they occur
@@ -1023,7 +1034,7 @@ So that the migration does not change learning flows.
 
 ---
 
-### Story 2.15: Study Buddy Chat Provider Path _(amended 2026-07-11)_
+### Story 2.15: Study Buddy Chat Provider Path _(amended 2026-07-11 revised — MiniLM + DeepSeek)_
 
 As a learner,
 I want Nova Study Buddy chat to keep grounded answers after the provider pivot,
@@ -1033,20 +1044,21 @@ So that tutoring quality is preserved.
 
 **Given** `/api/send-chat` answers Study Buddy messages
 **When** OpenRouter is configured
-**Then** chat completion calls route through OpenRouter using `OPENROUTER_MODEL` (`nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`)
+**Then** chat completion calls route through OpenRouter using `OPENROUTER_MODEL` (**`deepseek/deepseek-v4-flash`** — not Nemotron-for-all)
 **And** context comes from Supabase hybrid retrieval in `lib/ingest/` — **not** the Python `rag/` sidecar
+**And** response includes **citations** when chunks are retrieved
 
-**Given** embeddings are needed for retrieval
+**Given** embeddings are needed for retrieval / ingest
 **When** vectors are produced
-**Then** the implementation uses local 384-d feature-hash embeddings matching `document_chunks.embedding`
+**Then** primary implementation is **client MiniLM** 384-d matching `document_chunks.embedding`; **feature-hash is fallback only**
 **And** no OpenRouter/OpenAI embeddings API is required for the live path
 
 **Given** chat returns an answer
 **When** Next.js persists chat messages
-**Then** the canonical chat write path remains authenticate -> check quota -> retrieve + OpenRouter -> persist user/assistant messages -> decrement quota -> return committed state
-**And** provider failure does not save orphan assistant messages or consume chat quota
+**Then** the canonical chat write path is authenticate → verify ownership → **claim quota (`consume_chat_quota`)** → retrieve + OpenRouter → persist user/assistant messages (with citations) → return committed state
+**And** ~~provider failure does not consume chat quota~~ is **desired** but **not live** (claim is pre-LLM); treat refund-on-provider-failure as remaining work
 
-> _Historical title/AC referenced “Python RAG Chat Provider Swap” / `/api/chat` sidecar — superseded 2026-07-11._
+> _Historical AC: Python RAG swap, Nemotron free slug for all models, feature-hash-only embeddings, decrement-after-success chat ordering — superseded 2026-07-11 revised._
 
 ---
 
@@ -1065,8 +1077,9 @@ So that Learnium's PRD promises remain true after migration.
 
 **Given** OpenRouter model routing is configured
 **When** model env vars are reviewed
-**Then** every LLM-touching flow has a named model, fallback policy, and cost class
+**Then** every LLM-touching flow has a named model (`deepseek/deepseek-v4-flash` for chat/vision/audio/transcription env contract), fallback policy, and cost class
 **And** the LLM cost per weekly-active-user metric remains trackable (NFR6)
+**And** embeddings cost is local/client (MiniLM) — not an OpenRouter embeddings line item
 
 **Given** provider data handling policy is documented
 **When** deployment checklist is reviewed
@@ -1085,17 +1098,18 @@ So that OpenRouter can be adopted without blocking launch hardening.
 
 **Given** the provider pivot is implemented
 **When** smoke verification runs locally
-**Then** Set generation, invalid-topic rejection, Study Buddy chat, semantic-cache hit behavior, and quota decrement-after-success are manually verified or covered by available tests
+**Then** Set generation, invalid-topic rejection, Study Buddy create/ingest/chat, and chat quota claim-before-LLM are manually verified or covered by available tests (Vitest/Playwright/CI exist)
 **And** failures are categorized as configuration, provider, validation, quota, or persistence
+**And** ~~semantic-cache hit behavior~~ is **not** part of the live Study Buddy path
 
 **Given** OpenRouter is unavailable or a selected model regresses
 **When** rollback is needed
-**Then** switching env vars can route back to the previous OpenAI-compatible endpoint or a known-good OpenRouter model without code changes
-**And** rollback does not require database migration or persisted content changes
+**Then** switching model env vars can route to a known-good OpenRouter model (including approved free `:free` slugs or approved paid exceptions in `lib/openrouter.ts`) without code changes
+**And** base URL remains OpenRouter (hardcoded); rollback does not require database migration or persisted content changes
 
 **Given** docs are updated
 **When** a future agent reads project context, architecture, PRD addendum, or this story
-**Then** OpenRouter is clearly the default provider gateway
+**Then** OpenRouter is clearly the default provider gateway with **DeepSeek V4 Flash** env contract and **client MiniLM** embeddings
 **And** OpenAI-compatible SDK references are understood as client compatibility, not direct OpenAI vendor commitment
 
 ---

@@ -1,6 +1,6 @@
 "use client";
 
-import AuthNav from "@/app/components/nav/AuthNav";
+import { AppNav } from "@/app/components/nav/AppNav";
 import LessonChain from "@/app/components/lessons/LessonChain";
 import LessonQuizModal from "@/app/components/modals/LessonQuizModal";
 import SetCompleteModal from "@/app/components/modals/SetCompleteModal";
@@ -10,8 +10,18 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
-import { Undo2, BrainCog, SquareChevronRight } from "lucide-react";
+import { Undo2, BrainCog, SquareChevronRight, FileText, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
+import { Modal } from "@/app/components/ui/Modal";
+
+type SetSource = {
+  id: number;
+  title: string;
+  url: string;
+  publisher?: string;
+  publishedAt?: string;
+  excerpt?: string;
+};
 
 type LessonData = {
   id: number;
@@ -19,6 +29,7 @@ type LessonData = {
   set_id: number;
   title: string;
   position: number;
+  difficulty?: number | null;
 };
 
 type ParagraphData = {
@@ -51,6 +62,10 @@ type QuizData = {
 type APIResponse = {
   title?: string;
   error?: string;
+  complexity?: string | null;
+  complexityScore?: number | null;
+  passThreshold?: number;
+  sources?: SetSource[];
   lessons?: LessonData[];
   paragraphs?: ParagraphData[][];
   completedLessons?: number;
@@ -76,6 +91,11 @@ export default function SetPage() {
   const [completedSetModalOpen, setCompletedSetModalOpen] =
     useState<boolean>(false);
   const [setTitle, setSetTitle] = useState<string | undefined>();
+  const [complexity, setComplexity] = useState<string | null>(null);
+  const [complexityScore, setComplexityScore] = useState<number | null>(null);
+  const [passThreshold, setPassThreshold] = useState(0.75);
+  const [sources, setSources] = useState<SetSource[]>([]);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
 
   useEffect(() => {
     const getSetData = async () => {
@@ -91,6 +111,16 @@ export default function SetPage() {
 
           if (data.paragraphs && data.lessons) {
             setSetTitle(data.title);
+            setComplexity(data.complexity ?? null);
+            setComplexityScore(
+              typeof data.complexityScore === "number"
+                ? data.complexityScore
+                : null,
+            );
+            setPassThreshold(
+              typeof data.passThreshold === "number" ? data.passThreshold : 0.75,
+            );
+            setSources(Array.isArray(data.sources) ? data.sources : []);
             setParagraphs(data.paragraphs);
             setLessons(data.lessons);
             setCompletedLessons(data.completedLessons);
@@ -161,11 +191,11 @@ export default function SetPage() {
         Skip to content
       </a>
 
-      <AuthNav />
+      <AppNav />
 
       <main
         id="main-content"
-        className="mx-auto w-full max-w-6xl flex-grow px-4 pb-16 pt-8 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-6xl flex-grow px-4 pb-[6.5rem] pt-8 sm:px-6 lg:px-8 md:pb-16"
         tabIndex={-1}
       >
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -182,11 +212,21 @@ export default function SetPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[7.5rem_minmax(0,1fr)] lg:items-start lg:gap-8">
-          {/* Lesson path rail */}
-          <aside className="rounded-xl border border-border bg-surface-raised p-4 lg:sticky lg:top-24">
-            <p className="text-label mb-4 text-center text-xs text-muted">
-              Path
-            </p>
+          {/* Lesson path rail — DESIGN.md lesson-node */}
+          <aside className="rounded-xl border border-border bg-surface-raised p-4 lg:sticky lg:top-24 lg:px-3 lg:py-5">
+            <div className="mb-4 flex flex-col items-center gap-1">
+              <p className="text-label text-[0.6875rem] uppercase tracking-[0.08em] text-muted">
+                Path
+              </p>
+              {lessons && (
+                <p className="text-numeral text-caption text-muted">
+                  <span className="text-primary">{Math.min(currentLesson + 1, lessonCount)}</span>
+                  <span aria-hidden="true"> / </span>
+                  <span className="sr-only">of </span>
+                  {lessonCount}
+                </p>
+              )}
+            </div>
             <div className="flex justify-center overflow-x-auto no-scrollbar">
               {!lessons && (
                 <div className="flex flex-row items-center lg:flex-col">
@@ -197,9 +237,9 @@ export default function SetPage() {
                         key={key}
                         className="flex flex-row items-center lg:flex-col"
                       >
-                        <div className="h-14 w-14 animate-pulse rounded-full bg-surface" />
+                        <div className="h-12 w-12 animate-pulse rounded-full bg-surface" />
                         {key < 3 && (
-                          <div className="h-1 w-6 rounded-full bg-surface lg:h-8 lg:w-1" />
+                          <div className="h-1 w-7 rounded-full bg-accent-progress-track lg:h-7 lg:w-1" />
                         )}
                       </div>
                     ))}
@@ -227,6 +267,44 @@ export default function SetPage() {
               <h1 className="text-heading text-2xl text-primary md:text-3xl">
                 {lessons ? lessons[currentLesson].title : "Loading…"}
               </h1>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {complexityScore != null && (
+                  <span className="text-numeral rounded-full border border-border bg-surface px-2.5 py-0.5 text-caption text-muted">
+                    Complexity {complexityScore}/10
+                  </span>
+                )}
+                {complexity && (
+                  <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-caption capitalize text-muted">
+                    {complexity} path
+                  </span>
+                )}
+                {lessons && (
+                  <span className="text-numeral rounded-full border border-border bg-surface px-2.5 py-0.5 text-caption text-muted">
+                    {lessons.length} lessons
+                  </span>
+                )}
+                {lessons?.[currentLesson]?.difficulty != null && (
+                  <span className="text-numeral rounded-full border border-border bg-surface px-2.5 py-0.5 text-caption text-muted">
+                    Difficulty {lessons[currentLesson].difficulty}/5
+                  </span>
+                )}
+                <span className="text-numeral rounded-full border border-border bg-surface px-2.5 py-0.5 text-caption text-muted">
+                  {Math.round(passThreshold * 100)}% to pass
+                </span>
+                {sources.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSourcesOpen(true)}
+                    className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-raised px-2.5 py-0.5 text-caption text-muted transition-colors hover:text-primary"
+                  >
+                    <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span className="text-numeral text-primary">
+                      {sources.length}
+                    </span>
+                    sources
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="flex-grow">
@@ -350,6 +428,48 @@ export default function SetPage() {
           onClose={() => setCompletedSetModalOpen(false)}
           setTitle={setTitle ?? ""}
         />
+
+        <Modal
+          isOpen={sourcesOpen}
+          onClose={() => setSourcesOpen(false)}
+          title="Sources"
+        >
+          <p className="text-caption mb-4 text-muted">
+            Web sources triaged for this learning path (when research ran).
+          </p>
+          <ul className="flex flex-col gap-3">
+            {sources.map((src) => (
+              <li
+                key={`${src.id}-${src.url}`}
+                className="rounded-xl border border-border bg-surface p-4 text-left"
+              >
+                <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-label text-sm text-primary">{src.title}</p>
+                  <span className="text-numeral text-caption text-muted">
+                    S{src.id}
+                  </span>
+                </div>
+                {src.publisher && (
+                  <p className="text-caption text-muted">{src.publisher}</p>
+                )}
+                {src.excerpt && (
+                  <p className="text-caption mt-2 line-clamp-3 text-muted">
+                    {src.excerpt}
+                  </p>
+                )}
+                <a
+                  href={src.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="focus-ring mt-2 inline-flex items-center gap-1 text-caption text-brand hover:underline"
+                >
+                  Open source
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Modal>
       </main>
     </div>
   );

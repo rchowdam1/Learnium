@@ -1,138 +1,23 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import { zOutputSchema, type OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
-import { normalizeSetOutput } from "@/lib/normalize-set-output";
-import { freeOpenRouterModel } from "@/lib/openrouter";
 
-const openai = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY || "dummy_key",
-  defaultHeaders: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    "X-Title": "Learnium",
-  },
-  timeout: 90_000,
-});
-
-const MODEL = freeOpenRouterModel("OPENROUTER_MODEL");
-
-const SYSTEM_PROMPT = `You are a knowledgeable teacher specializing in microlearning sets.
-Generate a set of 4-12 lessons with quizzes based on the user's topic description.
-
-Return ONLY valid JSON (no markdown fences) matching this exact shape:
-
-{
-  "flagged": false,
-  "lessons": [
-    {
-      "title": "Lesson title",
-      "paragraphs": ["paragraph 1", "paragraph 2", "paragraph 3"]
-    }
-  ],
-  "quizzes": [
-    {
-      "title": "Same as lesson title",
-      "questions": [
-        {
-          "question": "Question text?",
-          "options": ["Option A", "Option B", "Option C", "Option D"],
-          "answer": "Option A"
-        }
-      ]
-    }
-  ]
-}
-
-Rules:
-- Generate 4-12 lessons (adjust based on topic breadth).
-- Each lesson must have a title and 3-5 non-empty paragraph strings.
-- There must be exactly one quiz per lesson (same length arrays), quiz title matching the lesson.
-- Each quiz has 3-5 questions; each question has exactly 4 options.
-- "answer" is REQUIRED and MUST be the exact string of one of the options (not an index or letter).
-- If the topic is unsafe, illegal, unethical, or nonsensical, set "flagged" to true and use empty lessons/quizzes arrays.`;
-
-const RETRY_PROMPT = `Your previous JSON was invalid. Return corrected JSON only.
-Every question MUST include an "answer" field whose value is exactly one of that question's "options" strings.
-Do not use correct_answer, indexes, or letters like "A". Use the key name "answer".`;
-
-async function generateSetJson(
-  description: string,
-  extraUserMessage?: string,
-  signal?: AbortSignal,
-): Promise<{ parsed: unknown; usageTokens?: number }> {
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    { role: "system", content: SYSTEM_PROMPT },
-    {
-      role: "user",
-      content: `The description given is "${description}". Generate the microlearning set as JSON.`,
-    },
-  ];
-
-  if (extraUserMessage) {
-    messages.push({ role: "user", content: extraUserMessage });
-  }
-
-  const completion = await openai.chat.completions.create(
-    {
-      model: MODEL,
-      messages,
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      // Reasoning models spend part of the token budget on thinking, so the
-      // visible JSON needs headroom or a full set will truncate mid-object.
-      max_tokens: 8192,
-      // OpenRouter reasoning control (not in the OpenAI SDK type — sent as-is).
-      reasoning: { effort: "high" },
-    } as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
-    { signal },
-  );
-
-  const content = completion.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("Empty response from model");
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(content);
-  } catch {
-    console.error("Failed to parse model JSON:", content.slice(0, 200));
-    throw new Error("Failed to parse generated content");
-  }
-
-  return {
-    parsed,
-    usageTokens: completion.usage?.total_tokens,
-  };
-}
-
-function validateSetOutput(raw: unknown): OutputSchema | null {
-  const normalized = normalizeSetOutput(raw);
-  const validation = zOutputSchema.safeParse(normalized);
-  if (!validation.success) {
-    console.error("Schema validation failed:", validation.error.issues);
-    return null;
-  }
-  return validation.data;
-}
+const EDGE_FUNCTION_URL = `${process.env.SUPABASE_URL ?? "https://mcyljssaisahfpwrdikt.supabase.co"}/functions/v1/generate-set-job`;
 
 /**
  * POST /api/input-check
  *
- * Pipeline (strict order — AC from Story 2.1):
+ * Enqueue pipeline (replaces synchronous multi-phase generation):
  *   1. Parse request body
  *   2. Authenticate
  *   3. Validate input
  *   4. Check quota (read-only, refresh if eligible)
- *   5. Call OpenRouter
- *   6. Normalize + validate output (one retry)
- *   7. Handle flagged content
- *   8. Persist graph atomically (create_set_graph RPC)
- *   9. Consume quota atomically (consume_set_quota RPC)
- *  10. Return success
+ *   5. Idempotency: reject duplicate active jobs for same user+title
+ *   6. Insert queued set_generation_jobs row
+ *   7. Invoke Edge Function with service-role key
+ *   8. Return { success: true, jobId } immediately
  *
- * Quota is NEVER consumed before persistence succeeds.
+ * PATCH /api/input-check
+ *   Cancel a queued/running job. Body: { jobId }.
  */
 export async function POST(request: Request) {
   // ─── Step 1: Parse body ────────────────────────────────────────────
@@ -173,7 +58,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Heuristic content checks (preserved from original)
   if (!/[aeiou]{1,}/i.test(rawDescription)) {
     return NextResponse.json(
       { success: false, message: "Description must contain meaningful text" },
@@ -195,7 +79,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Title length guard
   if (rawTitle.length > 120) {
     return NextResponse.json(
       { success: false, message: "Title must be under 120 characters" },
@@ -204,11 +87,6 @@ export async function POST(request: Request) {
   }
 
   // ─── Step 4: Read-only quota pre-check ─────────────────────────────
-  // The create_set_graph_with_quota RPC (Step 8) performs the authoritative
-  // daily refresh + decrement atomically. This step is a READ-ONLY gate so we
-  // don't spend an AI call when the user is genuinely out of quota. We must not
-  // write quota columns from the user session — protect_profile_entitlements()
-  // reserves those for trusted paths (the RPC and the billing service).
   const { data: profileData, error: profileError } = await supabase
     .from("profile")
     .select("sets_remaining, sets_refresh_at")
@@ -222,9 +100,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Quota is available if the user still has sets left, or a daily refresh is
-  // due (no refresh date yet, or the refresh time has passed) — the RPC applies
-  // that refresh when it runs.
   const refreshDue =
     profileData.sets_refresh_at === null ||
     new Date(profileData.sets_refresh_at) <= new Date();
@@ -242,141 +117,184 @@ export async function POST(request: Request) {
     );
   }
 
-  // ─── Step 5: Call OpenRouter ───────────────────────────────────────
-  const generationController = new AbortController();
-  const abortFromClient = () => generationController.abort();
-  const timeoutId = setTimeout(() => generationController.abort(), 90_000);
-  request.signal.addEventListener("abort", abortFromClient, { once: true });
+  // ─── Step 5: Idempotency check ─────────────────────────────────────
+  // Prevent duplicate active jobs for the same user+title
+  const { data: existingJobs } = await supabase
+    .from("set_generation_jobs")
+    .select("id, title")
+    .eq("profile_id", user.id)
+    .in("status", ["queued", "running"]);
 
-  let parsedResponse: OutputSchema | null = null;
-  let usageTokens: number | undefined;
-
-  try {
-    const { parsed, usageTokens: tokens } =
-      await generateSetJson(rawDescription, undefined, generationController.signal);
-    usageTokens = tokens;
-    parsedResponse = validateSetOutput(parsed);
-
-    // One correction retry
-    if (!parsedResponse) {
-      console.warn("Retrying set generation after schema validation failure");
-      const retry = await generateSetJson(rawDescription, RETRY_PROMPT, generationController.signal);
-      usageTokens = retry.usageTokens;
-      parsedResponse = validateSetOutput(retry.parsed);
-    }
-  } catch (error: unknown) {
-    if (request.signal.aborted || generationController.signal.aborted) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "AI generation timed out or was cancelled — please try again",
-          code: "GENERATION_CANCELLED",
-          retryable: true,
-        },
-        { status: 499 },
-      );
-    }
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("OpenRouter API error:", message);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "AI provider error — please try again",
-        code: "PROVIDER_ERROR",
-        retryable: true,
-      },
-      { status: 502 },
-    );
-  } finally {
-    clearTimeout(timeoutId);
-    request.signal.removeEventListener("abort", abortFromClient);
-  }
-
-  // ─── Step 6: Validate output ───────────────────────────────────────
-  if (!parsedResponse) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Generated content failed quality validation — please try again",
-        code: "VALIDATION_FAILED",
-        retryable: true,
-      },
-      { status: 422 },
-    );
-  }
-
-  // ─── Step 7: Handle flagged content ────────────────────────────────
-  if (parsedResponse.flagged) {
-    if (request.signal.aborted || generationController.signal.aborted) {
-      return NextResponse.json(
-        { success: false, message: "Generation cancelled", code: "GENERATION_CANCELLED" },
-        { status: 499 },
-      );
-    }
-    const { error: flagError } = await supabase.from("flagged").insert({
-      profile_id: user.id,
-      profile_email: user.email,
-      query: rawDescription,
-    });
-    if (flagError) {
-      console.error("Failed to log flagged query:", flagError.message);
-    }
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Could not process your request",
-        code: "CONTENT_FLAGGED",
-        retryable: false,
-      },
-      { status: 422 },
-    );
-  }
-
-  // ─── Step 8: Persist graph atomically ─────────────────────────────
-  const graphData = {
-    title: rawTitle,
-    description: rawDescription,
-    category: rawCategory,
-    lessons: parsedResponse.lessons,
-    quizzes: parsedResponse.quizzes,
-  };
-
-  if (request.signal.aborted || generationController.signal.aborted) {
-    return NextResponse.json(
-      { success: false, message: "Generation cancelled", code: "GENERATION_CANCELLED" },
-      { status: 499 },
-    );
-  }
-
-  const { data: setId, error: graphError } = await supabase.rpc(
-    "create_set_graph_with_quota",
-    { graph_data: graphData },
+  const existingJob = existingJobs?.find(
+    (candidate) => candidate.title.toLocaleLowerCase() === rawTitle.toLocaleLowerCase(),
   );
+  if (existingJob) {
+    // Invoke the Edge Function to ensure the existing job is being processed
+    await invokeEdgeFunction(existingJob.id);
+    return NextResponse.json({
+      success: true,
+      jobId: existingJob.id,
+      deduplicated: true,
+    });
+  }
 
-  if (graphError || !setId) {
-    if (graphError?.message.includes("QUOTA_EXHAUSTED")) {
-      return NextResponse.json({ success: false, message: "No set generation quota remaining for today", code: "QUOTA_EXHAUSTED", retryable: true }, { status: 429 });
+  // ─── Step 6: Create queued job ─────────────────────────────────────
+  const { data: job, error: insertError } = await supabase
+    .from("set_generation_jobs")
+    .insert({
+      profile_id: user.id,
+      title: rawTitle,
+      description: rawDescription,
+      category: rawCategory,
+      status: "queued",
+      phase: "Queued",
+      completed_lessons: 0,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !job) {
+    if (insertError?.code === "23505") {
+      const { data: activeJob } = await supabase
+        .from("set_generation_jobs")
+        .select("id, title")
+        .eq("profile_id", user.id)
+        .in("status", ["queued", "running"]);
+      const matchingJob = activeJob?.find(
+        (candidate) => candidate.title.toLocaleLowerCase() === rawTitle.toLocaleLowerCase(),
+      );
+      if (matchingJob) {
+        const invokeResult = await invokeEdgeFunction(matchingJob.id);
+        if (invokeResult.ok) {
+          return NextResponse.json({ success: true, jobId: matchingJob.id, deduplicated: true });
+        }
+      }
     }
-    console.error("create_set_graph failed:", graphError?.message);
+    console.error("Failed to create generation job:", insertError?.message);
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to save generated set",
-        code: "PERSISTENCE_ERROR",
+        message: "Failed to enqueue generation job",
+        code: "ENQUEUE_ERROR",
         retryable: true,
       },
       { status: 500 },
     );
   }
 
-  // Quota decrement and graph persistence are one database transaction.
-  console.log(
-    `Set ${setId} generated with model ${MODEL}: ${usageTokens ?? "?"} tokens used`,
-  );
+  // ─── Step 7: Invoke Edge Function ──────────────────────────────────
+  const invokeResult = await invokeEdgeFunction(job.id);
 
-  return NextResponse.json({
-    success: true,
-    setId,
-    parsedResponse,
-  });
+  if (!invokeResult.ok) {
+    console.warn(
+      `Job ${job.id} enqueued but Edge Function invocation failed: ${invokeResult.error}`,
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        jobId: job.id,
+        message: "Generation worker could not start. Please try again.",
+        code: "WORKER_START_ERROR",
+        retryable: true,
+      },
+      { status: 502 },
+    );
+  }
+
+  // ─── Step 8: Return immediately ────────────────────────────────────
+  return NextResponse.json({ success: true, jobId: job.id });
+}
+
+/**
+ * PATCH /api/input-check — Cancel a queued/running generation job.
+ */
+export async function PATCH(request: Request) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { success: false, message: "Authentication required" },
+      { status: 401 },
+    );
+  }
+
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Invalid request body" },
+      { status: 400 },
+    );
+  }
+
+  const jobId = typeof body.jobId === "string" ? body.jobId : "";
+
+  if (!jobId) {
+    return NextResponse.json(
+      { success: false, message: "jobId is required" },
+      { status: 400 },
+    );
+  }
+
+  const { data: cancelledJobs, error } = await supabase
+    .from("set_generation_jobs")
+    .update({ status: "cancelled", phase: "Cancelled" })
+    .eq("id", jobId)
+    .eq("profile_id", user.id)
+    .in("status", ["queued", "running"])
+    .select("id");
+
+  if (error) {
+    console.error("Failed to cancel job:", error.message);
+    return NextResponse.json(
+      { success: false, message: "Failed to cancel job" },
+      { status: 500 },
+    );
+  }
+
+  if (!cancelledJobs || cancelledJobs.length === 0) {
+    return NextResponse.json(
+      { success: false, message: "Generation job is no longer cancellable" },
+      { status: 409 },
+    );
+  }
+
+  return NextResponse.json({ success: true });
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+async function invokeEdgeFunction(jobId: string): Promise<{ ok: boolean; error?: string }> {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!serviceRoleKey) {
+    console.error("SUPABASE_SERVICE_ROLE_KEY not configured");
+    return { ok: false, error: "Service role key not configured" };
+  }
+
+  try {
+    const response = await fetch(EDGE_FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apiKey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+      body: JSON.stringify({ jobId }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      return { ok: false, error: `HTTP ${response.status}: ${errorText.slice(0, 200)}` };
+    }
+
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { ok: false, error: message };
+  }
 }

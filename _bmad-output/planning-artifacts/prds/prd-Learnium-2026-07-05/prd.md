@@ -296,9 +296,9 @@ A user can delete their account, removing personal data and chat history within 
 
 **Cost.** Every LLM-touching action is Quota-gated, cache-checked (semantic cache before model calls), or generation-deferred (Paths generate Sets lazily, FR-17). LLM cost per weekly-active user is a tracked counter-metric (SM-C3). Free-tier Quotas are the cost throttle.
 
-**LLM Integration & OpenRouter.** All LLM calls (content generation, Study Buddy chat, quizzes) route through OpenRouter as the default gateway. This integration is entirely environment-driven and depends on the presence of `OPENROUTER_API_KEY` and server-only model env vars. No hardcoded direct-provider endpoints are permitted in the Next.js app.
+**LLM Integration & OpenRouter.** All LLM calls (content generation, Study Buddy chat, quizzes, multimodal extract) route through OpenRouter as the default gateway. This integration depends on `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`). The OpenRouter base URL is hardcoded to `https://openrouter.ai/api/v1` (there is **no** `OPENROUTER_BASE_URL` env var). No direct third-party provider SDKs outside the OpenRouter OpenAI-compatible client.
 
-> **Amendment 2026-07-11:** Study Buddy retrieval is implemented in Next.js (`lib/ingest/`) with Supabase pgvector — not the FastAPI RAG service. Embeddings are local 384-d feature-hash vectors. All OpenRouter chat/vision/audio/transcription env vars use `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`.
+> **Amendment 2026-07-11 (revised — client MiniLM + DeepSeek):** Study Buddy is **not** the FastAPI RAG service. Live path: `POST /api/create-buddy` (JSON shell only) → browser extract/chunk/embed → `POST /api/ingest-document` (plus `extract-media`, `storage-usage`, `delete-buddy`) → Supabase Storage + `document_chunks` (pgvector). Embeddings: **client MiniLM** (`Xenova/all-MiniLM-L6-v2`, 384-d) primary, **feature-hash fallback**. OpenRouter generation/multimodal env contract: **`deepseek/deepseek-v4-flash`** (not Nemotron-for-all). Chat: claim quota before LLM; citations returned. Storage: Free **750MB** / Plus **5GB**; **100MB**/file; **8** files. LessonId grounding on send-chat remains **planned**. See `addendum.md`.
 
 ## 7. MVP Scope
 

@@ -12,6 +12,35 @@ export type RetrievedChunk = {
   score: number;
 };
 
+/** Client-ready citation for Study Buddy chat sources chip + preview panel. */
+export type ChatCitation = {
+  index: number;
+  documentName: string;
+  chunkIndex: number;
+  preview: string;
+  chunkId?: number;
+};
+
+const PREVIEW_MAX_CHARS = 280;
+
+export function buildChatCitations(chunks: RetrievedChunk[]): ChatCitation[] {
+  return chunks.map((chunk, i) => {
+    const trimmed = chunk.content.replace(/\s+/g, " ").trim();
+    const preview =
+      trimmed.length > PREVIEW_MAX_CHARS
+        ? `${trimmed.slice(0, PREVIEW_MAX_CHARS).trimEnd()}…`
+        : trimmed;
+
+    return {
+      index: i + 1,
+      documentName: chunk.document_name,
+      chunkIndex: chunk.chunk_index,
+      preview,
+      chunkId: chunk.id,
+    };
+  });
+}
+
 /**
  * Hybrid retrieval: semantic (pgvector) + keyword (tsvector), fused by id.
  */
@@ -21,10 +50,15 @@ export async function retrieveBuddyContext(options: {
   studyBotId: number;
   query: string;
   matchCount?: number;
+  /** Prefer client MiniLM embedding (384-d). Falls back to feature-hash. */
+  queryEmbedding?: number[];
 }): Promise<RetrievedChunk[]> {
   const { supabase, profileId, studyBotId, query } = options;
   const matchCount = options.matchCount ?? 8;
-  const queryEmbedding = embedText(query);
+  const queryEmbedding =
+    options.queryEmbedding && options.queryEmbedding.length === 384
+      ? options.queryEmbedding
+      : embedText(query);
   const { pgConfig: queryLang } = detectLanguage(query);
 
   const [{ data: semantic, error: semErr }, { data: keyword, error: kwErr }] =
@@ -163,7 +197,8 @@ ${options.buddyDescription ? `Your purpose: ${options.buddyDescription}` : ""}
 
 Answer the student's question using ONLY the provided source context when possible.
 If the context does not contain enough information, say what is missing and answer carefully from general knowledge while clearly labeling that part.
-Be concise, accurate, and cite sources like [Source N] when you use them.
+Be concise, accurate, and cite sources with short markers like [Source N] at the end of a claim when grounded.
+Do not dump multi-source parentheticals mid-sentence (avoid "[Source 1, Source 8]"). Prefer one short marker per claim.
 Never invent quotes from the materials.`;
 
   const completion = await client.chat.completions.create({

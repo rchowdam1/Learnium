@@ -4,6 +4,8 @@ import {
   retrieveBuddyContext,
   buildContextPrompt,
   answerWithContext,
+  buildChatCitations,
+  type ChatCitation,
 } from "@/lib/ingest";
 
 export const maxDuration = 120;
@@ -52,10 +54,28 @@ export async function POST(request: Request) {
   // ─── Step 2: Validate input ────────────────────────────────────────
   const messageToSend = String(reqData.userMessage || "").trim();
   const buddyId = Number(reqData.buddyId);
+  const rawEmbedding = reqData.queryEmbedding;
+  const queryEmbedding = Array.isArray(rawEmbedding)
+    ? (rawEmbedding as number[]).map(Number)
+    : undefined;
 
   if (!messageToSend || !Number.isFinite(buddyId)) {
     return NextResponse.json(
       { success: false, message: "buddyId and userMessage are required" },
+      { status: 400 },
+    );
+  }
+
+  if (
+    queryEmbedding &&
+    (queryEmbedding.length !== 384 ||
+      queryEmbedding.some((n) => !Number.isFinite(n)))
+  ) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "queryEmbedding must be a 384-d number array",
+      },
       { status: 400 },
     );
   }
@@ -102,7 +122,7 @@ export async function POST(request: Request) {
 
   // ─── Step 5: RAG retrieval ─────────────────────────────────────────
   let assistantMessage: string;
-  let citations: { documentName: string; chunkIndex: number; sourceLocator?: string | null }[] = [];
+  let citations: ChatCitation[] = [];
 
   try {
     const chunks = await retrieveBuddyContext({
@@ -111,10 +131,11 @@ export async function POST(request: Request) {
       studyBotId: buddyId,
       query: messageToSend,
       matchCount: 8,
+      queryEmbedding,
     });
 
     const context = buildContextPrompt(chunks);
-    citations = chunks.map((chunk) => ({ documentName: chunk.document_name, chunkIndex: chunk.chunk_index }));
+    citations = buildChatCitations(chunks);
     assistantMessage = await answerWithContext({
       question: messageToSend,
       context,
@@ -152,6 +173,7 @@ export async function POST(request: Request) {
       bot_id: buddyId,
       is_user_message: false,
       message: assistantMessage,
+      citations: citations.length > 0 ? citations : null,
     });
 
   if (asstMsgError) {

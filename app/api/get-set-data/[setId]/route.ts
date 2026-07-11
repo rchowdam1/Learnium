@@ -216,7 +216,11 @@ export async function GET(
 
   return NextResponse.json(
     {
-      title: setData.title,
+      title: setData?.title,
+      complexity: setData?.complexity ?? null,
+      complexityScore: setData?.complexity_score ?? null,
+      passThreshold: setData?.pass_threshold ?? 0.75,
+      sources: Array.isArray(setData?.sources) ? setData.sources : [],
       lessons: lessonData,
       paragraphs: paragraphs,
       completedLessons: completed,

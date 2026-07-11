@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
+import {
+  PASS_THRESHOLD,
+  didPass,
+  scorePercent,
+} from "@/lib/sets/pass";
 
 type OptionData = {
   id?: number;
@@ -32,24 +37,14 @@ export async function POST(request: Request) {
         message: "Quiz has already been completed",
         success: true,
         alreadyCompleted: true,
+        passed: true,
         quizScore: quizCheck.questions_correct ?? 0,
       },
       { status: 200 },
     );
   }
 
-  const { data: quizData, error: quizUpdateError } = await supabase
-    .from("quizzes")
-    .update({ completed: true })
-    .eq("id", quizId)
-    .select()
-    .single();
-
-  if (quizUpdateError) {
-    console.log("Could not update the quiz");
-    return NextResponse.json({ success: false }, { status: 200 });
-  }
-
+  // Score first — do not mark completed until the pass threshold is met
   const { data: questionData, error: questionError } = await supabase
     .from("questions")
     .select("*")
@@ -61,6 +56,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false }, { status: 200 });
   }
 
+  const totalQuestions = questionData.length;
   let quizScore = 0;
 
   for (let index = 0; index < body.answers.length; index++) {
@@ -83,15 +79,41 @@ export async function POST(request: Request) {
     }
   }
 
-  console.log(`The score on this quiz is ${quizScore}`);
+  const percent = scorePercent(quizScore, totalQuestions);
+  const passed = didPass(quizScore, totalQuestions);
 
-  const { error: quizScoreUpdateError } = await supabase
+  console.log(
+    `The score on this quiz is ${quizScore}/${totalQuestions} (${percent}) passed=${passed}`,
+  );
+
+  // Always persist attempt score; optionally attempt_count / last_percent when present
+  await saveAttemptInfo(supabase, quizId, quizCheck, quizScore, percent);
+
+  if (!passed) {
+    return NextResponse.json(
+      {
+        success: true,
+        passed: false,
+        quizScore,
+        totalQuestions,
+        percent,
+        requiredPercent: PASS_THRESHOLD,
+        message: "Need 75% to unlock the next lesson",
+      },
+      { status: 200 },
+    );
+  }
+
+  // Passed — permanently mark quiz + lesson completed for unlock
+  const { data: quizData, error: quizUpdateError } = await supabase
     .from("quizzes")
-    .update({ questions_correct: quizScore })
-    .eq("id", quizId);
+    .update({ completed: true, questions_correct: quizScore })
+    .eq("id", quizId)
+    .select()
+    .single();
 
-  if (quizScoreUpdateError) {
-    console.log("Could not update the score of the quiz");
+  if (quizUpdateError) {
+    console.log("Could not update the quiz");
     return NextResponse.json({ success: false }, { status: 200 });
   }
 
@@ -106,7 +128,64 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    { success: true, quizScore },
+    {
+      success: true,
+      passed: true,
+      quizScore,
+      totalQuestions,
+      percent,
+      requiredPercent: PASS_THRESHOLD,
+    },
     { status: 200 },
   );
+}
+
+/**
+ * Persist attempt stats without marking the quiz completed.
+ * `questions_correct` always exists; `attempt_count` / `last_percent` are best-effort
+ * so the route keeps working if those columns have not been migrated yet.
+ */
+async function saveAttemptInfo(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  quizId: number,
+  quizCheck: Record<string, unknown>,
+  quizScore: number,
+  percent: number,
+) {
+  const baseUpdate: Record<string, unknown> = {
+    questions_correct: quizScore,
+  };
+
+  const priorAttempts =
+    typeof quizCheck.attempt_count === "number" ? quizCheck.attempt_count : 0;
+
+  const withOptional: Record<string, unknown> = {
+    ...baseUpdate,
+    last_percent: percent,
+    attempt_count: priorAttempts + 1,
+  };
+
+  const { error: optionalError } = await supabase
+    .from("quizzes")
+    .update(withOptional)
+    .eq("id", quizId);
+
+  if (!optionalError) {
+    return;
+  }
+
+  // Columns may not exist yet — fall back to known columns only
+  console.log(
+    "Optional quiz attempt columns unavailable; saving questions_correct only",
+    optionalError,
+  );
+
+  const { error: baseError } = await supabase
+    .from("quizzes")
+    .update(baseUpdate)
+    .eq("id", quizId);
+
+  if (baseError) {
+    console.log("Could not update the score of the quiz", baseError);
+  }
 }

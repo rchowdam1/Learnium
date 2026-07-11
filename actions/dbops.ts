@@ -1,5 +1,6 @@
 import { OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
+import { persistSetMeta } from "@/lib/sets/persist-set-meta";
 
 /**
  * Create a set with its full graph (lessons, paragraphs, quizzes, questions, options)
@@ -7,6 +8,7 @@ import { createClient } from "@/lib/server";
  *
  * The RPC uses auth.uid() for profile_id — no caller-controlled user_id.
  * On any mid-insert failure, the entire graph rolls back.
+ * Depth/sources/pass meta are patched after insert (see persistSetMeta).
  */
 export async function createSet(
   parsedResponse: OutputSchema,
@@ -44,8 +46,11 @@ export async function createSet(
     return false;
   }
 
+  const id = Number(setId);
+  await persistSetMeta(supabase, id, parsedResponse);
+
   return {
-    id: Number(setId),
+    id,
     lessonCount: parsedResponse.lessons.length,
   };
 }

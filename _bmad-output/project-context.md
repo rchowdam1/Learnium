@@ -30,9 +30,18 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Stripe 18.4.0 — subscriptions/billing (`lib/stripe.ts`)
 - Tailwind CSS v4 (`@tailwindcss/postcss`); design primitives under `app/components/ui/`
 - OpenRouter via OpenAI-compatible SDK (`openai` 5.3.0) — base URL `https://openrouter.ai/api/v1`
-  - All model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`) use free multimodal `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`
-- Study Buddy RAG: **in-process** Next.js `lib/ingest/` — extract (pdf-parse, mammoth, JSZip, vision/transcription), chunk, **local 384-d feature-hash embeddings**, store in `document_chunks`, hybrid retrieve via `match_document_chunks` + `keyword_document_chunks`
-- `rag/` Python FastAPI + Chroma + LangCache is **legacy / unused** for create-buddy and send-chat — do not wire new features to it
+  - **Shipped env contract:** all model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`) are `deepseek/deepseek-v4-flash`
+  - `lib/openrouter.ts` allows `:free` models **or** the approved paid slug `deepseek/deepseek-v4-flash`; if env is unset, code default is still `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`
+- Study Buddy RAG (live path):
+  1. `POST /api/create-buddy` JSON only `{ title, description, category }` → buddy shell + storage quota snapshot
+  2. Browser extract (pdf.js / mammoth / jszip) **or** `POST /api/extract-media` for image/audio/video
+  3. Browser chunk + embed with MiniLM `Xenova/all-MiniLM-L6-v2` (384-d, `@huggingface/transformers`)
+  4. `POST /api/ingest-document` → `claim_study_storage`, upload raw file to Supabase Storage `study-documents`, insert client embeddings into `document_chunks` (`embedding_model` column)
+  5. Chat: client sends `queryEmbedding`; `POST /api/send-chat` hybrid retrieves (`match_document_chunks` + `keyword_document_chunks`) then OpenRouter answer + `citations` jsonb / sources chip UI
+- Embeddings: **primary = browser MiniLM**; feature-hash in `lib/ingest/embed.ts` is **fallback only** (not OpenRouter embeddings API)
+- Storage: Free **750MB** / Plus **5GB**; max **100MB**/file; max **8** files/buddy; RPCs `claim_study_storage` / `release_study_storage`; `profile.storage_bytes_used`
+- Chat quota: `consume_chat_quota` **before** LLM (claim-first; **no refund** on provider failure)
+- `rag/` Python FastAPI + Chroma + LangCache, `RAG_SERVICE_URL`, and server multipart `ingestBuddyDocuments` create-buddy path are **legacy / unused** — do not wire new features to them
 - zod 3.25.62, franc 6.2.0, axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
 - Tests: Vitest 4 (`tests/smoke`, jsdom) + Playwright (`tests/e2e`); CI in `.github/workflows/ci.yml`
 
@@ -55,10 +64,10 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Authenticated shell pages live under `app/(app)/` (dashboard, learn, review, leagues, profile, settings, onboarding); dynamic learning surfaces stay at `app/sets/[setId]` and `app/buddy/[buddyId]`
 - `middleware.ts` `protectedPaths` is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
 - Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy,ui}`, not by feature — place new components in the matching role folder; reusable design-system primitives go in `ui/`
-- Study Buddy ingest/chat stay in Next.js: browser multipart → `/api/create-buddy` → `ingestBuddyDocuments`; chat → `/api/send-chat` → `retrieveBuddyContext` / `answerWithContext`. Do **not** call `RAG_SERVICE_URL` or the Python `rag/` service for the live path
-- Embeddings are local feature-hash (`lib/ingest/embed.ts`, 384 dims matching `document_chunks.embedding`) — not OpenRouter/OpenAI embeddings API
-- LLM provider configuration is OpenRouter-first and env-driven: `OPENROUTER_API_KEY`, hardcoded OpenRouter base URL in current routes, model env vars above, plus `HTTP-Referer` / `X-Title` attribution headers. Do not hardcode direct provider models or swap to the Responses API
-- Mutations with auth, billing, quota, progress, AI, or privacy impact go through server actions or API routes — not browser-direct provider/DB writes
+- Study Buddy live path: JSON `POST /api/create-buddy` (shell only) → browser extract/chunk/MiniLM embed → `POST /api/ingest-document` (storage claim + chunks); chat → client `queryEmbedding` + `POST /api/send-chat` → hybrid retrieve + OpenRouter. Do **not** call `RAG_SERVICE_URL`, Python `rag/`, or legacy server `ingestBuddyDocuments` multipart create-buddy for the live path
+- Embeddings: primary browser MiniLM (`lib/ingest/client/embed.ts`, `Xenova/all-MiniLM-L6-v2`, 384-d); feature-hash (`lib/ingest/embed.ts`) is fallback only — not OpenRouter/OpenAI embeddings API
+- LLM provider configuration is OpenRouter-first and env-driven: `OPENROUTER_API_KEY`, hardcoded OpenRouter base URL in current routes, model env vars above (`deepseek/deepseek-v4-flash` shipped; Nemotron free if unset), plus `HTTP-Referer` / `X-Title` attribution headers. Do not hardcode direct provider models or swap to the Responses API
+- Mutations with auth, billing, quota, progress, AI, or privacy impact go through server actions or API routes — not browser-direct provider/DB writes. Client may compute MiniLM embeddings and post them only via authenticated `/api/ingest-document` / `queryEmbedding` on `/api/send-chat`
 
 ### Testing Rules
 
@@ -90,10 +99,11 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - `middleware.ts` protects a path if pathname equals the entry **or** starts with `path + "/"` (exact/subpath, not naive `startsWith(path)`). Still be precise when adding paths to avoid unintended overlaps
 - Every user-owned object read/write must prove ownership through parent `profile_id` (or an explicit public projection). Id-only access is invalid even behind middleware
 - **LLM provider is OpenRouter** via `openai` Chat Completions (`chat.completions.create`) with `response_format: { type: "json_object" }` where JSON is required — do NOT use the Responses API. Always include OpenRouter attribution headers
-- Study Buddy vectors live in Supabase `document_chunks` with RLS (`profile_id = auth.uid()`). Retrieval RPCs must pass both `filter_study_bot_id` and `filter_profile_id`. Browser never writes chunks or calls OpenRouter directly for buddy RAG
+- Study Buddy vectors live in Supabase `document_chunks` with RLS (`profile_id = auth.uid()`), `embedding_model` metadata, and hybrid RPCs that must pass both `filter_study_bot_id` and `filter_profile_id`. Chunks are inserted only through authenticated `/api/ingest-document` (client MiniLM embeddings). Browser never calls OpenRouter for buddy chat; media extract uses server `/api/extract-media`. Assistant messages store `citations` jsonb; UI shows sources chips
+- Storage quota: Free 750MB / Plus 5GB, max 100MB/file, max 8 files/buddy; claim via `claim_study_storage`, release via `release_study_storage`, track on `profile.storage_bytes_used`; raw files in Supabase Storage bucket `study-documents`
 - Stripe webhook route must keep raw `request.text()` body + `stripe-signature` validation before `constructEvent`. Entitlement comes from subscription lifecycle events, not checkout success alone
-- Quota ordering is strict: authenticate → validate → check quota → call provider/ingest → validate output → persist → decrement quota. Never spend quota on failed provider/validation/persistence
-- Buddy readiness: treat Buddies as chat-ready only when ingest succeeds with `chunks_count > 0`; failed/empty ingest must not look usable
+- **Chat quota is claim-first:** `/api/send-chat` calls `consume_chat_quota` **before** retrieval/LLM; provider failure does **not** refund the claim. Other generation flows still prefer check → act → persist → decrement where implemented that way
+- Buddy readiness: treat Buddies as chat-ready only when at least one document ingest succeeds with chunks; failed/empty ingest must not look usable
 - Review Sessions must not consume generation or chat quota
 - Signup enforces 16+ age gate; do not send chats/docs/learning history to providers for training
 

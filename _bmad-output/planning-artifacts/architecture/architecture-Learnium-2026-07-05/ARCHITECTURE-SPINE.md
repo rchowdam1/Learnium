@@ -23,8 +23,8 @@ companions: []
 
 # Architecture Spine - Learnium
 
-> **Amendment 2026-07-11 — Study Buddy ingest + pgvector pivot.**  
-> Study Buddy create/chat no longer use the Python FastAPI + Chroma + LangCache sidecar (`rag/`). Browser multipart uploads go to Next.js `/api/create-buddy`; `lib/ingest/` extracts multi-type documents, chunks, embeds with **local 384-d feature-hash** vectors, and stores rows in Supabase `document_chunks` (pgvector + FTS, RLS by `profile_id` / `study_bot_id`). Chat via `/api/send-chat` uses hybrid retrieval (`match_document_chunks` + `keyword_document_chunks`) then OpenRouter. `RAG_SERVICE_URL` is unused for the live path. AD-6, AD-10, AD-13, and AD-14 below are amended accordingly; historical Python-sidecar wording is superseded.
+> **Amendment 2026-07-11 — Study Buddy ingest + pgvector pivot (client MiniLM).**  
+> Study Buddy create/chat no longer use the Python FastAPI + Chroma + LangCache sidecar (`rag/`) or server multipart `ingestBuddyDocuments`. Live path: JSON `POST /api/create-buddy` creates a buddy shell; browser extracts (pdf.js/mammoth/jszip or `/api/extract-media`), chunks, and embeds with **MiniLM `Xenova/all-MiniLM-L6-v2` (384-d)**; `POST /api/ingest-document` claims storage, stores the raw file in Supabase Storage `study-documents`, and inserts client embeddings into `document_chunks` (pgvector + FTS, RLS, `embedding_model`). Chat client sends `queryEmbedding`; `/api/send-chat` hybrid-retrieves (`match_document_chunks` + `keyword_document_chunks`), answers via OpenRouter, persists `citations` jsonb. Feature-hash in `lib/ingest/embed.ts` is **fallback only**. `RAG_SERVICE_URL` is unused. AD-6, AD-10, AD-13, and AD-14 below are amended accordingly.
 
 ## Design Paradigm
 
@@ -33,16 +33,17 @@ Learnium uses a **modular server-first layered monolith** with **in-process Stud
 ```mermaid
 flowchart LR
   UI[App Router pages and components] --> Actions[Server actions and API routes]
+  UI --> ClientEmbed[Browser MiniLM extract chunk embed]
+  ClientEmbed --> IngestAPI["/api/ingest-document"]
   Actions --> Domain[Server-owned domain mutations]
-  Domain --> Supabase[(Supabase Auth Postgres pgvector)]
+  Domain --> Supabase[(Supabase Auth Postgres pgvector Storage)]
+  IngestAPI --> Supabase
   Actions --> Stripe[Stripe]
-  Actions --> Ingest[lib/ingest extract chunk embed]
-  Ingest --> Supabase
-  Actions --> OpenRouter[OpenRouter chat vision audio]
+  Actions --> OpenRouter[OpenRouter chat vision audio extract-media]
   Middleware[Next middleware] --> UI
 ```
 
-Dependency direction is inward to server authority. Components display state and request work; API routes and server actions enforce auth, quota, validation, persistence, and provider calls. Study Buddy retrieval and tutor answers are owned by Next.js server routes plus Supabase vector/FTS RPCs — not a separate Python process.
+Dependency direction is inward to server authority. Components display state and request work; API routes and server actions enforce auth, quota, validation, persistence, and provider calls. Study Buddy **embeddings are computed in the browser** (MiniLM); chunk persistence, storage claim, hybrid retrieval, and tutor answers are owned by Next.js server routes plus Supabase vector/FTS RPCs — not a separate Python process.
 
 ## Invariants & Rules
 
@@ -61,8 +62,8 @@ Dependency direction is inward to server authority. Components display state and
 ### AD-3 - Quota Transaction Ordering [ADOPTED]
 
 - **Binds:** Set generation, Path generation, Study Buddy chat, future LLM-touching actions.
-- **Prevents:** Quota loss on rejected/failed actions, duplicate decrements on retry, and paid-tier inconsistency.
-- **Rule:** Quota counters are mutated only by database RPCs or a single quota domain service backed by atomic database writes. Launch default is no reservation: authenticate -> validate input -> check available quota -> call provider -> validate output -> persist durable result -> `consume_*_quota` -> return success. Provider, validation, or persistence failure does not spend user quota. Read endpoints do not reset or consume quota.
+- **Prevents:** Duplicate decrements on retry and paid-tier inconsistency; documents honest spend semantics per flow.
+- **Rule:** Quota counters are mutated only by database RPCs or a single quota domain service backed by atomic database writes. **Study Buddy chat is claim-first:** authenticate → validate → verify ownership → `consume_chat_quota` → retrieve → OpenRouter → persist; provider failure does **not** refund the claim. Other generation flows should prefer check → act → persist → decrement where implemented that way. Read endpoints do not reset or consume quota.
 
 ### AD-4 - Server-Owned Progress And Rewards
 
@@ -79,8 +80,8 @@ Dependency direction is inward to server authority. Components display state and
 ### AD-6 - Study Buddy Ingest And Retrieval Contract [ADOPTED] _(amended 2026-07-11)_
 
 - **Binds:** Study Buddy, uploaded Buddy documents, grounded tutor chat.
-- **Prevents:** Browser-direct provider/DB vector writes, ungrounded general assistant behavior, and reintroducing the legacy Python sidecar as the live path.
-- **Rule:** Browser uploads documents only via authenticated multipart to `/api/create-buddy`. Server code in `lib/ingest/` extracts, chunks, embeds (local 384-d feature-hash), and writes `document_chunks` scoped by `profile_id` + `study_bot_id`. Chat goes through `/api/send-chat`, which hybrid-retrieves via Supabase RPCs then calls OpenRouter. Browser never calls OpenRouter or writes chunks for arbitrary `buddyId`. The legacy `rag/` Python service and `RAG_SERVICE_URL` are not part of the live contract.
+- **Prevents:** Ungrounded general assistant behavior, unauthenticated vector/storage writes, and reintroducing legacy Python/server-multipart paths as the live path.
+- **Rule:** Live pipeline: (1) JSON `POST /api/create-buddy` `{ title, description, category }` creates the buddy shell + returns storage quota snapshot; (2) browser extracts text (pdf.js/mammoth/jszip) or `POST /api/extract-media` for image/audio/video; (3) browser chunks and embeds with MiniLM `Xenova/all-MiniLM-L6-v2` (384-d, `@huggingface/transformers`); feature-hash in `lib/ingest/embed.ts` is fallback only; (4) authenticated `POST /api/ingest-document` claims storage (`claim_study_storage`), uploads raw file to Storage bucket `study-documents`, inserts client embeddings into `document_chunks` (`embedding_model`, scoped by `profile_id` + `study_bot_id`); (5) chat client sends `queryEmbedding`; `/api/send-chat` hybrid-retrieves (`match_document_chunks` + `keyword_document_chunks`) then OpenRouter, persisting `citations` jsonb for sources-chip UI. Browser never calls OpenRouter for buddy chat. Legacy: Python `rag/`, `RAG_SERVICE_URL`, server multipart create-buddy → `ingestBuddyDocuments`.
 
 ### AD-7 - Stripe As Billing Source Of Truth [ADOPTED]
 
@@ -102,9 +103,9 @@ Dependency direction is inward to server authority. Components display state and
 
 ### AD-10 - Deployable Service Configuration _(amended 2026-07-11)_
 
-- **Binds:** Next.js deployment, Supabase (including pgvector), Stripe webhooks, OpenRouter keys and model routing.
+- **Binds:** Next.js deployment, Supabase (including pgvector + Storage), Stripe webhooks, OpenRouter keys and model routing.
 - **Prevents:** Localhost-only production, secrets in browser bundles, service-role leakage, and environment drift.
-- **Rule:** Provider keys live in environment variables scoped to the deployed service. LLM and multimodal ingest route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`) — all defaulting to the free multimodal slug `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. Study Buddy vectors require Supabase with the `document_chunks` migration applied — no separate RAG host. Service-role Supabase access is restricted to server-only privileged modules and never used for regular user-facing queries. `RAG_SERVICE_URL` is legacy/unused.
+- **Rule:** Provider keys live in environment variables scoped to the deployed service. LLM and multimodal extract (`/api/extract-media`) route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`). **Shipped env contract:** all four use `deepseek/deepseek-v4-flash`. `lib/openrouter.ts` accepts `:free` models or approved paid `deepseek/deepseek-v4-flash`; if env is unset, code default is still `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. Study Buddy vectors require Supabase with `document_chunks`, storage quota RPCs, and `study-documents` bucket — no separate RAG host; embeddings are browser MiniLM (not OpenRouter embeddings API). Service-role Supabase access is restricted to server-only privileged modules. `RAG_SERVICE_URL` is legacy/unused.
 
 ### AD-11 - Scheduled Work Authority
 
@@ -120,15 +121,15 @@ Dependency direction is inward to server authority. Components display state and
 
 ### AD-13 - Canonical Chat Write Path _(amended 2026-07-11)_
 
-- **Binds:** Study Buddy messages, chat quota, hybrid retrieval + OpenRouter.
+- **Binds:** Study Buddy messages, chat quota, hybrid retrieval + OpenRouter, citations.
 - **Prevents:** Alternate endpoints bypassing quota, creating orphan messages, or saving assistant messages not produced by the canonical tutor path.
-- **Rule:** One server endpoint (`/api/send-chat`) owns the chat transaction: authenticate, check chat quota, retrieve buddy-scoped chunks, call OpenRouter, persist user and assistant messages, consume quota, return committed state. Any legacy or helper endpoint may only delegate to that owner or be limited to migration/admin use.
+- **Rule:** One server endpoint (`/api/send-chat`) owns the chat transaction: authenticate → validate (`buddyId`, `userMessage`, optional 384-d `queryEmbedding`) → verify buddy ownership → **`consume_chat_quota` claim-first (no refund on later provider failure)** → hybrid retrieve (prefer client MiniLM `queryEmbedding`, else feature-hash fallback) → OpenRouter answer → persist user + assistant rows including `citations` jsonb → return committed state (sources chip UI). Any legacy or helper endpoint may only delegate to that owner or be limited to migration/admin use.
 
 ### AD-14 - Buddy Document Ingestion Lifecycle _(amended 2026-07-11)_
 
-- **Binds:** Study Buddy creation, uploaded documents, Supabase `document_chunks` ingestion, Buddy readiness.
-- **Prevents:** UI showing a Buddy as usable while ingest failed/empty, or writing chunks for another user's Buddy.
-- **Rule:** Buddy creation is server-mediated: create `study_bots` row → `ingestBuddyDocuments` → success only when `chunks_count > 0`. Failed or empty ingest must not present the Buddy as chat-ready. Every upload is mediated by `/api/create-buddy`; RLS and RPC filters enforce `profile_id` + `study_bot_id` ownership. (Earlier `pending_db` / `pending_rag` / Chroma wording is superseded by this in-process path.)
+- **Binds:** Study Buddy creation, uploaded documents, storage quota, Supabase `document_chunks` ingestion, Buddy readiness.
+- **Prevents:** UI showing a Buddy as usable while ingest failed/empty, over-quota storage, or writing chunks for another user's Buddy.
+- **Rule:** Buddy shell creation is JSON-only via `/api/create-buddy` (no files). Client then extract/chunk/MiniLM-embeds and posts each file to `/api/ingest-document`, which claims storage, stores the raw blob, and inserts embeddings. Limits: Free **750MB** / Plus **5GB** total (`profile.storage_bytes_used`), max **100MB**/file, max **8** files/buddy; RPCs `claim_study_storage` / `release_study_storage`. Buddy is chat-ready only when at least one ingest yields chunks; failed/empty ingest must not look usable. RLS and RPC filters enforce `profile_id` + `study_bot_id`. (Legacy server multipart create-buddy → `ingestBuddyDocuments` and Chroma/`pending_rag` wording are superseded.)
 
 ### AD-15 - Generated Content Atomicity
 
@@ -158,10 +159,11 @@ Dependency direction is inward to server authority. Components display state and
 | Expected failures | Do not throw for expected Supabase/provider failures; return the existing envelope and preserve user input/quota. |
 | Protected surfaces | New authenticated top-level routes must be added to `middleware.ts` `protectedPaths`; be precise because matching is prefix-based. |
 | Ownership paths | `lessonId` and `quizId` authorize through Lesson -> Set -> profile; `buddyId` and chat authorize through Study Buddy -> profile; Review items authorize through profile; Path Sets authorize through Path owner or standalone Set owner. |
-| AI schemas | Generated Set/Lesson payloads stay schema-validated in Next.js (zod). Study Buddy chat uses server-owned retrieve + prompt assembly in `lib/ingest/`. |
+| AI schemas | Generated Set/Lesson payloads stay schema-validated in Next.js (zod). Study Buddy chat uses server-owned retrieve + prompt assembly in `lib/ingest/`; assistant `citations` jsonb powers sources UI. |
 | Accessibility | Real controls, visible focus, `aria-live` feedback, reduced motion, persistent-chrome focus protection, and 44px targets are implementation constraints, not visual polish. |
-| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, OpenRouter model names, and service-role keys stay server-only. |
-| LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure API key, model slugs (chat/vision/audio/transcription), and optional attribution headers through env vars so provider swaps do not alter product/domain code. Embeddings for buddy RAG are local (384-d), not OpenRouter. |
+| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, OpenRouter model names, and service-role keys stay server-only. Shipped OpenRouter models: `deepseek/deepseek-v4-flash` for MODEL/VISION/AUDIO/TRANSCRIPTION; code default if unset remains Nemotron free. |
+| LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure API key, model slugs (chat/vision/audio/transcription), and optional attribution headers through env vars so provider swaps do not alter product/domain code. Buddy RAG embeddings are browser MiniLM 384-d (feature-hash fallback), not OpenRouter embeddings API. |
+| Study storage | Free 750MB / Plus 5GB; max 100MB/file; max 8 files/buddy; `claim_study_storage` / `release_study_storage`; raw files in `study-documents`. |
 | Service-role boundary | Service-role Supabase access is limited to named server-only privileged modules for account deletion, profile bootstrap/repair, and admin reconciliation; regular user-facing reads/writes cannot import it. |
 | API errors | API failures keep `{ success: false, message, code, retryable }`; `code` distinguishes auth, authorization, validation, quota, provider, readiness, billing, and unknown failures. |
 
@@ -176,9 +178,9 @@ Dependency direction is inward to server authority. Components display state and
 | Supabase JS | 2.50.0 manifest baseline; npm latest checked as 2.110.0 on 2026-07-05 |
 | Stripe Node | 18.4.0 manifest baseline; npm latest checked as 22.3.0 on 2026-07-05 |
 | Tailwind CSS | 4.x manifest baseline; npm latest checked as 4.3.2 on 2026-07-05 |
-| OpenAI-compatible JS client | `openai` 5.3.0 manifest baseline used as compatibility client; npm latest checked as 6.45.0 on 2026-07-05; runtime provider target is OpenRouter |
-| Study Buddy ingest | `lib/ingest/` (pdf-parse, mammoth, JSZip, OpenRouter vision/transcription) + local 384-d feature-hash embeddings + Supabase pgvector |
-| Python `rag/` | **Legacy / unused** for Study Buddy (FastAPI + Chroma + LangCache) — retained for reference only |
+| OpenAI-compatible JS client | `openai` 5.3.0 manifest baseline used as compatibility client; npm latest checked as 6.45.0 on 2026-07-05; runtime provider target is OpenRouter (`deepseek/deepseek-v4-flash` shipped; Nemotron free if env unset) |
+| Study Buddy ingest | Browser MiniLM (`@huggingface/transformers`, `Xenova/all-MiniLM-L6-v2`) + client extract; `/api/extract-media` for media; `/api/ingest-document` → Storage + `document_chunks`; feature-hash fallback only |
+| Python `rag/` / server multipart ingest | **Legacy / unused** for Study Buddy — retained for reference only |
 
 ## Structural Seed
 
@@ -191,8 +193,8 @@ Learnium/
     buddy/[buddyId]/      # Study Buddy surfaces
   actions/                # Server action mutations and DB operation helpers
   lib/                    # Supabase, Stripe, server-only provider clients
-    ingest/               # Study Buddy extract/chunk/embed/retrieve (live path)
-  supabase/migrations/    # Includes document_chunks + hybrid retrieval RPCs
+    ingest/               # Server retrieve/answer + limits; client/ MiniLM embed + browser extract
+  supabase/migrations/    # document_chunks, citations, storage quota RPCs, hybrid retrieval
   rag/                    # DEPRECATED Python sidecar — not used for create-buddy/chat
   _bmad-output/           # Planning artifacts, PRD, UX, architecture
 ```
@@ -237,7 +239,7 @@ sequenceDiagram
 | --- | --- | --- |
 | FR-1..FR-3 Set generation and content quality | `app/api/input-check`, generation routes/actions, Supabase Sets/Lessons | AD-3, AD-5, AD-10, AD-15 |
 | FR-4..FR-5 Lessons and progression | `app/sets/[setId]`, lesson components, progress actions | AD-4, AD-5, AD-12, AD-15 |
-| FR-6 Study Buddy | `app/api/create-buddy`, `app/api/send-chat`, `lib/ingest/`, `document_chunks` | AD-3, AD-6, AD-10, AD-13, AD-14 |
+| FR-6 Study Buddy | `app/api/create-buddy`, `extract-media`, `ingest-document`, `send-chat`, `lib/ingest/` (+ `client/`), `document_chunks`, Storage `study-documents` | AD-3, AD-6, AD-10, AD-13, AD-14 |
 | FR-7..FR-9 Daily Goals, Streaks, reminders | profile/settings, scheduled jobs | AD-4, AD-11, AD-16 |
 | FR-10..FR-12 XP, Levels, Badges | server event handlers, Supabase reward tables | AD-4 |
 | FR-13..FR-14 Leagues | league routes/views, scheduled cycle jobs, privacy projections | AD-4, AD-8, AD-11, AD-16 |
@@ -255,8 +257,8 @@ sequenceDiagram
 | League tier count and promotion/demotion counts | Resolved: 5 tiers (Bronze-Diamond), cohorts of 30, top/bottom 5 promote/demote. |
 | Fixed interval vs SM-2 Review algorithm | Deferred: V1 starts with fixed intervals; recurrence state is server-owned so the algorithm can evolve. |
 | Email vs web push reminders | Resolved: email-only for v1. |
-| RAG production host and vector/cache managed services | **Resolved 2026-07-11:** Study Buddy vectors live in Supabase pgvector (`document_chunks`); no separate Python/Chroma/LangCache host for the live path. |
+| RAG production host and vector/cache managed services | **Resolved 2026-07-11:** Study Buddy vectors live in Supabase pgvector (`document_chunks`); browser MiniLM embeddings; no separate Python/Chroma/LangCache host for the live path. |
 | Test framework and CI shape | Deferred: Required for launch hardening, but exact Vitest/Playwright composition belongs to test architecture setup. |
 | Next 16 / React 19.2 upgrade | Deferred: Local stack is valid but upgrade should be assessed separately. |
-| Python dependency pinning and model config | Resolved: Configured via environment variables (`OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and environment-selected model slugs). |
+| Python dependency pinning and model config | Resolved (legacy for RAG): OpenRouter via `OPENROUTER_API_KEY` + model env vars; shipped `deepseek/deepseek-v4-flash`, code default Nemotron free if unset. |
 | Exact Stripe API version and handler details | Deferred: The spine binds subscription event classes; handler details are billing-specific. |

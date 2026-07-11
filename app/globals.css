@@ -148,6 +148,24 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  /* Active lesson-node progress ring — subtle accent-glow pulse (DESIGN.md) */
+  .lesson-node-ring-glow {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent-glow) 55%, transparent));
+    animation: lesson-node-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes lesson-node-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent-glow) 40%, transparent));
+  }
+  50% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--accent-glow) 70%, transparent));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

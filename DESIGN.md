@@ -58,6 +58,11 @@ colors:
   warning-dark: '#F59E0B'
   error-dark: '#F87171'
   info-dark: '#60A5FA'
+  # --- Implementation tokens (globals.css) ---
+  overlay: 'rgb(11 15 20 / 0.45)'       # modal/scrim backdrop — light
+  overlay-dark: 'rgb(0 0 0 / 0.6)'      # modal/scrim backdrop — dark
+  selection: '#D3D9E0'                  # text selection highlight — light
+  selection-dark: '#2A3644'             # text selection highlight — dark
 typography:
   display:
     fontFamily: 'Bricolage Grotesque'
@@ -203,19 +208,38 @@ components:
     foreground-dark: '{colors.background-dark}'
     ring: '{components.progress-ring}'
     numeral: '{typography.numeral}'
+    note: 'DESIGN target = brand circle + progress ring. Implementation status: StatusChrome ships an interim Pill level chip (L{n}), not the ringed badge.'
   lesson-node:
     locked-background: '{colors.surface}'
+    locked-border: '{colors.border-strong}'
     locked-icon: 'padlock'
     locked-icon-color: '{colors.text-disabled}'
     active-background: '{colors.brand}'
     active-background-dark: '{colors.brand-dark}'
     active-icon: 'play'
     active-ring: '{components.progress-ring}'
+    active-glow: '{colors.accent-glow}'
     complete-background: '{colors.accent}'
     complete-icon: 'check'
     complete-foreground: '{colors.on-accent}'
     radius: '{rounded.full}'
-    note: 'Locked/active/complete must remain distinguishable in grayscale: padlock, play/dot, check.'
+    note: 'Locked/active/complete must remain distinguishable in grayscale: padlock, play/dot, check. Shipped: locked uses hairline border-strong for contrast; active is slightly enlarged vs locked/complete; active has progress ring + accent-glow pulse.'
+  sources-chip:
+    background: '{colors.surface-raised}'
+    border: '{colors.border}'
+    radius: '{rounded.full}'
+    icon: 'FileText'
+    count: '{typography.numeral}'
+    label: '{typography.caption}'
+    note: 'Unique document count + "source(s)" caption. Opens sources-panel. File: app/components/study-buddy/Chat.tsx'
+  sources-panel:
+    title: 'Sources'
+    item-background: '{colors.surface}'
+    item-border: '{colors.border}'
+    item-radius: '{rounded.xl}'
+    meta: '{typography.caption}'
+    preview: '{typography.caption}'
+    note: 'Modal list: document name + Source N · §chunk + line-clamped preview. File: app/components/study-buddy/Chat.tsx'
   input:
     background: '{colors.surface-raised}'
     background-dark: '{colors.surface-raised-dark}'
@@ -247,11 +271,13 @@ components:
     current-user-background: '{colors.surface}'
     promotion-accent: '{colors.accent-progress}'
     numeral: '{typography.numeral}'
+    note: 'Planned — Leagues route is placeholder; component not shipped.'
   review-session-card:
     background: '{colors.surface-raised}'
     background-dark: '{colors.surface-raised-dark}'
     border: '{colors.border}'
     radius: '{rounded.xl}'
+    note: 'Planned — review-session flow not shipped; routes placeholder.'
   celebration-overlay:
     background: '{colors.surface-raised}'
     background-dark: '{colors.surface-raised-dark}'
@@ -261,7 +287,7 @@ components:
     numeral: '{typography.numeral}'
   nova-avatar:
     radius: '{rounded.full}'
-    note: 'North Star geometric character. States: encouraging / skeptical / celebratory starburst.'
+    note: 'DESIGN target = geometric North Star. States: encouraging / skeptical / celebratory starburst. Implementation status: chat uses Lucide Bot as interim avatar (shipped).'
   toast:
     background: '{colors.surface-raised}'
     background-dark: '{colors.surface-raised-dark}'
@@ -292,6 +318,7 @@ Palette: **Midnight Ink / Pure**. Light and dark are **co-equal** — every surf
 - **Accent Lime (`#84CC16`, glow `#B8F135`)** — The energetic reward color. **RESERVED** for moment-of-gain feedback: XP bursts, level-up, correct answers, and completion CTAs (Continue Lesson, Complete). Always-on progress uses muted `accent-progress` (`#4D7C0F` light / `#84CC16` dark) so the reward burst still feels earned.
 - **Streak Amber (`#F59E0B`)** — Streak flames 🔥 only. Not a general warning fill, not decoration.
 - **Semantic** — `error` (`#DC2626` / `#F87171`), `success` maps to the lime family, `warning` is reserved for explicit caution states, `info` a blue (`#3B82F6` / `#60A5FA`).
+- **Overlay / selection (implementation tokens)** — Modal and scrim backdrops use `{colors.overlay}` (`rgb(11 15 20 / 0.45)` light / `rgb(0 0 0 / 0.6)` dark). Text selection uses `{colors.selection}` (`#D3D9E0` light / `#2A3644` dark). Both are defined in `globals.css` and referenced as CSS variables (`--overlay`, `--selection`).
 
 Avoid: a third ad-hoc blue set, gradients on the base surface, and using lime or amber outside their reserved reward/streak roles.
 
@@ -341,15 +368,17 @@ Visual specs only (states/token refs). Behavior lives in EXPERIENCE.md.
 - **Progress bar** — `{rounded.full}` track `{colors.accent-progress-track}`, fill `{colors.accent-progress}`. Percent label (if shown) in `{typography.numeral}`.
 - **Progress ring** — Circular `{rounded.full}` stroke, muted progress fill on `{colors.accent-progress-track}` track. Wraps Nova and level badges to show Lesson/Level completion.
 - **Streak flame** — flame glyph in `{colors.streak}` with day count in `{colors.text-primary}` / `{colors.text-primary-dark}` using `{typography.numeral}`. Amber is exclusive to the glyph.
-- **Level badge / ring** — Circular badge, `{colors.brand}` face, level number in `{typography.numeral}`, wrapped by a muted progress ring toward next level.
-- **Lesson node** — Circular node on the Learning Path. **Locked**: `{colors.surface}` fill + padlock glyph + `{colors.text-disabled}`. **Active**: `{colors.brand}` face + play/dot glyph + progress ring + subtle `{colors.accent-glow}` pulse. **Complete**: lime fill + `{colors.on-accent}` check. Locked/active/complete must remain distinct in grayscale.
-- **Modal** — `{colors.surface-raised}`, `{rounded.2xl}`, soft shadow, hairline border. Title in `h2`, body in `body`. One level deep.
+- **Level badge / ring** — Circular badge, `{colors.brand}` face, level number in `{typography.numeral}`, wrapped by a muted progress ring toward next level. *Implementation status:* StatusChrome ships an interim Pill level chip (`L{n}`), not the ringed badge.
+- **Lesson node** — Circular node on the Learning Path. **Locked**: `{colors.surface}` fill + padlock glyph + `{colors.text-disabled}` + hairline `{colors.border-strong}` for contrast (shipped). **Active**: slightly enlarged vs locked/complete; `{colors.brand}` face + play/dot glyph + progress ring + subtle `{colors.accent-glow}` pulse (shipped). **Complete**: lime fill + `{colors.on-accent}` check. Locked/active/complete must remain distinct in grayscale.
+- **Sources chip** — `{components.sources-chip}`. `rounded-full`, hairline `{colors.border}`, `{colors.surface-raised}` fill. FileText icon + unique document count in `{typography.numeral}` + caption "source"/"sources". Opens the sources panel. Shipped in `app/components/study-buddy/Chat.tsx`.
+- **Sources panel** — `{components.sources-panel}`. Modal titled "Sources". List rows: document name + `Source N · §chunk` meta + caption preview (`line-clamp`). Row surface `{colors.surface}` + `{colors.border}`, `{rounded.xl}`. Shipped in `app/components/study-buddy/Chat.tsx`.
+- **Modal** — `{colors.surface-raised}`, `{rounded.2xl}`, soft shadow, hairline border. Backdrop uses `{colors.overlay}`. Title in `h2`, body in `body`. One level deep.
 - **Input / field** — `{components.input}`. Uses a 3:1 interactive boundary at rest, not a decorative hairline. Focus: `{colors.brand}` border + `{colors.info}` ring. Label above in `{typography.label}`; error text `{colors.error}` plus an icon/text cue, never color alone.
-- **Nav — top bar** — Sticky, `{colors.background}`, hairline bottom border. Logo/brand in `{colors.brand}`; XP pill + streak flame + avatar right-aligned, all using `{typography.numeral}`.
+- **Nav — top bar** — Sticky, `{colors.background}`, hairline bottom border. Logo/brand in `{colors.brand}`; XP pill + streak flame + avatar right-aligned, all using `{typography.numeral}`. *Implementation status (known split):* `AppNav` mounts full `StatusChrome` (XP / level / streak / goal / quota). Set detail, Study Buddy, and subscriptions pages still use `AuthNav`, which shows logo + welcome + Profile only — no StatusChrome.
 - **Nav — mobile bottom bar** — Fixed bottom, `{colors.surface-raised}`, hairline top border. 4–5 icon tabs, active tab tinted `{colors.brand}` (light) / `{colors.text-primary-dark}` (dark). 44px+ targets.
-- **Leaderboard (League) row** — Full-width row, hairline divider. Rank + XP in `{typography.numeral}`, avatar `{rounded.full}`, name in `body-strong`. Current user row tinted `{colors.surface}`; promotion zone marked with `{colors.accent-progress}`.
-- **Review-session card** — `{colors.surface-raised}`, `{rounded.xl}`. Prompt in `h3`/`body`; reveal/answer actions use the lime progress button for "Correct," secondary for "Again."
-- **Nova avatar** — Geometric North Star, `{rounded.full}` frame. Expression states: **encouraging** (steady, warm), **skeptical** (raised-brow, for honesty beats), **celebratory** (full starburst, for wins/level-ups). Appears in Study Buddy chat, empty states, and celebration moments.
+- **Leaderboard (League) row** — Full-width row, hairline divider. Rank + XP in `{typography.numeral}`, avatar `{rounded.full}`, name in `body-strong`. Current user row tinted `{colors.surface}`; promotion zone marked with `{colors.accent-progress}`. *Implementation status:* planned — Leagues route is a placeholder; component not shipped.
+- **Review-session card** — `{colors.surface-raised}`, `{rounded.xl}`. Prompt in `h3`/`body`; reveal/answer actions use the lime progress button for "Correct," secondary for "Again." *Implementation status:* planned — review-session flow not shipped.
+- **Nova avatar** — Geometric North Star, `{rounded.full}` frame. Expression states: **encouraging** (steady, warm), **skeptical** (raised-brow, for honesty beats), **celebratory** (full starburst, for wins/level-ups). Appears in Study Buddy chat, empty states, and celebration moments. *Implementation status:* DESIGN target remains the geometric North Star; current chat ships Lucide `Bot` as an interim avatar.
 - **Celebration / level-up overlay** — `{rounded.2xl}` card, soft shadow, Nova in starburst state. Headline in `display`/`display-sm` (Bricolage), XP/level gains in `{typography.numeral}`, lime accents and `{colors.accent-glow}`. The one place energy is fully spent.
 - **Toast** — `{colors.surface-raised}`, `{rounded.xl}`, hairline border, soft shadow. Icon tinted by semantic role (`success` lime, `error`, `info`). Text in `body-strong`.
 
