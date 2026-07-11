@@ -1,10 +1,19 @@
 ---
 project_name: 'Learnium'
 user_name: 'Arnav'
-date: '2026-07-05'
-sections_completed: ['technology_stack', 'language_specific_rules', 'framework_specific_rules', 'testing_rules', 'code_quality_rules', 'workflow_rules', 'critical_dont_miss_rules']
+date: '2026-07-10'
+sections_completed:
+  [
+    'technology_stack',
+    'language_rules',
+    'framework_rules',
+    'testing_rules',
+    'quality_rules',
+    'workflow_rules',
+    'anti_patterns',
+  ]
 status: 'complete'
-rule_count: 25
+rule_count: 32
 optimized_for_llm: true
 ---
 
@@ -17,13 +26,13 @@ _This file contains critical rules and patterns that AI agents must follow when 
 ## Technology Stack & Versions
 
 - Next.js 15.3.3 (App Router), React 19.0.0, TypeScript 5 (`strict: true`)
-- Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres
-- Stripe 18.4.0 — subscriptions/billing
-- Tailwind CSS v4 (`@tailwindcss/postcss`)
-- OpenRouter via OpenAI-compatible SDK (`openai` npm package) — base URL `https://openrouter.ai/api/v1`, free model default `meta-llama/llama-3.2-3b-instruct:free`, configurable via `OPENROUTER_MODEL` env var
-- Separate Python/FastAPI microservice in `rag/` (not built by Next.js): LangChain, Chroma vector store, OpenRouter via OpenAI-compatible SDK/client configuration, Redis LangCache (`langcache` pkg) for semantic response caching
-- zod 3.25.62 (LLM output schema validation), franc 6.2.0 (language detection), axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
-- **Test framework configured**: Vitest smoke tests, Playwright E2E smoke tests, and GitHub Actions CI are present.
+- Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres; local schema via `supabase/migrations/`
+- Stripe 18.4.0 — subscriptions/billing (`lib/stripe.ts`)
+- Tailwind CSS v4 (`@tailwindcss/postcss`); design primitives under `app/components/ui/`
+- OpenRouter via OpenAI-compatible SDK (`openai` 5.3.0) — base URL `https://openrouter.ai/api/v1`, model via `OPENROUTER_MODEL` (default `meta-llama/llama-3.2-3b-instruct:free`)
+- Python RAG sidecar in `rag/` (not built by Next.js): FastAPI, LangChain, Chroma, Pydantic, Redis LangCache (`rag/scache.py`)
+- zod 3.25.62, franc 6.2.0, axios 1.13.2, react-hot-toast 2.5.2, lucide-react 0.511.0
+- Tests: Vitest 4 (`tests/smoke`, jsdom) + Playwright (`tests/e2e`); CI in `.github/workflows/ci.yml`
 
 ## Critical Implementation Rules
 
@@ -31,7 +40,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 - `strict: true` in `tsconfig.json` — do not add `any` or loosen strictness to silence errors
 - Use path alias `@/*` (maps to project root) instead of relative `../../` chains
-- Named exports only — no default exports in `lib/`, `actions/`, or API routes
+- Named exports only — no default exports in `lib/`, `actions/`, or API routes (`lib/stripe.ts` is the existing exception)
 - Two Supabase client factories, do not conflate: `lib/supabase.ts` `createSupabaseClient()` (browser) vs `lib/server.ts` `createClient()` (server, async, cookie-based)
 - Never throw for expected failure paths. Pattern: destructure `{ data, error }` from every Supabase call, `if (error)` → `console.log` message + early return
   - API routes return `NextResponse.json({ success: false, message }, { status })`
@@ -40,39 +49,51 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ### Framework-Specific Rules
 
-- API routes live at `app/api/<kebab-case-action>/route.ts`, one per verb-style action (e.g. `get-buddies`, `mark-lesson-complete`) — not grouped as RESTful resources. Follow this naming for new endpoints.
-- `middleware.ts` `protectedPaths` array is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
-- Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy}`, not by feature — place new components in the matching role folder
-- Next.js ↔ Python RAG service boundary: communication only via configured `RAG_SERVICE_URL` endpoints, no shared types — mirror any schema change (e.g. `OutputSchema`) manually in `rag/main.py`'s Pydantic models
-- New RAG endpoints should check the semantic cache (`rag/scache.py`, Redis LangCache) before calling the LLM, matching the pattern in `/api/chat`
-- LLM provider configuration should be OpenRouter-first and env-driven: `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, server-only model names, and optional OpenRouter app attribution headers. Do not hardcode direct provider models or base URLs in route handlers.
+- API routes live at `app/api/<kebab-case-action>/route.ts`, one per verb-style action (e.g. `get-buddies`, `mark-lesson-complete`) — not grouped as RESTful resources
+- Authenticated shell pages live under `app/(app)/` (dashboard, learn, review, leagues, profile, settings, onboarding); dynamic learning surfaces stay at `app/sets/[setId]` and `app/buddy/[buddyId]`
+- `middleware.ts` `protectedPaths` is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
+- Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy,ui}`, not by feature — place new components in the matching role folder; reusable design-system primitives go in `ui/`
+- Next.js ↔ Python RAG boundary: server code should call configured `RAG_SERVICE_URL` endpoints only; mirror schema changes (e.g. `OutputSchema`) manually in `rag/main.py` Pydantic models — no shared types package
+- New RAG endpoints should check semantic cache (`rag/scache.py`) before calling the LLM, matching `/api/chat`
+- LLM provider configuration is OpenRouter-first and env-driven: `OPENROUTER_API_KEY`, hardcoded OpenRouter base URL in current routes, `OPENROUTER_MODEL`, plus `HTTP-Referer` / `X-Title` attribution headers. Do not hardcode direct provider models or swap to the Responses API
+- Mutations with auth, billing, quota, progress, AI, or privacy impact go through server actions or API routes — not browser-direct provider/DB writes
 
 ### Testing Rules
 
-- Automated frontend smoke tests exist under `tests/smoke` and `tests/e2e`. Use `npm run lint`, `npx tsc --noEmit`, `npm test -- --run`, `npm run build`, and `npm run test:e2e` for the current quality gate.
+- Unit/component smoke tests: `tests/smoke/*.test.tsx` via Vitest (`npm test`); setup in `tests/setup.ts`
+- E2E smoke tests: `tests/e2e/*.spec.ts` via Playwright (`npm run test:e2e`); Vitest excludes `tests/e2e`
+- Quality gate: `npm run lint`, `npx tsc --noEmit`, `npm test`, `npm run build`, `npm run test:e2e`
+- Prefer extending existing smoke coverage over adding heavy fixture frameworks unless a story requires it
 
 ### Code Quality & Style Rules
 
-- ESLint: `eslint-config-next` (`next/core-web-vitals`, `next/typescript`) flat config, no custom overrides. No Prettier configured.
-- Naming: API route folders `kebab-case` (`get-buddy-data`), components `PascalCase.tsx`, functions/variables `camelCase`
-- Database tables/columns are `snake_case` (e.g. `study_bot_chats`, `is_user_message`) with no ORM/codegen — agents must manually translate `camelCase` ↔ `snake_case` at each Supabase call site
+- ESLint: `eslint-config-next` (`next/core-web-vitals`, `next/typescript`) flat config, no custom overrides. No Prettier configured
+- Naming: API route folders `kebab-case`, components `PascalCase.tsx`, functions/variables `camelCase`
+- Database tables/columns are `snake_case` (e.g. `study_bot_chats`, `is_user_message`) with no ORM/codegen — manually translate `camelCase` ↔ `snake_case` at each Supabase call site
+- Local schema source of truth for greenfield/local: `supabase/migrations/*.sql` — keep app queries aligned with migration columns
 - Comments are sparse, used only for non-obvious multi-step logic (e.g. DB insert ordering in `actions/dbops.ts`) — not JSDoc, not required per-function
+- Accessibility is an implementation constraint: real controls, visible focus, `aria-live` where feedback matters, respect reduced motion, ~44px targets
 
 ### Development Workflow Rules
 
 - Branch names are personal/feature-based (`arnav`, `semantic_cache`) — no `feat/`/`fix/` prefix convention
 - Commit messages: short, lowercase, descriptive (no Conventional Commits prefix)
-- PRs merged via GitHub — no PR template or required status checks
-- CI is configured in `.github/workflows/ci.yml` for pull requests and pushes to `main`/`master`: install, lint, build, unit tests, and E2E smoke tests.
+- PRs merged via GitHub — no PR template or required status checks beyond CI
+- CI (`.github/workflows/ci.yml`) on PRs and pushes to `main`/`master`: `npm ci`, lint, build, unit tests, Playwright E2E (Chromium)
+- Planning/architecture artifacts live under `_bmad-output/`; treat `ARCHITECTURE-SPINE.md` as the decision authority when code and docs diverge on intent
 
 ### Critical Don't-Miss Rules
 
-- `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It's **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present/populated in a fresh clone.
-- `middleware.ts` gates `protectedPaths` via `url.pathname.startsWith(path)` — a **prefix match, not exact**. New routes with overlapping prefixes (e.g. `/dashboardX` vs `/dashboard`) can be unintentionally protected/unprotected. Be precise when adding paths.
-- **LLM provider is OpenRouter** via the OpenAI-compatible SDK (`openai` npm package). The base URL is `https://openrouter.ai/api/v1`. API key is `OPENROUTER_API_KEY`. The model is configured via `OPENROUTER_MODEL` env var (defaults to free `meta-llama/llama-3.2-3b-instruct:free`). All LLM calls use Chat Completions API (`chat.completions.create`) with `response_format: { type: "json_object" }` — do NOT use the Responses API as OpenRouter doesn't support it. Always include `HTTP-Referer` and `X-Title` headers for OpenRouter attribution.
-- RAG service URL is configured via `RAG_SERVICE_URL` env var (defaults to `http://localhost:8000` for local dev).
-- Stripe webhook route imports `NextRequest` and validates the `stripe-signature` header before `constructEvent`; preserve the raw `.text()` body pattern for new Stripe webhook work.
-- Quota ordering is strict: check quota → call LLM → validate output → persist → decrement quota. Preserve check-before-spend, decrement-after-success ordering.
+- `lib/admin.ts` holds a Supabase **service-role** client (`SUPABASE_SERVICE_ROLE_KEY`, bypasses RLS), used only for privileged server-only ops (`deleteUser`, `createProfile`). It is **gitignored** (`/lib/admin.ts`) — exists locally but not in version control; never use it for regular user-facing queries, and don't assume it's present in a fresh clone
+- `middleware.ts` protects a path if pathname equals the entry **or** starts with `path + "/"` (exact/subpath, not naive `startsWith(path)`). Still be precise when adding paths to avoid unintended overlaps
+- Every user-owned object read/write must prove ownership through parent `profile_id` (or an explicit public projection). Id-only access is invalid even behind middleware
+- **LLM provider is OpenRouter** via `openai` Chat Completions (`chat.completions.create`) with `response_format: { type: "json_object" }` where JSON is required — do NOT use the Responses API. Always include OpenRouter attribution headers
+- RAG service URL defaults to `http://localhost:8000` via `RAG_SERVICE_URL`. Architecture target: service-to-service auth with `RAG_SERVICE_API_KEY`; browser must not become the long-term RAG caller for arbitrary `buddyId` traffic
+- Stripe webhook route must keep raw `request.text()` body + `stripe-signature` validation before `constructEvent`. Entitlement comes from subscription lifecycle events, not checkout success alone
+- Quota ordering is strict: authenticate → validate → check quota → call provider/RAG → validate output → persist → decrement quota. Never spend quota on failed provider/validation/persistence
+- Buddy readiness: only treat Buddies as chat-ready after RAG ingestion succeeds; failed ingestion must not look usable
+- Review Sessions must not consume generation or chat quota
+- Signup enforces 16+ age gate; do not send chats/docs/learning history to providers for training
 
 ---
 
@@ -92,4 +113,4 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-07-05
+Last Updated: 2026-07-10
