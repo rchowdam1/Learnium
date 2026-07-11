@@ -17,7 +17,6 @@
     "dotenv": "^16.5.0",
     "franc": "^6.2.0",
     "jszip": "^3.10.1",
-    "learnium": "file:",
     "lucide-react": "^0.511.0",
     "mammoth": "^1.12.0",
     "next": "15.3.3",

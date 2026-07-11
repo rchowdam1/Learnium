@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Loader2 } from "lucide-react";
 
 import { zOutputSchema } from "@/app/schema/OutputSchema";
@@ -56,12 +56,20 @@ export default function CreateSetModal({
 
   // to disable the button if a request to api is sent
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const generationAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => generationAbortRef.current?.abort();
+  }, []);
 
   if (!open) {
     return;
   }
 
   const handleClose = () => {
+    generationAbortRef.current?.abort();
+    generationAbortRef.current = null;
+    setIsLoading(false);
     setRequireTitle(false);
     setRequiredDescription(false);
     setRequiredCategory(false);
@@ -175,15 +183,19 @@ export default function CreateSetModal({
   const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setIsLoading(true);
+    if (isLoading || generationAbortRef.current) return;
 
     let numLessons: number | undefined = 0;
     let setId: number | undefined = undefined;
 
     if (!validateInputs()) {
-      setIsLoading(false);
       return;
     }
+
+    setIsLoading(true);
+    const controller = new AbortController();
+    generationAbortRef.current = controller;
+    let requestCompleted = false;
 
     // check if inputs are valid by sending api request
     try {
@@ -197,6 +209,7 @@ export default function CreateSetModal({
           description,
           category,
         }),
+        signal: controller.signal,
       });
 
       const data = (await response
@@ -208,7 +221,6 @@ export default function CreateSetModal({
           data.message || data.error ||
             "Could not generate this set. Please try again in a moment.",
         );
-        setIsLoading(false);
         return;
       }
 
@@ -221,22 +233,34 @@ export default function CreateSetModal({
             "You have ran out of requests. Please wait until the next day for more requests"
           );
         else toast.error(data.error);
-        setIsLoading(false);
         return;
       }
 
       console.log(data, "data from input-check api");
       numLessons = data.parsedResponse?.lessons.length;
       setId = data.setId;
+      requestCompleted = true;
     } catch {
-      toast.error("Could not validate this set input.");
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        toast.error("Could not validate this set input.");
+      }
+      return;
+    } finally {
+      if (!requestCompleted && generationAbortRef.current === controller) {
+        generationAbortRef.current = null;
+        setIsLoading(false);
+      }
+    }
+
+    if (controller.signal.aborted || generationAbortRef.current !== controller) {
       return;
     }
 
+    generationAbortRef.current = null;
+    setIsLoading(false);
+
     // inputs are valid, create the set
     onCreateSet(title, description, category, numLessons, setId);
-    setIsLoading(false);
     handleClose();
   };
 
@@ -272,7 +296,6 @@ export default function CreateSetModal({
             aria-label="Close create set modal"
             className="focus-ring absolute right-2 top-2 rounded-xl bg-surface p-1 text-muted hover:bg-surface-raised hover:text-primary"
             onClick={handleClose}
-            disabled={isLoading}
           >
             <X />
           </button>
@@ -359,7 +382,6 @@ export default function CreateSetModal({
                 type="button"
                 className="focus-ring w-39 cursor-pointer rounded-xl border border-border bg-surface py-2 text-label text-primary hover:bg-surface-raised"
                 onClick={handleClose}
-                disabled={isLoading}
               >
                 Cancel
               </button>

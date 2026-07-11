@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { zOutputSchema, type OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
-import { updateSetResetDate } from "@/actions/ProfileUpdates";
 import { normalizeSetOutput } from "@/lib/normalize-set-output";
 import { freeOpenRouterModel } from "@/lib/openrouter";
 
@@ -13,6 +12,7 @@ const openai = new OpenAI({
     "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     "X-Title": "Learnium",
   },
+  timeout: 90_000,
 });
 
 const MODEL = freeOpenRouterModel("OPENROUTER_MODEL");
@@ -59,6 +59,7 @@ Do not use correct_answer, indexes, or letters like "A". Use the key name "answe
 async function generateSetJson(
   description: string,
   extraUserMessage?: string,
+  signal?: AbortSignal,
 ): Promise<{ parsed: unknown; usageTokens?: number }> {
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     { role: "system", content: SYSTEM_PROMPT },
@@ -72,13 +73,20 @@ async function generateSetJson(
     messages.push({ role: "user", content: extraUserMessage });
   }
 
-  const completion = await openai.chat.completions.create({
-    model: MODEL,
-    messages,
-    response_format: { type: "json_object" },
-    temperature: 0.7,
-    max_tokens: 4096,
-  });
+  const completion = await openai.chat.completions.create(
+    {
+      model: MODEL,
+      messages,
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      // Reasoning models spend part of the token budget on thinking, so the
+      // visible JSON needs headroom or a full set will truncate mid-object.
+      max_tokens: 8192,
+      // OpenRouter reasoning control (not in the OpenAI SDK type — sent as-is).
+      reasoning: { effort: "high" },
+    } as OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+    { signal },
+  );
 
   const content = completion.choices?.[0]?.message?.content;
   if (!content) {
@@ -195,10 +203,15 @@ export async function POST(request: Request) {
     );
   }
 
-  // ─── Step 4: Fetch profile and check quota ─────────────────────────
+  // ─── Step 4: Read-only quota pre-check ─────────────────────────────
+  // The create_set_graph_with_quota RPC (Step 8) performs the authoritative
+  // daily refresh + decrement atomically. This step is a READ-ONLY gate so we
+  // don't spend an AI call when the user is genuinely out of quota. We must not
+  // write quota columns from the user session — protect_profile_entitlements()
+  // reserves those for trusted paths (the RPC and the billing service).
   const { data: profileData, error: profileError } = await supabase
     .from("profile")
-    .select("sets_remaining, sets_refresh_at, is_subscribed")
+    .select("sets_remaining, sets_refresh_at")
     .eq("id", user.id)
     .single();
 
@@ -209,46 +222,15 @@ export async function POST(request: Request) {
     );
   }
 
-  // Ensure sets_refresh_at is set
-  if (profileData.sets_refresh_at === null) {
-    await updateSetResetDate();
-  }
+  // Quota is available if the user still has sets left, or a daily refresh is
+  // due (no refresh date yet, or the refresh time has passed) — the RPC applies
+  // that refresh when it runs.
+  const refreshDue =
+    profileData.sets_refresh_at === null ||
+    new Date(profileData.sets_refresh_at) <= new Date();
+  const quotaAvailable = profileData.sets_remaining > 0 || refreshDue;
 
-  // Check if quota needs a daily refresh
-  const today = new Date().toISOString().split("T")[0];
-  const refreshAt = profileData.sets_refresh_at
-    ? profileData.sets_refresh_at.split("T")[0]
-    : null;
-
-  if (profileData.sets_remaining === 0 && refreshAt && refreshAt <= today) {
-    // Refresh quota for the new day
-    const refreshCount = profileData.is_subscribed ? 5 : 1;
-    const { error: refreshError } = await supabase
-      .from("profile")
-      .update({
-        sets_remaining: refreshCount,
-        sets_refresh_at: new Date(
-          new Date(today).getTime() + 86400000,
-        ).toISOString(),
-      })
-      .eq("id", user.id);
-
-    if (refreshError) {
-      return NextResponse.json(
-        { success: false, message: "Could not refresh quota" },
-        { status: 500 },
-      );
-    }
-  }
-
-  // Re-read quota after potential refresh
-  const { data: refreshedProfile } = await supabase
-    .from("profile")
-    .select("sets_remaining")
-    .eq("id", user.id)
-    .single();
-
-  if (!refreshedProfile || refreshedProfile.sets_remaining <= 0) {
+  if (!quotaAvailable) {
     return NextResponse.json(
       {
         success: false,
@@ -261,23 +243,39 @@ export async function POST(request: Request) {
   }
 
   // ─── Step 5: Call OpenRouter ───────────────────────────────────────
+  const generationController = new AbortController();
+  const abortFromClient = () => generationController.abort();
+  const timeoutId = setTimeout(() => generationController.abort(), 90_000);
+  request.signal.addEventListener("abort", abortFromClient, { once: true });
+
   let parsedResponse: OutputSchema | null = null;
   let usageTokens: number | undefined;
 
   try {
     const { parsed, usageTokens: tokens } =
-      await generateSetJson(rawDescription);
+      await generateSetJson(rawDescription, undefined, generationController.signal);
     usageTokens = tokens;
     parsedResponse = validateSetOutput(parsed);
 
     // One correction retry
     if (!parsedResponse) {
       console.warn("Retrying set generation after schema validation failure");
-      const retry = await generateSetJson(rawDescription, RETRY_PROMPT);
+      const retry = await generateSetJson(rawDescription, RETRY_PROMPT, generationController.signal);
       usageTokens = retry.usageTokens;
       parsedResponse = validateSetOutput(retry.parsed);
     }
   } catch (error: unknown) {
+    if (request.signal.aborted || generationController.signal.aborted) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "AI generation timed out or was cancelled — please try again",
+          code: "GENERATION_CANCELLED",
+          retryable: true,
+        },
+        { status: 499 },
+      );
+    }
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("OpenRouter API error:", message);
     return NextResponse.json(
@@ -289,6 +287,9 @@ export async function POST(request: Request) {
       },
       { status: 502 },
     );
+  } finally {
+    clearTimeout(timeoutId);
+    request.signal.removeEventListener("abort", abortFromClient);
   }
 
   // ─── Step 6: Validate output ───────────────────────────────────────
@@ -306,6 +307,12 @@ export async function POST(request: Request) {
 
   // ─── Step 7: Handle flagged content ────────────────────────────────
   if (parsedResponse.flagged) {
+    if (request.signal.aborted || generationController.signal.aborted) {
+      return NextResponse.json(
+        { success: false, message: "Generation cancelled", code: "GENERATION_CANCELLED" },
+        { status: 499 },
+      );
+    }
     const { error: flagError } = await supabase.from("flagged").insert({
       profile_id: user.id,
       profile_email: user.email,
@@ -333,6 +340,13 @@ export async function POST(request: Request) {
     lessons: parsedResponse.lessons,
     quizzes: parsedResponse.quizzes,
   };
+
+  if (request.signal.aborted || generationController.signal.aborted) {
+    return NextResponse.json(
+      { success: false, message: "Generation cancelled", code: "GENERATION_CANCELLED" },
+      { status: 499 },
+    );
+  }
 
   const { data: setId, error: graphError } = await supabase.rpc(
     "create_set_graph_with_quota",
