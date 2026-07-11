@@ -10,9 +10,11 @@ import toast from "react-hot-toast";
 type OutputSchema = z.infer<typeof zOutputSchema>;
 
 type CreateSetResponse = {
+  success?: boolean;
   setId?: number;
   parsedResponse?: OutputSchema;
   error?: string;
+  message?: string;
 };
 
 type CreateModalProps = {
@@ -203,14 +205,15 @@ export default function CreateSetModal({
 
       if (!response.ok) {
         toast.error(
-          data.error ||
+          data.message || data.error ||
             "Could not generate this set. Please try again in a moment.",
         );
         setIsLoading(false);
         return;
       }
 
-      if (data.error) {
+      // Legacy error field check (kept for backward compat)
+      if (data.error && !data.success) {
         if (data.error === "Could not process your request")
           toast.error("Sorry! We can't make this set for you");
         else if (data.error === "User does not have any set requests remaining")

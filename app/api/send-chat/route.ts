@@ -9,14 +9,34 @@ import {
 export const maxDuration = 120;
 
 /**
- * Receives:
- * - buddyId: number | string
- * - userMessage: string
+ * POST /api/send-chat
+ *
+ * Pipeline (strict order — AC from Story 2.1 / 2.10):
+ *   1. Authenticate
+ *   2. Validate input
+ *   3. Verify buddy ownership
+ *   4. Atomic check-and-claim chat quota (consume_chat_quota RPC)
+ *   5. RAG retrieval
+ *   6. LLM call
+ *   7. Persist chat messages
+ *   8. Return success
+ *
+ * Quota is claimed atomically BEFORE the LLM call.
+ * The pre-check and decrement are a single atomic operation — no race window.
  */
 export async function POST(request: Request) {
-  const reqData = await request.json();
-  const supabase = await createClient();
+  // ─── Step 1: Parse + Auth ──────────────────────────────────────────
+  let reqData: Record<string, unknown>;
+  try {
+    reqData = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Invalid request body" },
+      { status: 400 },
+    );
+  }
 
+  const supabase = await createClient();
   const {
     data: { user },
     error: userError,
@@ -24,31 +44,12 @@ export async function POST(request: Request) {
 
   if (userError || !user) {
     return NextResponse.json(
-      { success: false, message: "User is not logged in" },
+      { success: false, message: "Authentication required" },
       { status: 401 },
     );
   }
 
-  const { data: profileChatData, error: profileChatError } = await supabase
-    .from("profile")
-    .select("chats_remaining")
-    .eq("id", user.id)
-    .single();
-
-  if (profileChatError) {
-    return NextResponse.json(
-      { success: false, message: "Could not retrieve profile chat data" },
-      { status: 400 },
-    );
-  }
-
-  if (profileChatData.chats_remaining <= 0) {
-    return NextResponse.json(
-      { success: false, message: "User has no chats remaining for the day" },
-      { status: 200 },
-    );
-  }
-
+  // ─── Step 2: Validate input ────────────────────────────────────────
   const messageToSend = String(reqData.userMessage || "").trim();
   const buddyId = Number(reqData.buddyId);
 
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Ensure buddy belongs to this user
+  // ─── Step 3: Verify ownership ──────────────────────────────────────
   const { data: buddy, error: buddyError } = await supabase
     .from("study_bots")
     .select("id, bot_name, description, profile_id")
@@ -74,6 +75,32 @@ export async function POST(request: Request) {
     );
   }
 
+  // ─── Step 4: Atomic check-and-claim quota ──────────────────────────
+  const { data: quotaClaimed, error: quotaError } = await supabase.rpc(
+    "consume_chat_quota",
+  );
+
+  if (quotaError) {
+    console.error("consume_chat_quota error:", quotaError.message);
+    return NextResponse.json(
+      { success: false, message: "Could not verify chat quota" },
+      { status: 500 },
+    );
+  }
+
+  if (!quotaClaimed) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "No chat quota remaining for today",
+        code: "QUOTA_EXHAUSTED",
+        retryable: true,
+      },
+      { status: 429 },
+    );
+  }
+
+  // ─── Step 5: RAG retrieval ─────────────────────────────────────────
   let assistantMessage: string;
 
   try {
@@ -97,12 +124,13 @@ export async function POST(request: Request) {
     const message =
       err instanceof Error ? err.message : "Failed to generate a response";
     return NextResponse.json(
-      { success: false, message },
-      { status: 400 },
+      { success: false, message, code: "PROVIDER_ERROR", retryable: true },
+      { status: 502 },
     );
   }
 
-  const { error: userMessageError } = await supabase
+  // ─── Step 6: Persist chat messages ────────────────────────────────
+  const { error: userMsgError } = await supabase
     .from("study_bot_chats")
     .insert({
       profile_id: user.id,
@@ -111,14 +139,11 @@ export async function POST(request: Request) {
       message: messageToSend,
     });
 
-  if (userMessageError) {
-    return NextResponse.json(
-      { success: false, message: "Couldn't insert user's chat into database" },
-      { status: 400 },
-    );
+  if (userMsgError) {
+    console.error("Failed to persist user message:", userMsgError.message);
   }
 
-  const { error: assistantMessageError } = await supabase
+  const { error: asstMsgError } = await supabase
     .from("study_bot_chats")
     .insert({
       profile_id: user.id,
@@ -127,27 +152,11 @@ export async function POST(request: Request) {
       message: assistantMessage,
     });
 
-  if (assistantMessageError) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Couldn't insert assistant's chat into database",
-      },
-      { status: 400 },
-    );
+  if (asstMsgError) {
+    console.error("Failed to persist assistant message:", asstMsgError.message);
   }
 
-  const { error: rpcError } = await supabase.rpc("decrement_chat_quota", {
-    user_id: user.id,
-  });
-
-  if (rpcError) {
-    return NextResponse.json(
-      { success: false, message: "Couldn't decrement user's chat quota" },
-      { status: 400 },
-    );
-  }
-
+  // ─── Step 7: Return success ────────────────────────────────────────
   return NextResponse.json(
     { success: true, assistantMessage },
     { status: 200 },

@@ -1,5 +1,14 @@
 import { createClient } from "@/lib/server";
 
+/**
+ * Atomically decrement the user's sets_remaining by 1.
+ * Uses the consume_set_quota RPC which guards against going below zero
+ * and is atomic (no read-then-write race).
+ *
+ * @deprecated Prefer calling consume_set_quota RPC directly in route handlers
+ *   so quota can be consumed AFTER successful persistence. This function
+ *   exists for backward compatibility with routes that haven't been reordered yet.
+ */
 export async function decrementRequests() {
   const supabase = await createClient();
 
@@ -8,53 +17,31 @@ export async function decrementRequests() {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
-    // user is not logged in
+  if (userError || !user) {
     console.log("User is not logged in");
     return { success: false, message: "User is not logged in" };
   }
 
-  // get the user's profile using logged in user's id
-  const { data: profileData, error: profileError } = await supabase
-    .from("profile")
-    .select("*")
-    .eq("id", user?.id)
-    .single();
+  const { data: quotaOk, error: rpcError } = await supabase.rpc(
+    "consume_set_quota",
+  );
 
-  if (profileError) {
-    console.log("Could not retrieve profile");
-    return { success: false, message: "Could not retrieve profile" };
+  if (rpcError) {
+    console.error("consume_set_quota RPC error:", rpcError.message);
+    return { success: false, message: "Could not decrement quota" };
   }
 
-  // update sets_remaining
-  let remainingSets = profileData.sets_remaining;
-
-  if (remainingSets > 0) {
-    remainingSets -= 1;
-  } else {
-    // user has no more remaining set requests
-    console.log("User does not have any set requests remaining");
+  if (!quotaOk) {
     return {
       success: false,
       message: "User does not have any set requests remaining",
     };
   }
 
-  const { error: profileUpdateError } = await supabase
-    .from("profile")
-    .update({ sets_remaining: remainingSets })
-    .eq("id", user?.id);
-
-  if (profileUpdateError) {
-    console.log("Could not update user's requests");
-    return { success: false, message: "Could not update the user's requests" };
-  }
-
-  return { success: true }; // this means we have successfully updated the user's sets_remaining
+  return { success: true };
 }
 
 export async function resetSets() {
-  // resets sets_remaining if necessary
   const supabase = await createClient();
 
   const {
@@ -62,77 +49,59 @@ export async function resetSets() {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
+  if (userError || !user) {
     console.log("User is not logged in");
     return { success: false, message: "User is not logged in" };
   }
 
-  // check if user is subscribed or not
+  // Fetch subscription status
   const { data: profileData, error: profileError } = await supabase
     .from("profile")
-    .select("*")
-    .eq("id", user?.id)
+    .select("is_subscribed")
+    .eq("id", user.id)
     .single();
 
-  if (profileError) {
+  if (profileError || !profileData) {
     console.log("Could not retrieve profile");
     return { success: false, message: "Could not retrieve profile" };
   }
 
-  if (profileData.is_subscribed) {
-    // reset 'sets_remaining' to 5
-    const { error: setRequestUpdateError } = await supabase
-      .from("profile")
-      .update({ sets_remaining: 5 })
-      .eq("id", user?.id);
+  const newQuota = profileData.is_subscribed ? 5 : 1;
 
-    if (setRequestUpdateError) {
-      console.log("Failed to reset the user's set request");
-      return {
-        success: false,
-        message: "Failed to reset the user's set request",
-      };
-    }
-  } else {
-    // reset 'sets_remaning' to 1
-    const { error: setRequestUpdateError } = await supabase
-      .from("profile")
-      .update({ sets_remaining: 1 })
-      .eq("id", user?.id);
+  const { error: updateError } = await supabase
+    .from("profile")
+    .update({ sets_remaining: newQuota })
+    .eq("id", user.id);
 
-    if (setRequestUpdateError) {
-      console.log("Failed to reset the user's set request");
-      return {
-        success: false,
-        message: "Failed to reset the user's set request",
-      };
-    }
+  if (updateError) {
+    console.log("Failed to reset the user's set requests");
+    return { success: false, message: "Failed to reset the user's set requests" };
   }
 
-  // if this point has been reached, success
   return { success: true };
 }
 
 export async function updateSetResetDate() {
   const supabase = await createClient();
+
   const {
     data: { user },
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
+  if (userError || !user) {
     console.log("User is not logged in");
     return { success: false, message: "User is not logged in" };
   }
 
-  // set the 'sets_refresh_at' to the day after the current day
-  const date = new Date(new Date().toISOString().split("T")[0]); // current day in YYYY-MM-DD format
-  date.setDate(date.getDate() + 1); // next day in YYYY-MM-DD format
+  // Set the sets_refresh_at to the day after the current day
+  const date = new Date(new Date().toISOString().split("T")[0]);
+  date.setDate(date.getDate() + 1);
 
   const { error: setRequestUpdateError } = await supabase
     .from("profile")
     .update({ sets_refresh_at: date.toISOString() })
-    .eq("id", user?.id);
+    .eq("id", user.id);
 
   if (setRequestUpdateError) {
     console.log("Could not update the set refresh date");

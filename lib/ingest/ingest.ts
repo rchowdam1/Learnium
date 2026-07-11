@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { extractFromFile } from "./extract";
 import { chunkText } from "./chunk";
 import { embedText } from "./embed";
+import { detectLanguage } from "../detect-language";
 
 export type IngestFileResult = {
   fileName: string;
@@ -94,6 +95,9 @@ export async function ingestBuddyDocuments(options: {
       continue;
     }
 
+    // Detect language for FTS indexing (one detection per file)
+    const { pgConfig: langConfig } = detectLanguage(text);
+
     const rows = chunks.map((content, chunkIndex) => ({
       profile_id: profileId,
       study_bot_id: studyBotId,
@@ -104,6 +108,7 @@ export async function ingestBuddyDocuments(options: {
       mime_type: extracted.mimeType,
       source_type: extracted.sourceType,
       embedding: embedText(content),
+      language: langConfig,
     }));
 
     const BATCH = 40;

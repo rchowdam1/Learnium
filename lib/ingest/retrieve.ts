@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { embedText } from "./embed";
+import { detectLanguage } from "../detect-language";
 
 export type RetrievedChunk = {
   id: number;
@@ -23,6 +24,7 @@ export async function retrieveBuddyContext(options: {
   const { supabase, profileId, studyBotId, query } = options;
   const matchCount = options.matchCount ?? 8;
   const queryEmbedding = embedText(query);
+  const { pgConfig: queryLang } = detectLanguage(query);
 
   const [{ data: semantic, error: semErr }, { data: keyword, error: kwErr }] =
     await Promise.all([
@@ -38,6 +40,7 @@ export async function retrieveBuddyContext(options: {
         filter_study_bot_id: studyBotId,
         filter_profile_id: profileId,
         match_count: matchCount,
+        query_language: queryLang,
       }),
     ]);
 

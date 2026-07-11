@@ -2,12 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { zOutputSchema, type OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
-import { createSet } from "@/actions/dbops";
-import {
-  decrementRequests,
-  resetSets,
-  updateSetResetDate,
-} from "@/actions/ProfileUpdates";
+import { updateSetResetDate } from "@/actions/ProfileUpdates";
 import { normalizeSetOutput } from "@/lib/normalize-set-output";
 
 const openai = new OpenAI({
@@ -19,13 +14,12 @@ const openai = new OpenAI({
   },
 });
 
-// Default to a free model; override via env for production
 const MODEL =
   process.env.OPENROUTER_MODEL ||
-    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
 
 const SYSTEM_PROMPT = `You are a knowledgeable teacher specializing in microlearning sets.
-Generate a set of 3-5 lessons with quizzes based on the user's topic description.
+Generate a set of 4-12 lessons with quizzes based on the user's topic description.
 
 Return ONLY valid JSON (no markdown fences) matching this exact shape:
 
@@ -52,6 +46,7 @@ Return ONLY valid JSON (no markdown fences) matching this exact shape:
 }
 
 Rules:
+- Generate 4-12 lessons (adjust based on topic breadth).
 - Each lesson must have a title and 3-5 non-empty paragraph strings.
 - There must be exactly one quiz per lesson (same length arrays), quiz title matching the lesson.
 - Each quiz has 3-5 questions; each question has exactly 4 options.
@@ -115,175 +110,275 @@ function validateSetOutput(raw: unknown): OutputSchema | null {
   return validation.data;
 }
 
+/**
+ * POST /api/input-check
+ *
+ * Pipeline (strict order — AC from Story 2.1):
+ *   1. Parse request body
+ *   2. Authenticate
+ *   3. Validate input
+ *   4. Check quota (read-only, refresh if eligible)
+ *   5. Call OpenRouter
+ *   6. Normalize + validate output (one retry)
+ *   7. Handle flagged content
+ *   8. Persist graph atomically (create_set_graph RPC)
+ *   9. Consume quota atomically (consume_set_quota RPC)
+ *  10. Return success
+ *
+ * Quota is NEVER consumed before persistence succeeds.
+ */
 export async function POST(request: Request) {
-  const data = await request.json();
-
-  // heuristic regex checks
-  const description = data.description.trim();
-
-  // check if description contains any vowels
-  if (!/[aeiou]{1,}/i.test(description)) {
+  // ─── Step 1: Parse body ────────────────────────────────────────────
+  let body: Record<string, unknown>;
+  try {
+    body = await request.json();
+  } catch {
     return NextResponse.json(
-      { error: "Description doesn't contain a vowel" },
-      { status: 200 },
+      { success: false, message: "Invalid request body" },
+      { status: 400 },
     );
   }
 
-  // check if description contains too many consonants
-  if (/[^aeiou]{7,}/i.test(description)) {
-    return NextResponse.json(
-      { error: "Description contains 7 or more consective consonants" },
-      { status: 200 },
-    );
-  }
+  const rawTitle = typeof body.title === "string" ? body.title.trim() : "";
+  const rawDescription =
+    typeof body.description === "string" ? body.description.trim() : "";
+  const rawCategory =
+    typeof body.category === "string" ? body.category.trim() : "";
 
-  if (/(.{3,})\1{1,}/i.test(description)) {
-    return NextResponse.json(
-      { error: "Description contains repeating words" },
-      { status: 200 },
-    );
-  }
-
-  // check if user has remaining set requests
+  // ─── Step 2: Authenticate ──────────────────────────────────────────
   const supabase = await createClient();
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profileData, error: profileError } = await supabase
-    .from("profile")
-    .select("*")
-    .eq("id", user?.id)
-    .single();
-
-  if (profileError) {
-    console.log("Could not retrieve profile");
+  if (!user) {
     return NextResponse.json(
-      { error: "Could not retrieve profile" },
-      { status: 200 },
+      { success: false, message: "Authentication required" },
+      { status: 401 },
     );
   }
 
-  // if 'sets_refresh_at' is null, set to today
-  if (profileData.sets_refresh_at === null) {
-    const result = await updateSetResetDate();
-    if (result.success === false) {
-      console.log("Could not update the set reset date");
-    }
+  // ─── Step 3: Validate input ────────────────────────────────────────
+  if (!rawTitle || !rawDescription || !rawCategory) {
+    return NextResponse.json(
+      { success: false, message: "Title, description, and category are required" },
+      { status: 400 },
+    );
   }
 
-  // check if sets need resetting
+  // Heuristic content checks (preserved from original)
+  if (!/[aeiou]{1,}/i.test(rawDescription)) {
+    return NextResponse.json(
+      { success: false, message: "Description must contain meaningful text" },
+      { status: 400 },
+    );
+  }
+
+  if (/[^aeiou]{7,}/i.test(rawDescription)) {
+    return NextResponse.json(
+      { success: false, message: "Description contains too many consecutive consonants" },
+      { status: 400 },
+    );
+  }
+
+  if (/(.{3,})\1{1,}/i.test(rawDescription)) {
+    return NextResponse.json(
+      { success: false, message: "Description contains repeating text" },
+      { status: 400 },
+    );
+  }
+
+  // Title length guard
+  if (rawTitle.length > 120) {
+    return NextResponse.json(
+      { success: false, message: "Title must be under 120 characters" },
+      { status: 400 },
+    );
+  }
+
+  // ─── Step 4: Fetch profile and check quota ─────────────────────────
+  const { data: profileData, error: profileError } = await supabase
+    .from("profile")
+    .select("sets_remaining, sets_refresh_at, is_subscribed")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || !profileData) {
+    return NextResponse.json(
+      { success: false, message: "Could not retrieve profile" },
+      { status: 500 },
+    );
+  }
+
+  // Ensure sets_refresh_at is set
+  if (profileData.sets_refresh_at === null) {
+    await updateSetResetDate();
+  }
+
+  // Check if quota needs a daily refresh
   const today = new Date().toISOString().split("T")[0];
-  const setsRefreshAt = profileData.sets_refresh_at
+  const refreshAt = profileData.sets_refresh_at
     ? profileData.sets_refresh_at.split("T")[0]
     : null;
 
-  if (
-    profileData.sets_remaining === 0 &&
-    setsRefreshAt &&
-    setsRefreshAt <= today
-  ) {
-    let result = await updateSetResetDate();
-    if (result.success === false) {
+  if (profileData.sets_remaining === 0 && refreshAt && refreshAt <= today) {
+    // Refresh quota for the new day
+    const refreshCount = profileData.is_subscribed ? 5 : 1;
+    const { error: refreshError } = await supabase
+      .from("profile")
+      .update({
+        sets_remaining: refreshCount,
+        sets_refresh_at: new Date(
+          new Date(today).getTime() + 86400000,
+        ).toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (refreshError) {
       return NextResponse.json(
-        { error: "Could not update the reset date" },
-        { status: 200 },
-      );
-    }
-    result = await resetSets();
-    if (result.success === false) {
-      return NextResponse.json(
-        { error: "Could not reset the remaining set requests" },
-        { status: 200 },
-      );
-    }
-  }
-
-  // Decrement quota before LLM call
-  const result = await decrementRequests();
-  if (result.success === false) {
-    if (result.message === "User does not have any set requests remaining") {
-      return NextResponse.json({ error: result.message }, { status: 200 });
-    }
-    return NextResponse.json(
-      { error: "An error occurred while trying to decrease 'sets_remaining'" },
-      { status: 200 },
-    );
-  }
-
-  try {
-    let { parsed, usageTokens } = await generateSetJson(description);
-    let parsedResponse = validateSetOutput(parsed);
-
-    // One retry with a stricter correction prompt if schema still fails
-    if (!parsedResponse) {
-      console.warn("Retrying set generation after schema validation failure");
-      const retry = await generateSetJson(description, RETRY_PROMPT);
-      parsed = retry.parsed;
-      usageTokens = retry.usageTokens;
-      parsedResponse = validateSetOutput(parsed);
-    }
-
-    if (!parsedResponse) {
-      return NextResponse.json(
-        {
-          error:
-            "Generated content failed quality validation — please try again",
-        },
+        { success: false, message: "Could not refresh quota" },
         { status: 500 },
       );
     }
+  }
 
-    if (parsedResponse.flagged) {
-      const { error } = await supabase.from("flagged").insert({
-        profile_id: user?.id,
-        profile_email: user?.email,
-        query: data.description,
-      });
-      if (error) {
-        console.log("Flagged Response, but couldn't add it to db");
-      }
-      return NextResponse.json(
-        { error: "Could not process your request" },
-        { status: 200 },
-      );
-    }
+  // Re-read quota after potential refresh
+  const { data: refreshedProfile } = await supabase
+    .from("profile")
+    .select("sets_remaining")
+    .eq("id", user.id)
+    .single();
 
-    // Create the set in database
-    const title = data.title;
-    const category = data.category;
-    const createResult = await createSet(
-      parsedResponse,
-      title,
-      description,
-      category,
+  if (!refreshedProfile || refreshedProfile.sets_remaining <= 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "No set generation quota remaining for today",
+        code: "QUOTA_EXHAUSTED",
+        retryable: true,
+      },
+      { status: 429 },
     );
+  }
 
-    if (createResult === false) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Set creation in the database was unsuccessful",
-        },
-        { status: 400 },
-      );
+  // ─── Step 5: Call OpenRouter ───────────────────────────────────────
+  let parsedResponse: OutputSchema | null = null;
+  let usageTokens: number | undefined;
+
+  try {
+    const { parsed, usageTokens: tokens } =
+      await generateSetJson(rawDescription);
+    usageTokens = tokens;
+    parsedResponse = validateSetOutput(parsed);
+
+    // One correction retry
+    if (!parsedResponse) {
+      console.warn("Retrying set generation after schema validation failure");
+      const retry = await generateSetJson(rawDescription, RETRY_PROMPT);
+      usageTokens = retry.usageTokens;
+      parsedResponse = validateSetOutput(retry.parsed);
     }
-
-    console.log(
-      `Set generated with model ${MODEL}: ${usageTokens} tokens used`,
-    );
-
-    return NextResponse.json({
-      parsedResponse,
-      setId: createResult.id,
-    });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("OpenRouter API error:", message);
     return NextResponse.json(
-      { error: "AI provider error — please try again" },
+      {
+        success: false,
+        message: "AI provider error — please try again",
+        code: "PROVIDER_ERROR",
+        retryable: true,
+      },
+      { status: 502 },
+    );
+  }
+
+  // ─── Step 6: Validate output ───────────────────────────────────────
+  if (!parsedResponse) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Generated content failed quality validation — please try again",
+        code: "VALIDATION_FAILED",
+        retryable: true,
+      },
+      { status: 422 },
+    );
+  }
+
+  // ─── Step 7: Handle flagged content ────────────────────────────────
+  if (parsedResponse.flagged) {
+    const { error: flagError } = await supabase.from("flagged").insert({
+      profile_id: user.id,
+      profile_email: user.email,
+      query: rawDescription,
+    });
+    if (flagError) {
+      console.error("Failed to log flagged query:", flagError.message);
+    }
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Could not process your request",
+        code: "CONTENT_FLAGGED",
+        retryable: false,
+      },
+      { status: 422 },
+    );
+  }
+
+  // ─── Step 8: Persist graph atomically ─────────────────────────────
+  const graphData = {
+    title: rawTitle,
+    description: rawDescription,
+    category: rawCategory,
+    lessons: parsedResponse.lessons,
+    quizzes: parsedResponse.quizzes,
+  };
+
+  const { data: setId, error: graphError } = await supabase.rpc(
+    "create_set_graph",
+    { graph_data: graphData },
+  );
+
+  if (graphError || !setId) {
+    console.error("create_set_graph failed:", graphError?.message);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to save generated set",
+        code: "PERSISTENCE_ERROR",
+        retryable: true,
+      },
       { status: 500 },
     );
   }
+
+  // ─── Step 9: Consume quota atomically ─────────────────────────────
+  const { data: quotaConsumed, error: quotaError } = await supabase.rpc(
+    "consume_set_quota",
+  );
+
+  if (quotaError) {
+    console.error("consume_set_quota error:", quotaError.message);
+    // Set was persisted but quota wasn't consumed — log and continue.
+    // The user got a free set this time; better than losing their quota.
+    console.warn(
+      `Set ${setId} persisted but quota not consumed for user ${user.id}`,
+    );
+  } else if (!quotaConsumed) {
+    console.warn(
+      `Set ${setId} persisted but quota was already exhausted for user ${user.id}`,
+    );
+  }
+
+  // ─── Step 10: Return success ───────────────────────────────────────
+  console.log(
+    `Set ${setId} generated with model ${MODEL}: ${usageTokens ?? "?"} tokens used`,
+  );
+
+  return NextResponse.json({
+    success: true,
+    setId,
+    parsedResponse,
+  });
 }

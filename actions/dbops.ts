@@ -1,6 +1,13 @@
 import { OutputSchema } from "@/app/schema/OutputSchema";
 import { createClient } from "@/lib/server";
-// create the set with the given parsedResponse
+
+/**
+ * Create a set with its full graph (lessons, paragraphs, quizzes, questions, options)
+ * in a single atomic transaction via the create_set_graph Postgres RPC.
+ *
+ * The RPC uses auth.uid() for profile_id — no caller-controlled user_id.
+ * On any mid-insert failure, the entire graph rolls back.
+ */
 export async function createSet(
   parsedResponse: OutputSchema,
   title: string,
@@ -14,122 +21,33 @@ export async function createSet(
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
+  if (error || !user) {
     console.log("Could not retrieve authenticated user in actions");
     return false;
   }
 
-  /* 1. create the set
-   *  Attributes:
-   *     - profile_id
-   *     - title
-   *     - description
-   *     - category
-   *     - is_flagged
-   */
+  const graphData = {
+    title,
+    description,
+    category,
+    lessons: parsedResponse.lessons,
+    quizzes: parsedResponse.quizzes,
+  };
 
-  const { data: set, error: createSetError } = await supabase
-    .from("sets")
-    .insert({
-      profile_id: user?.id,
-      title: title,
-      description: description,
-      category: category,
-      is_flagged: false, // route handler deals with the outcome of flagged set to true upon the request
-    })
-    .select()
-    .single();
+  const { data: setId, error: rpcError } = await supabase.rpc(
+    "create_set_graph",
+    { graph_data: graphData },
+  );
 
-  if (createSetError) {
-    console.log("Error creating set");
+  if (rpcError || !setId) {
+    console.error("create_set_graph RPC failed:", rpcError?.message);
     return false;
   }
 
-  let lessonCount = 0;
-
-  /*
-   * For each of the lessons from the input create the lessons, paragraphs, quizzes, questions, and options
-   * There will be the same number of lessons and quizzes
-   */
-
-  // 2. Create lessons, paragraphs, quizzes, questions, and options
-  for (let i = 0; i < parsedResponse.lessons.length; i++) {
-    const lesson = parsedResponse.lessons[i];
-
-    const { data: curLesson, error: createLessonError } = await supabase
-      .from("lessons")
-      .insert({ set_id: set.id, title: lesson.title, position: i })
-      .select()
-      .single();
-
-    if (createLessonError) {
-      console.log("Could not create lesson");
-      return false;
-    }
-
-    // Paragraphs
-    for (let j = 0; j < lesson.paragraphs.length; j++) {
-      const paragraph = lesson.paragraphs[j];
-
-      const { error: paragraphError } = await supabase
-        .from("paragraphs")
-        .insert({ lesson_id: curLesson.id, content: paragraph, position: j });
-
-      if (paragraphError) {
-        console.log("Could not create paragraph");
-        return false;
-      }
-    }
-
-    // Quiz
-    const currentQuiz = parsedResponse.quizzes[i];
-    const { data: quiz, error: createQuizError } = await supabase
-      .from("quizzes")
-      .insert({ lesson_id: curLesson.id, title: currentQuiz.title })
-      .select()
-      .single();
-
-    if (createQuizError) {
-      console.log("Could not create quiz");
-      return false;
-    }
-
-    // Questions and Options
-    for (let q = 0; q < currentQuiz.questions.length; q++) {
-      const question = currentQuiz.questions[q];
-      const { data: curQuestion, error: createQuestionError } = await supabase
-        .from("questions")
-        .insert({
-          quiz_id: quiz.id,
-          question: question.question,
-          answer: question.answer,
-          position: q,
-        })
-        .select()
-        .single();
-
-      if (createQuestionError) {
-        console.log("Could not create question");
-        return false;
-      }
-
-      for (let o = 0; o < question.options.length; o++) {
-        const option = question.options[o];
-        const { error: createOptionError } = await supabase
-          .from("options")
-          .insert({ question_id: curQuestion.id, option: option, position: o });
-
-        if (createOptionError) {
-          console.log("Could not create option");
-          return false;
-        }
-      }
-    }
-
-    lessonCount++;
-  }
-
-  return { id: set.id, lessonCount };
+  return {
+    id: Number(setId),
+    lessonCount: parsedResponse.lessons.length,
+  };
 }
 
 export async function createBuddy(
@@ -150,7 +68,6 @@ export async function createBuddy(
   }
 
   // create the buddy
-
   const { data: buddy, error: createBuddyError } = await supabase
     .from("study_bots")
     .insert({
