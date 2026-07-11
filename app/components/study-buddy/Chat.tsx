@@ -344,7 +344,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           messages.map((message, index) => {
             return (
               <div
-                key={message.id ?? index}
+                key={message.id ? `msg-db-${message.id}` : `msg-idx-${index}`}
                 className={`mt-3 flex items-start ${
                   message.is_user_message
                     ? "mr-2 justify-end"
