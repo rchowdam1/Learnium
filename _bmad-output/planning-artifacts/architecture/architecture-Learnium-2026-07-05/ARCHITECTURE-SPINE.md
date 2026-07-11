@@ -25,6 +25,9 @@ companions: []
 
 > **Amendment 2026-07-11 — Study Buddy ingest + pgvector pivot (client MiniLM).**  
 > Study Buddy create/chat no longer use the Python FastAPI + Chroma + LangCache sidecar (`rag/`) or server multipart `ingestBuddyDocuments`. Live path: JSON `POST /api/create-buddy` creates a buddy shell; browser extracts (pdf.js/mammoth/jszip or `/api/extract-media`), chunks, and embeds with **MiniLM `Xenova/all-MiniLM-L6-v2` (384-d)**; `POST /api/ingest-document` claims storage, stores the raw file in Supabase Storage `study-documents`, and inserts client embeddings into `document_chunks` (pgvector + FTS, RLS, `embedding_model`). Chat client sends `queryEmbedding`; `/api/send-chat` hybrid-retrieves (`match_document_chunks` + `keyword_document_chunks`), answers via OpenRouter, persists `citations` jsonb. Feature-hash in `lib/ingest/embed.ts` is **fallback only**. `RAG_SERVICE_URL` is unused. AD-6, AD-10, AD-13, and AD-14 below are amended accordingly.
+> 
+> **Amendment 2026-07-11 — Local Database Setup, local Edge Runtime, Set Generation Job Substrate, and unified AppNav Integration.**  
+> The architecture context is updated to align with the local database setup (Supabase CLI running at `http://127.0.0.1:54321` with schema migrations) and the local Edge Runtime environment using `supabase/functions/.env` for secrets like `OPENROUTER_API_KEY`. It incorporates `AD-18` outlining the Row Level Security (RLS) policies and security-definer RPC structure for the `set_generation_jobs` table. Finally, the legacy `AuthNav` has been replaced by the unified `AppNav` header component across all authenticated routes. AD-2, AD-10, and AD-18 below are amended/added accordingly.
 
 ## Design Paradigm
 
@@ -56,8 +59,8 @@ Dependency direction is inward to server authority. Components display state and
 ### AD-2 - Auth And Route Protection [ADOPTED]
 
 - **Binds:** Accounts, dashboard, Sets, Lessons, Buddy chat, subscriptions, profile, future Review/League/Path surfaces.
-- **Prevents:** Protected user data appearing on public routes or privileged Supabase access leaking into the browser.
-- **Rule:** `middleware.ts` `protectedPaths` is the single route gate for authenticated app surfaces, server code must use `lib/server.ts` `createClient()` for cookie-bound Supabase access, and every user-owned object read/write must prove ownership through its parent `profile_id`. The browser client in `lib/supabase.ts` is only for browser-safe auth/read patterns.
+- **Prevents:** Protected user data appearing on public routes, privileged Supabase access leaking into the browser, and inconsistent/competing navigation components.
+- **Rule:** `middleware.ts` `protectedPaths` is the single route gate for authenticated app surfaces, server code must use `lib/server.ts` `createClient()` for cookie-bound Supabase access, and every user-owned object read/write must prove ownership through its parent `profile_id`. The browser client in `lib/supabase.ts` is only for browser-safe auth/read patterns. All authenticated routes (including `app/(app)/*`, `app/sets/[setId]`, `app/buddy/[buddyId]`, and `app/subscriptions`) must import and render the unified `AppNav` header component (legacy `AuthNav` is obsolete).
 
 ### AD-3 - Quota Transaction Ordering [ADOPTED]
 
@@ -105,7 +108,7 @@ Dependency direction is inward to server authority. Components display state and
 
 - **Binds:** Next.js deployment, Supabase (including pgvector + Storage), Stripe webhooks, OpenRouter keys and model routing.
 - **Prevents:** Localhost-only production, secrets in browser bundles, service-role leakage, and environment drift.
-- **Rule:** Provider keys live in environment variables scoped to the deployed service. LLM and multimodal extract (`/api/extract-media`) route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`). **Shipped env contract:** all four use `deepseek/deepseek-v4-flash`. `lib/openrouter.ts` accepts `:free` models or approved paid `deepseek/deepseek-v4-flash`; if env is unset, code default is still `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. Study Buddy vectors require Supabase with `document_chunks`, storage quota RPCs, and `study-documents` bucket — no separate RAG host; embeddings are browser MiniLM (not OpenRouter embeddings API). Service-role Supabase access is restricted to server-only privileged modules. `RAG_SERVICE_URL` is legacy/unused.
+- **Rule:** Provider keys live in environment variables scoped to the deployed service. LLM and multimodal extract (`/api/extract-media`) route through OpenRouter using OpenAI-compatible clients configured by `OPENROUTER_API_KEY` and server-only model env vars (`OPENROUTER_MODEL`, `OPENROUTER_VISION_MODEL`, `OPENROUTER_AUDIO_MODEL`, `OPENROUTER_TRANSCRIPTION_MODEL`). **Shipped env contract:** all four use `deepseek/deepseek-v4-flash`. `lib/openrouter.ts` accepts `:free` models or approved paid `deepseek/deepseek-v4-flash`; if env is unset, code default is still `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free`. Study Buddy vectors require Supabase with `document_chunks`, storage quota RPCs, and `study-documents` bucket — no separate RAG host; embeddings are browser MiniLM (not OpenRouter embeddings API). Service-role Supabase access is restricted to server-only privileged modules. `RAG_SERVICE_URL` is legacy/unused. Local database runs on Supabase CLI (`SUPABASE_URL=http://127.0.0.1:54321`) with migrations inside `supabase/migrations/` and credentials stored in `.env.local`. Local Edge Runtime executes Supabase Edge Functions (like `generate-set-job`) via Deno, utilizing environment secrets (e.g. `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `SUPABASE_SERVICE_ROLE_KEY`) loaded from `supabase/functions/.env`.
 
 ### AD-11 - Scheduled Work Authority
 
@@ -149,6 +152,17 @@ Dependency direction is inward to server authority. Components display state and
 - **Prevents:** Under-scope child accounts and use of personal learning data in ways the product privacy constraint forbids.
 - **Rule:** Signup enforces the 16+ age gate before account creation. User chats, uploaded documents, learning history, and generated progress data are not sent to providers for training; AI provider calls must use product-approved privacy settings and avoid unnecessary personal data in prompts.
 
+### AD-18 - Set Generation Job Substrate and RLS Policies [ADOPTED]
+
+- **Binds:** Set generation, async workers, `set_generation_jobs` table, schema migrations.
+- **Prevents:** Concurrent or duplicate set generation requests, unprivileged client-side job modifications, and security bypasses.
+- **Rule:** The `set_generation_jobs` table has Row Level Security (RLS) enabled.
+  - **Select:** Authenticated users can view only their own generation jobs (`auth.uid() = profile_id`).
+  - **Insert:** Authenticated users can only insert/enqueue their own jobs (`auth.uid() = profile_id`) with strict checks enforcing that `status = 'queued'`, `phase = 'Queued'`, and all progress/metadata fields (completed_lessons, total_lessons, set_id, error_code, error_message, workflow_run_id) are initialized to `null` or `0`.
+  - **Update:** Authenticated users can only update their own jobs (`auth.uid() = profile_id`) with check constraints restricting updates strictly to setting `status = 'cancelled'`.
+  - **Worker Operations:** Privileged operations (claiming jobs, updating progress, and inserting generated set graphs) are performed by the local Edge function worker (using Deno runtime with secrets in `supabase/functions/.env` and connecting via `service_role` to bypass RLS) using `security definer` functions (`public.claim_generation_job`, `public.update_generation_job`, `public.persist_generation_job_graph`) that are revoked from public/anon/authenticated roles.
+
+
 ## Consistency Conventions
 
 | Concern | Convention |
@@ -157,11 +171,11 @@ Dependency direction is inward to server authority. Components display state and
 | Supabase clients | Browser code uses `createSupabaseClient()` only for browser-safe flows; server code uses async `createClient()` from `lib/server.ts`; service-role code stays isolated. |
 | Data naming | Database tables/columns are `snake_case`; TypeScript values are `camelCase`; mappings happen at the Supabase call site until codegen/ORM is adopted. |
 | Expected failures | Do not throw for expected Supabase/provider failures; return the existing envelope and preserve user input/quota. |
-| Protected surfaces | New authenticated top-level routes must be added to `middleware.ts` `protectedPaths`; be precise because matching is prefix-based. |
+| Protected surfaces | New authenticated top-level routes must be added to `middleware.ts` `protectedPaths`; authenticated routes must import and render the unified `AppNav` header component. |
 | Ownership paths | `lessonId` and `quizId` authorize through Lesson -> Set -> profile; `buddyId` and chat authorize through Study Buddy -> profile; Review items authorize through profile; Path Sets authorize through Path owner or standalone Set owner. |
 | AI schemas | Generated Set/Lesson payloads stay schema-validated in Next.js (zod). Study Buddy chat uses server-owned retrieve + prompt assembly in `lib/ingest/`; assistant `citations` jsonb powers sources UI. |
 | Accessibility | Real controls, visible focus, `aria-live` feedback, reduced motion, persistent-chrome focus protection, and 44px targets are implementation constraints, not visual polish. |
-| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, OpenRouter model names, and service-role keys stay server-only. Shipped OpenRouter models: `deepseek/deepseek-v4-flash` for MODEL/VISION/AUDIO/TRANSCRIPTION; code default if unset remains Nemotron free. |
+| Env contract | Browser-exposed Supabase values use `NEXT_PUBLIC_*`; server secrets, Stripe keys, OpenRouter model names, and service-role keys stay server-only. Local DB uses `.env.local`; local Edge Runtime loads Deno secrets from `supabase/functions/.env`. Shipped OpenRouter models: `deepseek/deepseek-v4-flash` for MODEL/VISION/AUDIO/TRANSCRIPTION; code default if unset remains Nemotron free. |
 | LLM provider contract | OpenRouter is the default provider gateway. Keep OpenAI-compatible SDK call sites where they reduce churn, but configure API key, model slugs (chat/vision/audio/transcription), and optional attribution headers through env vars so provider swaps do not alter product/domain code. Buddy RAG embeddings are browser MiniLM 384-d (feature-hash fallback), not OpenRouter embeddings API. |
 | Study storage | Free 750MB / Plus 5GB; max 100MB/file; max 8 files/buddy; `claim_study_storage` / `release_study_storage`; raw files in `study-documents`. |
 | Service-role boundary | Service-role Supabase access is limited to named server-only privileged modules for account deletion, profile bootstrap/repair, and admin reconciliation; regular user-facing reads/writes cannot import it. |
@@ -237,7 +251,7 @@ sequenceDiagram
 
 | Capability / Area | Lives in | Governed by |
 | --- | --- | --- |
-| FR-1..FR-3 Set generation and content quality | `app/api/input-check`, generation routes/actions, Supabase Sets/Lessons | AD-3, AD-5, AD-10, AD-15 |
+| FR-1..FR-3 Set generation and content quality | `app/api/input-check`, generation routes/actions, Supabase Sets/Lessons | AD-3, AD-5, AD-10, AD-15, AD-18 |
 | FR-4..FR-5 Lessons and progression | `app/sets/[setId]`, lesson components, progress actions | AD-4, AD-5, AD-12, AD-15 |
 | FR-6 Study Buddy | `app/api/create-buddy`, `extract-media`, `ingest-document`, `send-chat`, `lib/ingest/` (+ `client/`), `document_chunks`, Storage `study-documents` | AD-3, AD-6, AD-10, AD-13, AD-14 |
 | FR-7..FR-9 Daily Goals, Streaks, reminders | profile/settings, scheduled jobs | AD-4, AD-11, AD-16 |

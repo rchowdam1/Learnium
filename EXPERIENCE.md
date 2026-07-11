@@ -38,7 +38,7 @@ Light and dark are co-equal (memlog) — every surface and state below must be a
 | Leagues | Leaderboard | Weekly cohort standing, promotion/demotion zones | **Placeholder** page |
 | Profile | XP / Levels / Badges / settings | Identity, achievements, chat-quota counter, settings entry | Shipped |
 
-**AuthNav vs full app shell (shipped):** Set viewer and Study Buddy chat use **AuthNav** (authenticated chrome without the full 5-tab shell), not the main tab bar. The 5-tab shell is for Dashboard / Learn / Review / Leagues / Profile. Do not assume every authenticated route shows all five tabs.
+**AppNav everywhere (shipped):** The main navigation bar `AppNav` has replaced the legacy `AuthNav` across all root-level authenticated pages (sets/[setId], buddy/[buddyId], subscriptions) to resolve overlapping headers and missing links, providing a unified top-bar shell and `StatusChrome` functionality. Other views like the Dashboard, Learn, Review, Leagues, and Profile continue to use the 5-tab app shell.
 
 Persistent chrome on the main shell (shipped display): **XP pill**, **streak flame**, **level**, **Daily-Goal progress**, and **sets remaining** are shown. **Chat quota is not in chrome** — it lives on Profile. Note: XP/streak *award* on lesson complete is **not fully wired** (display chrome exists; pipeline incomplete — see Shipped vs placeholder).
 
@@ -61,7 +61,7 @@ Persistent chrome on the main shell (shipped display): **XP pill**, **streak fla
 | XP / streak award on lesson complete | **Not fully wired** | Pipeline incomplete — do not treat awards as reliable |
 | Daily reminders (email/push) | **Target / roadmap** | Retention loop depends on this; not shipped as described |
 | Stripe Pro (~$9.99) | **Shipped** | UI may say **Pro** not Plus; treat as paid tier |
-| Set viewer / buddy chat chrome | **Shipped** | AuthNav, not full 5-tab shell |
+| Set viewer / buddy chat chrome | **Shipped** | AppNav, not full 5-tab shell |
 
 ### All surfaces
 
@@ -73,7 +73,7 @@ Persistent chrome on the main shell (shipped display): **XP pill**, **streak fla
 | Onboarding | First login after signup | **Shipped:** topic pick + **Daily-Goal tier** → dashboard. **Target (UJ-1):** first Set generation during onboarding. FR-7. | Shipped (gen climax = target) |
 | Dashboard (Home) | Primary nav / app open | Streak, Daily-Goal ring, resume. FR-7, FR-8. Due Reviews = target until Review ships. | Shipped (partial) |
 | Learning Path map | Learn / dashboard resume | Ordered Sets in a Path; locked/active/complete nodes. FR-17, FR-18. | **Target** (coming soon on Learn) |
-| Set / Lesson viewer | Set card (AuthNav) | Ordered Lessons within a Set. FR-4. | Shipped |
+| Set / Lesson viewer | Set card (AppNav) | Ordered Lessons within a Set. FR-4. | Shipped |
 | Lesson quiz | Inside a Lesson | Embedded check questions; answer/reveal. FR-3, FR-4. `[OPEN]` interior format (§9 Q4). | Partial / as built |
 | **Study Buddy** (first-class) | Own surface / create flow | Create buddy, file upload, client MiniLM embed, RAG chat, sources chip. Quota-gated. | **Shipped** |
 | Nova in-lesson chat | In-Lesson entry | Context-grounded tutoring from a Lesson. FR-6, UJ-2. | **Target / roadmap** |
@@ -95,8 +95,8 @@ The `mockups/` folder provides visual references for the full app. Use them as s
 | Landing / auth / onboarding | `mockups/landing_learnium_*`, `mockups/signup_*`, `mockups/login_*`, `mockups/onboarding_*` | Keep the centered, restrained composition. Signup must keep the accessible 16+ age gate and inline error behavior from this spine even when the mockup omits details. |
 | Dashboard / Learn | `mockups/home_dashboard_*`, `mockups/home_learnium_*`, `mockups/learn_*` | Desktop uses goal/review metrics beside active learning cards; mobile stacks metrics, reviews, then continue cards. XP, streak, level, daily-goal, and **sets remaining** remain persistent chrome; **chat quota is Profile-only** (shipped). Paths = coming soon. |
 | Learning path / lesson chain | `mockups/learning_path_*`, `mockups/lesson_chain_*` | **Target / Paths coming soon.** Use the vertical timeline direction with explicit complete/active/locked affordances. Active node is enlarged; locked and complete states must not rely on color alone. |
-| Lesson / quiz / review | `mockups/lesson_*`, `mockups/review_session_*`, `mockups/review_summary_*` | Lesson: as built under AuthNav. Review mockups are **target** (Review tab is placeholder). Review has no enforced timer. |
-| Study Buddy / Nova chat | `mockups/nova_assistant_*` | **Shipped:** first-class Study Buddy RAG (AuthNav), not full tab shell. **Target mockup shape:** lesson-context header + in-lesson Nova (UJ-2). Prefer sources chip for RAG; do not require lesson-context header for Study Buddy. |
+| Lesson / quiz / review | `mockups/lesson_*`, `mockups/review_session_*`, `mockups/review_summary_*` | Lesson: as built under AppNav. Review mockups are **target** (Review tab is placeholder). Review has no enforced timer. |
+| Study Buddy / Nova chat | `mockups/nova_assistant_*` | **Shipped:** first-class Study Buddy RAG (AppNav), not full tab shell. **Target mockup shape:** lesson-context header + in-lesson Nova (UJ-2). Prefer sources chip for RAG; do not require lesson-context header for Study Buddy. |
 | Paywall / profile / leagues / settings | `mockups/paywall_*`, `mockups/profile_*`, `mockups/public_profile_*`, `mockups/weekly_league_*`, `mockups/settings_*` | Preserve reassurance-first paywall, privacy-limited public profile, weekly league list, and clean settings sections. Legal/destructive flows use factual copy, not Nova wit. |
 | Celebrations / share artifacts / brand assets | `mockups/set_celebration_*`, `mockups/level_up_*`, `mockups/milestone_share_card_*`, `mockups/learnium_logo`, Nova/badge image mockups | Use as visual reference for reward concentration and Nova starburst. They do not override token colors, motion-reduction behavior, or final copy. |
 **Hierarchy:** Path → contains → Sets → contain → Lessons → contain → check questions. Modals stack **one level deep only** (celebration, paywall, report-content, delete-confirm) — never a modal atop a modal.
@@ -134,11 +134,12 @@ Behavioral only. Visual specs live in `DESIGN.md.Components`.
 | **XP award** (`{components.xp-pill}`) | **Target behavior:** awarded **server-side only**, on completion event, **idempotent** per event (FR-10). No client-originated XP. The pill animation is a *display* of a value the server already committed — never the source of truth. **Shipped today:** chrome shows XP/level; the award pipeline on lesson complete is **not fully wired**. |
 | **Streak** (`{components.streak-flame}`) | **Target behavior:** increments **once per day** when the Daily Goal is met, in the same session (no overnight batch, FR-8). Day boundary = user-local midnight `[ASSUMPTION #4]`. A missed day ends the streak → **soft-loss** state shows previous length + restart prompt, never a bare zero. Recovery/freeze/repair mechanic is `[OPEN]` (§9 Q2). **Shipped today:** flame/count display in chrome; award on goal/lesson complete **not fully wired**. |
 | **Progress persistence** | All progress (Lesson completion, Set %, Path %, XP, streak, review schedule) is server-persisted and reloads identically on any device. |
-| **Study Buddy chat (shipped)** | First-class surface: create a buddy, upload files (≤100MB each, ≤8 files/buddy), **client MiniLM embed**, RAG chat with **sources chip**. Chat quota: **claim/consume before LLM**; counter on Profile (not chrome). Storage: Free 750MB / Plus|Pro 5GB. Uses **AuthNav**. |
+| **Study Buddy chat (shipped)** | First-class surface: create a buddy, upload files (≤100MB each, ≤8 files/buddy), **client MiniLM embed**, RAG chat with **sources chip**. Chat quota: **claim/consume before LLM**; counter on Profile (not chrome). Storage: Free 750MB / Plus|Pro 5GB. Uses **AppNav**. |
 | **Nova in-lesson chat (target)** (`{components.nova-avatar}`) | **Target / roadmap:** grounded in the current Lesson's content when opened from a Lesson (FR-6, UJ-2). Not the same product as Study Buddy RAG. Each user message = one chat-Quota unit with claim-first ordering. Out-of-quota → paid-tier upsell inline, **but the Lesson continues** without Nova. |
 | **Leaderboard** (`{components.leaderboard-row}`) | Weekly cohort of ~30 active users `[ASSUMPTION #6]`. Ranked by XP earned that week. Promotion (top) / demotion (bottom) at cycle end; tier counts `[OPEN]` (§9 Q3). Refreshes on each Leagues page load — near-real-time not required. Opted-out users neither appear nor see standings (FR-14). |
 | **Review Session** (`{components.review-session-card}`) | 5-10 questions, completable in <3 min (FR-16). **Zero generation and zero chat Quota cost.** Awards XP and counts toward the Daily Goal. Correct answers lengthen the next interval; incorrect answers shorten it. No enforced countdown in v1; "<3 min" is descriptive only. If a timer is ever introduced, users can extend/disable it and the streak is never lost because of a timeout. Questions sourced from banks generated at Set-generation time `[ASSUMPTION: addendum]`. |
 | **Set generation (shipped)** | Topic → input-check → `create_set_graph_with_quota` (or equivalent). Reject gibberish/unsafe **without consuming set quota** (FR-2). Daily set quotas: Free **1/day**, Plus/Pro **5/day** (refresh daily — not a monthly free-Set pool). Target UX: 4–12 Lessons `[ASSUMPTION #3]`, ≤60s visible progress (FR-1). |
+| **Modals** | All modals (e.g., `CreateSetModal`, `CreateStudyBuddyModal`) must be fully controlled components. Uncontrolled implementations are banned to prevent stale state form-submission failures and ensure reliable reset behavior on open/close. |
 
 ## State Patterns
 
@@ -267,7 +268,7 @@ Do **not** collapse these into one surface:
 | Entry | First-class create/manage buddy flow | Open from inside a Lesson |
 | Grounding | Uploaded files → client **MiniLM** embed → **RAG** chat; **sources chip** | Current Lesson content (FR-6) |
 | Files | Max **100MB**/file, **8 files**/buddy; storage Free **750MB** / Plus|Pro **5GB** | N/A (lesson text) |
-| Chrome | **AuthNav** (not full 5-tab shell) | In-lesson overlay/panel (as designed) |
+| Chrome | **AppNav** | In-lesson overlay/panel (as designed) |
 | Quota | Chat units: **claim/consume before LLM**; counter on **Profile**, not chrome | Same chat-quota family when built; Lesson continues if out of quota |
 | Journeys | Live product for "ask my materials" | UJ-2 climax (judgment-free unblock in a Lesson) |
 

@@ -343,6 +343,8 @@ All of §4, phased as follows.
 4. **Lesson Interior Format (FR-3):** Lessons consist of structured text paragraphs with inline check questions (multiple-choice or short text) for real-time verification.
 5. **Reminder Channel (FR-9):** Email-only for v1.
 6. **Product Name:** "Learnium" is the official launch name.
+7. **Asynchronous Set Generation Enqueuing (FR-1):** Set generation runs asynchronously. The client enqueues a job, which triggers a background Supabase Edge Function (`generate-set-job`) using `EdgeRuntime.waitUntil` and OpenRouter/DeepSeek with JSON-safety instructions. Modals display live progress and support user cancellation.
+8. **Layout Bottom Nav Padding (NFR-8 / UX-DR8):** Mobile viewport padding-bottom is increased to `pb-[6.5rem]` (104px) on main layouts to prevent the fixed 5-tab navigation bar from overlapping content.
 
 ## 10. Assumptions Index
 

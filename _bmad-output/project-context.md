@@ -26,7 +26,8 @@ _This file contains critical rules and patterns that AI agents must follow when 
 ## Technology Stack & Versions
 
 - Next.js 15.3.3 (App Router), React 19.0.0, TypeScript 5 (`strict: true`)
-- Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres + **pgvector**; local schema via `supabase/migrations/`
+- Supabase: `@supabase/ssr` 0.6.1 + `@supabase/supabase-js` 2.50.0 — auth + Postgres + **pgvector**; local CLI database setup running at `SUPABASE_URL=http://127.0.0.1:54321` with schema migrations under `supabase/migrations/`
+- Local Edge Runtime: Supabase local Edge Functions (specifically `generate-set-job` worker) using Deno runtime with environment secrets (e.g. `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `SUPABASE_SERVICE_ROLE_KEY`) sourced from `supabase/functions/.env`
 - Stripe 18.4.0 — subscriptions/billing (`lib/stripe.ts`)
 - Tailwind CSS v4 (`@tailwindcss/postcss`); design primitives under `app/components/ui/`
 - OpenRouter via OpenAI-compatible SDK (`openai` 5.3.0) — base URL `https://openrouter.ai/api/v1`
@@ -62,6 +63,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 - API routes live at `app/api/<kebab-case-action>/route.ts`, one per verb-style action (e.g. `get-buddies`, `mark-lesson-complete`) — not grouped as RESTful resources
 - Authenticated shell pages live under `app/(app)/` (dashboard, learn, review, leagues, profile, settings, onboarding); dynamic learning surfaces stay at `app/sets/[setId]` and `app/buddy/[buddyId]`
+- Unified Navigation: All authenticated routes (including `app/(app)/*` pages, `app/sets/[setId]`, `app/buddy/[buddyId]`, and `app/subscriptions`) must import and render the unified `AppNav` header component. The legacy `AuthNav` component is obsolete and unused.
 - `middleware.ts` `protectedPaths` is the single auth gate — any new protected top-level route MUST be added there or it stays publicly accessible
 - Components are PascalCase `.tsx` grouped by UI role under `app/components/{cards,controllers,lessons,misc,modals,nav,study-buddy,ui}`, not by feature — place new components in the matching role folder; reusable design-system primitives go in `ui/`
 - Study Buddy live path: JSON `POST /api/create-buddy` (shell only) → browser extract/chunk/MiniLM embed → `POST /api/ingest-document` (storage claim + chunks); chat → client `queryEmbedding` + `POST /api/send-chat` → hybrid retrieve + OpenRouter. Do **not** call `RAG_SERVICE_URL`, Python `rag/`, or legacy server `ingestBuddyDocuments` multipart create-buddy for the live path
@@ -106,6 +108,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Buddy readiness: treat Buddies as chat-ready only when at least one document ingest succeeds with chunks; failed/empty ingest must not look usable
 - Review Sessions must not consume generation or chat quota
 - Signup enforces 16+ age gate; do not send chats/docs/learning history to providers for training
+- **set_generation_jobs RLS policies & worker contract:** Row level security is enabled on `set_generation_jobs`. Authenticated users can view (SELECT) only their own jobs (`auth.uid() = profile_id`), insert (INSERT) their own jobs under strict check constraints enforcing initial states (`status = 'queued'`, `phase = 'Queued'`, and progress/errors/run/set fields initialized to null/0), and cancel (UPDATE) their own jobs with check constraints restricting updates strictly to setting `status = 'cancelled'`. All privileged worker operations (claiming jobs, updating status/phase/progress, persisting generated graphs) bypass RLS via security definer functions (`claim_generation_job`, `update_generation_job`, `persist_generation_job_graph`) executed by the Edge function worker.
 
 ---
 

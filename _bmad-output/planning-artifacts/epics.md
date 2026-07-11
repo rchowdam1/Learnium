@@ -132,6 +132,7 @@ NFR16: ~~Launch hardening must address the current lack of automated test framew
 - Existing implementation notes identify Next.js 15 App Router, Supabase auth/Postgres/**pgvector**/Storage, Stripe, OpenRouter (**DeepSeek V4 Flash** model env contract), and quota plumbing for `sets_remaining` and chat (`consume_chat_quota`). Python/FastAPI RAG + Redis LangCache are **legacy / not required**.
 - OpenRouter is the default LLM provider gateway. OpenAI-compatible SDK/client surfaces remain; **API key and model slugs** are env-driven and server-only; base URL is hardcoded to OpenRouter.
 - Launch phasing per PRD §7.1: Phase A (pre-launch harden and retain — Sets, Lessons, Buddy, Streaks/Daily Goals, XP/Levels/Badges, Review Sessions, billing/tiers), Phase B (Leagues and Learning Paths, launch or ≤4 weeks post-launch), Phase C (social layer — public profiles, share cards, friends leaderboard).
+- **Asynchronous Set Generation & RLS Rules (2026-07-11):** Set generation runs asynchronously via `/api/input-check` and Supabase Edge Function `generate-set-job` using `EdgeRuntime.waitUntil`. Quota is checked read-only, and decremented in a single atomic transaction (`persist_generation_job_graph`) at successful completion. RLS rules restrict `set_generation_jobs` insertions to a strict initial state (`status='queued'`, etc.) and updates to `'cancelled'` status only; background worker updates are limited to `service_role` execution. Navbar layout overlap is fixed by adding `pb-[6.5rem]` mobile padding.
 
 ### UX Design Requirements
 

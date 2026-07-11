@@ -5,7 +5,7 @@ Personalized microlearning powered by AI.
 ## Getting Started
 
 1. Copy `.env.example` to `.env.local` and fill in the required variables (no secrets in `.env.example`).
-2. Start local Supabase (Postgres + Auth + pgvector) if you develop against the local stack — apply migrations under `supabase/migrations/` (includes Study Buddy `document_chunks` + hybrid retrieval RPCs).
+2. Start the local Supabase environment (Postgres + Auth + pgvector) running via Docker (port 54321) if you develop against the local stack (e.g. `supabase start`) — apply migrations under `supabase/migrations/` (includes Study Buddy `document_chunks` + hybrid retrieval RPCs).
 3. Run the Next.js app:
 
 ```bash

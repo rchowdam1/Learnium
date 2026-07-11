@@ -49,7 +49,47 @@ The Python/FastAPI RAG microservice notes below are **historical**. Live Study B
 
 Vitest + Playwright and `.github/workflows/ci.yml` **exist** (lint, build, unit, e2e). Earlier “no test framework / no CI” notes are **struck**.
 
+## Amendment 2026-07-11 (revised) — Asynchronous Set Generation & RLS Hardening
+
+Set generation has been refactored from synchronous execution to an asynchronous, worker-based queue model to ensure reliability and accurate quota consumption.
+
+### Asynchronous Enqueuing & Execution Workflow
+
+1. **`POST /api/input-check`**:
+   - Parses the request, validates title, description, and category.
+   - Performs a read-only quota pre-check.
+   - Idempotency Check: Searches `set_generation_jobs` for existing `queued` or `running` jobs for the same user and title. If found, it re-invokes the Edge Function and returns the existing `jobId` to avoid duplicate work.
+   - Enqueues the job by inserting a row in `set_generation_jobs` in `queued` status.
+   - Invokes the Supabase Edge Function `generate-set-job` via HTTP POST with the service role key and returns `{ success: true, jobId }` immediately.
+2. **Deno / Supabase Edge Function (`generate-set-job`)**:
+   - Claims the job atomically using the database RPC `claim_generation_job` (changing the job status to `running`).
+   - Responds with `202 Accepted` immediately, and continues processing in the background via `EdgeRuntime.waitUntil()`.
+   - Uses OpenRouter direct fetch with `deepseek/deepseek-v4-flash` as the default model.
+   - Chat-JSON Safety: Implements `chatJson` helper sending `response_format: { type: "json_object" }` to OpenRouter and appending JSON constraints to prompts. Uses `extractJson` parser to robustly find, extract, and parse JSON boundaries (`{}` or `[]`), stripping potential markdown code fences.
+   - Performs web research if needed, plans the curriculum, and generates the lessons/quizzes in batches.
+   - Validates the complete output against a Zod schema (Zod schema checking for min length, 4-12 lessons, placeholder checks, etc.).
+   - Persists the entire set graph atomically in a single transaction via the security-definer RPC `persist_generation_job_graph`.
+   - Marks the job status as `succeeded` or `failed`.
+
+### RLS Rules for Job Creators
+
+- **Table**: `public.set_generation_jobs`
+- **SELECT**: Policy `"Users can view their own generation jobs"` restricts visibility using `auth.uid() = profile_id`.
+- **INSERT**: Policy `"Users can enqueue their own generation jobs"` allows insertions for authenticated users only if the job state matches a strict initial template: `profile_id` matches `auth.uid()`, `status = 'queued'`, `phase = 'Queued'`, `completed_lessons = 0`, and all other fields (e.g., `set_id`, `error_code`, `error_message`, `workflow_run_id`, `total_lessons`) are `null`.
+- **UPDATE**: Policy `"Users can cancel their own generation jobs"` allows updating `status` and `phase` only if the user is explicitly setting `status = 'cancelled'`. All other updates (e.g., updating progress or saving sets) are forbidden to client users and restricted to the `service_role` executing the security definer RPC `update_generation_job`.
+
+### Modal UI & Mobile Navigation Layout Fixes
+
+1. **`CreateSetModal` Input & Progress Handling**:
+   - Replaced uncontrolled fields with fully controlled state inputs (`title`, `description`, `category`).
+   - Shows live enqueued progress by polling `/api/get-set-generation-job/[jobId]` and rendering the phase/detail updates inside an `aria-live="polite"` container.
+   - Provides a "Cancel Job" button that allows users to abort active jobs, which triggers a PATCH request to cancel the job in the database.
+2. **Mobile Navbar Layout Overlap Fix**:
+   - The fixed bottom navigation bar (height 20, or 80px) on mobile viewports (< 768px) previously obscured scrollable page content.
+   - Resolved by modifying the core layout shell (`app/(app)/layout.tsx`) and the set detail page (`app/sets/[setId]/page.tsx`) to add `pb-[6.5rem]` (104px padding-bottom) on mobile viewports, responsive-resetting to desktop values (`md:pb-0` or `md:pb-16`).
+
 ---
+
 
 ## Existing implementation notes (for architecture)
 
