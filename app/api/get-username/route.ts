@@ -29,7 +29,7 @@ export async function GET() {
 
   // got the username
   return NextResponse.json(
-    { success: true, username: data.username },
-    { status: 200 }
+    { success: true, data: { username: data.username } },
+    { status: 200 },
   );
 }

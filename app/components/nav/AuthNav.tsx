@@ -2,6 +2,8 @@
 
 import { BookOpen } from "lucide-react";
 import Profile from "../misc/Profile";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
 import toast from "react-hot-toast";
 import { createSupabaseClient } from "@/lib/supabase";
 import Link from "next/link";
@@ -9,7 +11,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function AuthNav() {
-  const [username, setUsername] = useState<string>("");
+  /*const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -31,7 +33,7 @@ export default function AuthNav() {
     };
 
     fetchUsername();
-  }, []);
+  }, []);*/
 
   // 6/22 look into signing out on the sets page
   const signOut = async () => {
@@ -50,6 +52,18 @@ export default function AuthNav() {
     }
   };
 
+  // using swr
+  const {
+    data: profileData,
+    error: profileError,
+    isLoading: profileLoading,
+  } = useSWR<{ success: boolean; username: string }>(
+    "/api/get-username",
+    fetcher,
+  );
+
+  console.log("username data:", profileData);
+
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
       <div className="flex justify-between items-center h-16 sm:mx-[4.5rem] lg:mx-18">
@@ -58,15 +72,29 @@ export default function AuthNav() {
           <span className="text-xl font-bold text-gray-900">Learnium</span>
         </div>
         <div className="flex items-center space-x-4">
-          <span className="text-sm text-gray-700">
-            {username && `Welcome, ${username}`}
-          </span>
+          {profileLoading ? (
+            <>
+              <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
+            </>
+          ) : profileError ? (
+            <div className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm">
+              Something went wrong
+            </div>
+          ) : (
+            <>
+              <span className="text-sm text-gray-700">
+                {profileData && `Welcome, ${profileData.username}`}
+                {!profileData && "Could not get the username"}
+              </span>
 
-          {/*Profile Button*/}
-          <Profile
-            onSignOut={signOut}
-            onViewProfile={() => console.log("Viewing profile...")}
-          />
+              {/*Profile Button*/}
+              <Profile
+                onSignOut={signOut}
+                onViewProfile={() => console.log("Viewing profile...")}
+              />
+            </>
+          )}
         </div>
       </div>
     </nav>
