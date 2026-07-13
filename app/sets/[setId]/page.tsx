@@ -1,7 +1,6 @@
 "use client";
 
 import AuthNav from "@/app/components/nav/AuthNav";
-import LessonBubble from "@/app/components/lessons/LessonBubble";
 import LessonChain from "@/app/components/lessons/LessonChain";
 import LessonQuizModal from "@/app/components/modals/LessonQuizModal";
 import SetCompleteModal from "@/app/components/modals/SetCompleteModal";
@@ -10,12 +9,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
-import {
-  Undo2,
-  CircleCheckBig,
-  BrainCog,
-  SquareChevronRight,
-} from "lucide-react";
+import { Undo2, BrainCog, SquareChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 
 type LessonData = {
@@ -274,6 +268,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
         </div>
         {quizzes && (
           <LessonQuizModal
+            setId={Number(setId)}
             quizId={quizzes[currentLesson].quizId}
             open={quizOpen}
             onClose={() => setQuizOpen(false)}
@@ -286,7 +281,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
             correctAnswers={quizzes[currentLesson].questions.map(
               (question, key) => {
                 return question.correctAnswer;
-              }
+              },
             )}
             onComplete={async () => {
               setCurrentLessonCompleted(true);

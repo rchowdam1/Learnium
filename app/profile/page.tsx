@@ -143,9 +143,10 @@ export default function ProfilePage() {
         const response = await fetch("/api/get-profile-data");
 
         if (response.ok) {
-          const data = await response.json();
+          let data = await response.json();
 
           if (data.success) {
+            data = data.data;
             toast.success("Requests remaining: ", data.requestsRemaining);
             setLoading(false);
             setUsername(data.username);
