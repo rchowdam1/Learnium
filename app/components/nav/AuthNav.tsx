@@ -62,8 +62,6 @@ export default function AuthNav() {
     fetcher,
   );
 
-  console.log("username data:", profileData);
-
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
       <div className="flex justify-between items-center h-16 sm:mx-[4.5rem] lg:mx-18">

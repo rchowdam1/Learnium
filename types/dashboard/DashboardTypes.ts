@@ -35,7 +35,7 @@ export type BuddyData = {
 export type ProfileData = {
   username: string;
   email: string | undefined;
-  requestsRemaning: number | undefined;
+  requestsRemaining: number | undefined;
   setsCreated: number;
   setsCompleted: number;
   isSubscribed: boolean;
