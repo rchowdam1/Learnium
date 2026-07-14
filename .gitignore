@@ -51,3 +51,8 @@ logic.txt
 /lib/admin.ts
 
 /app/api/test-ai-endpoint/
+
+/.cursor/
+.mindmap-config.json
+codebaseData.json
+learnium-mindmap.html

@@ -15,6 +15,7 @@ type CreateSetResponse = {
   parsedResponse?: OutputSchema;
   profile_id?: string;
   error?: string;
+  date?: string;
 };
 
 type CreateModalProps = {
@@ -206,11 +207,15 @@ export default function CreateSetModal({
       if (data.error) {
         if (data.error === "Could not process your request")
           toast.error("Sorry! We can't make this set for you");
-        else if (data.error === "User does not have any set requests remaining")
+        else if (
+          data.error === "User does not have any set requests remaining"
+        ) {
+          const [year, month, day] = (data.date ?? "").split("T")[0].split("-");
+          const formattedDate = `${month}/${day}/${year}`;
           toast.error(
-            "You have ran out of requests. Please wait until the next day for more requests",
+            `You have ran out of requests. Please wait until ${formattedDate} for more requests`,
           );
-        else toast.error(data.error);
+        } else toast.error(data.error);
         setIsLoading(false);
         return;
       }

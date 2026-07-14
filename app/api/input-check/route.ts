@@ -134,7 +134,10 @@ export async function POST(request: Request) {
     // check if user does not have any requests remaining
 
     if (result.message === "User does not have any set requests remaining") {
-      return NextResponse.json({ error: result.message }, { status: 200 });
+      return NextResponse.json(
+        { error: result.message, date: setsRefreshAt },
+        { status: 200 },
+      );
     }
 
     return NextResponse.json(
