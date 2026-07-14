@@ -5,11 +5,20 @@ import StatCard from "../components/cards/StatCards";
 import SetCard from "../components/cards/SetCards";
 import StudyBuddyCard from "../components/cards/StudyBuddyCards";
 import CreateSetController from "../components/controllers/CreateSetController";
-
-import { Plus } from "lucide-react";
-import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
 import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
+
+import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
+import toast from "react-hot-toast";
+
+import {
+  SetData,
+  BuddyData,
+  ProfileData,
+  OnCreateSet,
+} from "@/types/dashboard/DashboardTypes";
+import { optimisticallyCreateSet } from "@/lib/swr-mutations";
 
 type StatCards = {
   title: string;
@@ -40,55 +49,11 @@ type StudyBuddyCards = {
   }[];
 };
 
-type SetResponse = {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  numLessons: number;
-  date: string;
-  profile_id: string;
-  is_flagged: boolean;
-};
-
-type APIResponse = {
-  data?: SetResponse;
-  error?: string;
-};
-
 export default function Dashboard() {
   // state for skeleton loading
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [setCards, setSetCards] = useState<SetCards[]>([
-    /*{
-      id: 10,
-      title: "Spanish Basics",
-      category: "Communication",
-      description: "Learn fundamental Spanish vocabulary and phrases",
-      totalLessons: 10,
-      completedLessons: 3,
-      date: new Date().toISOString(),
-    },
-    {
-      id: 11,
-      title: "JavaScript Fundamentals",
-      category: "Technology",
-      description: "Master the basics of JavaScript programming",
-      totalLessons: 15,
-      completedLessons: 7,
-      date: new Date().toISOString(),
-    },
-    {
-      id: 12,
-      title: "Digital Marketing",
-      category: "Business",
-      description: "Learn essential digital marketing strategies",
-      totalLessons: 8,
-      completedLessons: 0,
-      date: new Date().toISOString(),
-    },*/
-  ]);
+  const [setCards, setSetCards] = useState<SetCards[]>([]);
 
   // state to toggle between learning sets and ai studdy buddy
   const [isLearningSetsActive, setIsLearningSetsActive] =
@@ -113,29 +78,20 @@ export default function Dashboard() {
     },
   ];
 
-  const createSet = (
-    title: string,
-    description: string,
-    category: string,
-    numLessons?: number,
-    setId?: number,
-  ): void => {
+  const createSet = (createSetData: OnCreateSet): void => {
     //create a set
     toast.success("Set created successfully!");
-    setSetCards((prevSetCards) => {
-      return [
-        ...prevSetCards,
-        {
-          id: setId ?? 0,
-          title: title,
-          category: category,
-          description: description,
-          totalLessons: numLessons ?? 5,
-          completedLessons: 0,
-          date: new Date().toISOString(),
-        },
-      ];
-    });
+
+    // optimistic UI update for set creation
+    optimisticallyCreateSet(
+      createSetData.title,
+      createSetData.description,
+      createSetData.category,
+      createSetData.numLessons,
+      createSetData.setId,
+      createSetData.profile_id,
+      createSetData.is_flagged,
+    );
   };
 
   const createStudyBuddy = (
@@ -168,7 +124,63 @@ export default function Dashboard() {
   };
 
   // load up the sets of the user and/or study buddies
+  // getting the set data, gonna replace all of the fetching in useEffect with
+  // useSWR
+
+  // set data first
+  const {
+    data: setData,
+    error: setError,
+    isLoading: setsLoading,
+  } = useSWR<SetData[]>("/api/get-sets", fetcher);
+  // buddy data 2nd
+  const {
+    data: buddyData,
+    error: buddyError,
+    isLoading: buddyLoading,
+  } = useSWR<BuddyData>("/api/get-buddies", fetcher);
+  // profile info last
+  const {
+    data: profileInfo,
+    error: profileError,
+    isLoading: profileLoading,
+  } = useSWR<ProfileData>("/api/get-profile-data", fetcher);
+
+  const errorSources = [
+    setError ? "sets" : null,
+    buddyError ? "buddies" : null,
+    profileError ? "profile data" : null,
+  ].filter(Boolean) as string[];
+
   useEffect(() => {
+    if (errorSources.length > 0) {
+      console.error(
+        `Dashboard data loading failed for: ${errorSources.join(", ")}`,
+      );
+    }
+  }, [errorSources]);
+
+  if (errorSources.length > 0) {
+    return (
+      <>
+        <AuthNav />
+
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-10">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-red-700">
+              Something went wrong
+            </h2>
+            <p className="mt-2 text-sm text-red-600">
+              We couldn’t load the {errorSources.join(", ")} data. Please
+              refresh the page and try again.
+            </p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  /*useEffect(() => {
     const loadSets = async () => {
       try {
         const response = await fetch("/api/get-sets");
@@ -277,7 +289,7 @@ export default function Dashboard() {
     loadSets();
     loadBuddies();
     getProfInfo();
-  }, []);
+  }, []);*/
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -286,7 +298,7 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
         {/*Stat Cards*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-8 mt-5">
-          {profileData.length === 0 &&
+          {profileLoading &&
             Array(3)
               .fill(0)
               .map((_, index) => {
@@ -297,8 +309,26 @@ export default function Dashboard() {
                   />
                 );
               })}
-          {profileData.length > 0 &&
-            profileData.map((statCard, index) => {
+          {profileInfo &&
+            [
+              {
+                title: "Total Sets",
+                icon: 1,
+                content: (
+                  profileInfo.setsCreated - profileInfo.setsCompleted
+                ).toString(),
+              },
+              {
+                title: "Completed Lessons",
+                icon: 2,
+                content: profileInfo.completedLessons.toString(),
+              },
+              {
+                title: "Overall Progress",
+                icon: 3,
+                content: profileInfo.overallProgress.toString() + "%",
+              },
+            ].map((statCard, index) => {
               return (
                 <StatCard
                   key={index}
@@ -343,7 +373,7 @@ export default function Dashboard() {
         <br />
         {isLearningSetsActive && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
-            {loading &&
+            {setsLoading &&
               Array(3)
                 .fill(0)
                 .map((_, index) => {
@@ -354,8 +384,10 @@ export default function Dashboard() {
                     />
                   );
                 })}
-            {!loading &&
-              setCards.map((setCard, index) => {
+            {setData &&
+              setData.map((setCard, index) => {
+                if (setCard.completed) return;
+
                 return (
                   <SetCard
                     key={index}
@@ -363,7 +395,7 @@ export default function Dashboard() {
                     title={setCard.title}
                     category={setCard.category}
                     description={setCard.description}
-                    totalLessons={setCard.totalLessons}
+                    totalLessons={setCard.numLessons}
                     completedLessons={setCard.completedLessons}
                     date={setCard.date}
                     onDeleteSet={onDeleteSet}
@@ -380,7 +412,7 @@ export default function Dashboard() {
               learning
             </span>
             <br />
-            {!studyBuddySets.length && (
+            {buddyData && !buddyData.buddyData.length && (
               <span className="font-bold text-lg">
                 No Study Buddies created yet. Upload study materials to get
                 started!
@@ -390,19 +422,31 @@ export default function Dashboard() {
             <br />
             {/* Study Buddy UI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-11">
-              {studyBuddySets.map((buddy, index) => {
-                //console.log("buddy.title: ", buddy.title);
-                return (
-                  <StudyBuddyCard
-                    key={index}
-                    id={buddy.id}
-                    title={buddy.title}
-                    category={buddy.category}
-                    description={buddy.description}
-                    documents={buddy.documents}
-                  />
-                );
-              })}
+              {buddyLoading &&
+                Array(3)
+                  .fill(0)
+                  .map((_, index) => {
+                    return (
+                      <div
+                        className="h-70 w-100 rounded-sm bg-card bg-gray-300 shadow-sm animate-pulse"
+                        key={index}
+                      />
+                    );
+                  })}
+              {buddyData &&
+                buddyData.buddyData.map((buddy, index) => {
+                  //console.log("buddy.title: ", buddy.title);
+                  return (
+                    <StudyBuddyCard
+                      key={index}
+                      id={buddy.id}
+                      title={buddy.bot_name}
+                      category={buddy.category}
+                      description={buddy.description}
+                      documents={buddyData.documentData[index]}
+                    />
+                  );
+                })}
             </div>
           </div>
         )}

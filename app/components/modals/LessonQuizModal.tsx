@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import next from "next";
+import { optimisticallyCompleteLesson } from "@/lib/swr-mutations";
 
 type OptionProps = {
   option: OptionData;
@@ -34,10 +34,10 @@ const Option = ({
           ? "bg-green-400"
           : "bg-red-300"
         : selected
-        ? "bg-blue-300"
-        : !displayCorrectAnswer
-        ? "hover:bg-gray-300 hover:shadow-md"
-        : ""
+          ? "bg-blue-300"
+          : !displayCorrectAnswer
+            ? "hover:bg-gray-300 hover:shadow-md"
+            : ""
     }
       ${
         previousAnswer && !correct && previousAnswer === option.option
@@ -133,6 +133,7 @@ type OptionData = {
 };
 
 type LessonQuizModalProps = {
+  setId: number;
   quizId: number;
   open: boolean;
   onClose: () => void;
@@ -149,6 +150,7 @@ type LessonQuizModalProps = {
 };
 
 export default function LessonQuizModal({
+  setId,
   quizId,
   open,
   onClose,
@@ -166,7 +168,7 @@ export default function LessonQuizModal({
   const [currentAnswers, setCurrentAnswers] = useState<string[]>(
     questions.map((question, key) => {
       return "";
-    })
+    }),
   );
 
   const answersFilled = (): boolean => {
@@ -206,7 +208,7 @@ export default function LessonQuizModal({
     setCurrentAnswers(
       questions.map((_) => {
         return "";
-      })
+      }),
     );
     setCurrentQuestion(0);
     setDisplayCorrectAnswers(false);
@@ -335,6 +337,8 @@ export default function LessonQuizModal({
                     if (data.quizScore || data.quizScore === 0) {
                       setQuizScore(data.quizScore);
                     }
+
+                    optimisticallyCompleteLesson(setId, lastLesson);
 
                     onComplete();
                     //onClose();

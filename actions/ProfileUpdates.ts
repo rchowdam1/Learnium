@@ -53,6 +53,48 @@ export async function decrementRequests() {
   return { success: true }; // this means we have successfully updated the user's sets_remaining
 }
 
+export async function incrementRequests() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.log("User is not logged in");
+    return { success: false, message: "User is not logged in" };
+  }
+
+  const { data: profileData, error: profileError } = await supabase
+    .from("profile")
+    .select("*")
+    .eq("id", user?.id)
+    .single();
+
+  if (profileError) {
+    console.log("Could not retrieve profile");
+    return { success: false, message: "Could not retrieve profile" };
+  }
+
+  const remainingSets = profileData.sets_remaining + 1;
+
+  const { error: profileUpdateError } = await supabase
+    .from("profile")
+    .update({ sets_remaining: remainingSets })
+    .eq("id", user?.id);
+
+  if (profileUpdateError) {
+    console.log("Could not refund user's set request");
+    return {
+      success: false,
+      message: "Could not refund the user's set request",
+    };
+  }
+
+  return { success: true };
+}
+
 export async function resetSets() {
   // resets sets_remaining if necessary
   const supabase = await createClient();

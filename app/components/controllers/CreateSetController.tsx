@@ -2,16 +2,12 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import CreateSetModal from "../modals/CreateSetModal";
+import { OnCreateSet } from "@/types/dashboard/DashboardTypes";
 
 export default function CreateSetController({
   onCreateSet,
 }: {
-  onCreateSet: (
-    title: string,
-    description: string,
-    category: string,
-    numLessons?: number
-  ) => void;
+  onCreateSet: (createSetData: OnCreateSet) => void;
 }) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
 

@@ -186,7 +186,7 @@ async def chat_request(request: ChatRequest):
 
         return {
             "response": response, "cached_response": True
-        } 
+        }
 
 
     # convert the query to an embedding and search for the 3 most relevant chunks

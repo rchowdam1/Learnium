@@ -49,3 +49,5 @@ logic.txt
 /rag/Dockerfile
 
 /lib/admin.ts
+
+/app/api/test-ai-endpoint/

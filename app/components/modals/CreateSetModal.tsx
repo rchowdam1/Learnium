@@ -3,6 +3,7 @@ import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 
 import { zOutputSchema } from "@/app/schema/OutputSchema";
+import { OnCreateSet } from "@/types/dashboard/DashboardTypes";
 import { z } from "zod";
 
 import toast from "react-hot-toast";
@@ -12,18 +13,14 @@ type OutputSchema = z.infer<typeof zOutputSchema>;
 type CreateSetResponse = {
   setId?: number;
   parsedResponse?: OutputSchema;
+  profile_id?: string;
   error?: string;
 };
 
 type CreateModalProps = {
   open: boolean;
   onClose: () => void;
-  onCreateSet: (
-    title: string,
-    description: string,
-    category: string,
-    numLessons?: number
-  ) => void;
+  onCreateSet: (createSetData: OnCreateSet) => void;
 };
 
 export default function CreateSetModal({
@@ -174,8 +171,10 @@ export default function CreateSetModal({
 
     setIsLoading(true);
 
-    let numLessons: number | undefined = 0;
+    let numLessons: number | undefined = undefined;
     let setId: number | undefined = undefined;
+    let profile_id: string | undefined = undefined;
+    let is_flagged: boolean | undefined = undefined;
 
     if (!validateInputs()) {
       setIsLoading(false);
@@ -209,24 +208,41 @@ export default function CreateSetModal({
           toast.error("Sorry! We can't make this set for you");
         else if (data.error === "User does not have any set requests remaining")
           toast.error(
-            "You have ran out of requests. Please wait until the next day for more requests"
+            "You have ran out of requests. Please wait until the next day for more requests",
           );
         else toast.error(data.error);
         setIsLoading(false);
         return;
       }
 
+      // set generation successful
       console.log(data, "data from input-check api");
       numLessons = data.parsedResponse?.lessons.length;
       setId = data.setId;
+      profile_id = data.profile_id;
+      is_flagged = data.parsedResponse?.flagged;
     } catch (error) {
       alert(error);
       setIsLoading(false);
       return;
     }
 
+    if (!setId || !profile_id) {
+      toast.error("Set was created but response data was incomplete");
+      setIsLoading(false);
+      return;
+    }
+
     // inputs are valid, create the set
-    onCreateSet(title, description, category, numLessons, setId);
+    onCreateSet({
+      title,
+      description,
+      category,
+      numLessons: numLessons ?? 0,
+      setId,
+      profile_id,
+      is_flagged: is_flagged ?? false,
+    });
     setIsLoading(false);
     handleClose();
   };
@@ -274,10 +290,10 @@ export default function CreateSetModal({
                 {requireTitle
                   ? "Required: Please enter a title"
                   : !validTitleLength
-                  ? "Must be between 5-50 characters"
-                  : !validTitleContent
-                  ? "Must be plausible"
-                  : ""}
+                    ? "Must be between 5-50 characters"
+                    : !validTitleContent
+                      ? "Must be plausible"
+                      : ""}
               </span>
             </label>
             <input
@@ -294,10 +310,10 @@ export default function CreateSetModal({
                 {requireDescription
                   ? "Required: Please enter a description"
                   : !validDescriptionLength
-                  ? "Must be between 10-200 characters"
-                  : !validDescriptionContent
-                  ? "Must be plausible in order to generate a set"
-                  : ""}
+                    ? "Must be between 10-200 characters"
+                    : !validDescriptionContent
+                      ? "Must be plausible in order to generate a set"
+                      : ""}
               </span>
             </label>
             <textarea

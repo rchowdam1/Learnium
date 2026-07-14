@@ -1,11 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import AuthNav from "../components/nav/AuthNav";
 import Progress from "../components/misc/Progress";
-
 import {
-  CircleUser,
   Settings,
   Undo2,
   Trophy,
@@ -16,7 +14,10 @@ import {
   Eye,
   Crown,
 } from "lucide-react";
-import toast from "react-hot-toast";
+
+import { fetcher } from "@/lib/fetcher";
+import useSWR from "swr";
+import { ProfileData } from "@/types/dashboard/DashboardTypes";
 
 type SetData = {
   id: number;
@@ -118,8 +119,11 @@ const StatCard = ({
 };
 
 export default function ProfilePage() {
-  // state for skeleton loading
-  const [loading, setLoading] = useState<boolean>(true);
+  // state to display completed sets
+  const [displayCompletedSets, setDisplayCompletedSets] =
+    useState<boolean>(false);
+
+  /*
   // state for profile data
   const [username, setUsername] = useState<string>();
   const [email, setEmail] = useState<string>();
@@ -133,19 +137,17 @@ export default function ProfilePage() {
   const [averageQuizScore, setAverageQuizScore] = useState<number>();
   const [setData, setSetData] = useState<SetData[]>();
 
-  // state to display completed sets
-  const [displayCompletedSets, setDisplayCompletedSets] =
-    useState<boolean>(false);
-
+  
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const response = await fetch("/api/get-profile-data");
 
         if (response.ok) {
-          const data = await response.json();
+          let data = await response.json();
 
           if (data.success) {
+            data = data.data;
             toast.success("Requests remaining: ", data.requestsRemaining);
             setLoading(false);
             setUsername(data.username);
@@ -172,7 +174,19 @@ export default function ProfilePage() {
     };
 
     fetchProfileData();
-  }, []);
+  }, []);*/
+
+  const {
+    data: profileInfo,
+    error: profileError,
+    isLoading: profileLoading,
+  } = useSWR<ProfileData & { setData: SetData[] }>(
+    "/api/get-profile-data",
+    fetcher,
+  );
+
+  console.log("Profile Object", profileInfo);
+  console.log("Requests Remaining:", profileInfo?.requestsRemaining);
 
   function formatDate(dateString: string | undefined): string {
     if (dateString === undefined) {
@@ -198,7 +212,7 @@ export default function ProfilePage() {
         </Link>
 
         {/* profile content (will include a card for each component) */}
-        {loading && (
+        {profileLoading && (
           <div className="max-w-5xl mt-6 p-6 mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="h-90 w-90 bg-gray-300 rounded-lg animate-pulse" />
             <div className="h-90 w-90 bg-gray-300 rounded-lg animate-pulse" />
@@ -208,7 +222,18 @@ export default function ProfilePage() {
             <div className="h-90 w-90 bg-gray-300 rounded-lg animate-pulse" />
           </div>
         )}
-        {!loading && (
+        {profileError && (
+          <div className="max-w-2xl mt-10 mx-auto rounded-lg border border-red-200 bg-red-50 p-6 text-center shadow-sm">
+            <h2 className="text-lg font-semibold text-red-700">
+              Something went wrong
+            </h2>
+            <p className="mt-2 text-sm text-red-600">
+              We couldn’t load your profile information. Please refresh the page
+              and try again.
+            </p>
+          </div>
+        )}
+        {profileInfo && (
           <div className="max-w-5xl mt-6 p-6 mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
             {/**Profile Card */}
             <div className="w-full h-full bg-white rounded-lg shadow-md pb-3">
@@ -216,28 +241,34 @@ export default function ProfilePage() {
                 {/*<CircleUser className="w-20 h-20 relative bottom-3" />*/}
                 {/*User Circle*/}
                 <div className="w-20 h-20 relative bottom-3 rounded-full bg-gray-100 flex justify-center items-center text-2xl">
-                  {username?.charAt(0)}
+                  {profileInfo?.username?.charAt(0)}
                 </div>
                 <div className="flex flex-col items-center">
                   <span className="text-xl font-semibold">
-                    {username}
+                    {profileInfo?.username}
                     <button className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-1 rounded-md hover:text-gray-400 hover:bg-blue-50 ml-2">
                       Change Username
                     </button>
                   </span>
-                  <span className="text-md text-gray-500">{email}</span>
+                  <span className="text-md text-gray-500">
+                    {profileInfo.email}
+                  </span>
                   {/**User's Current Plan*/}
                   <div className="mt-2 flex items-center">
                     <span
                       className={`rounded-tl-full rounded-bl-full pl-4 pr-2 py-2 ${
-                        isSubscribed ? "bg-gray-100" : "bg-[#df8af2]"
+                        profileInfo.isSubscribed
+                          ? "bg-gray-100"
+                          : "bg-[#df8af2]"
                       } text-gray-600`}
                     >
                       Free
                     </span>
                     <span
                       className={`rounded-tr-full rounded-br-full pl-3 pr-4 py-2 ${
-                        isSubscribed ? "bg-[#df8af2]" : "bg-gray-100"
+                        profileInfo.isSubscribed
+                          ? "bg-[#df8af2]"
+                          : "bg-gray-100"
                       } text-gray-600`}
                     >
                       Pro
@@ -257,10 +288,10 @@ export default function ProfilePage() {
               </div>
               {/**Requests Remaining*/}
               <div className="flex flex-col items-center mt-6">
-                <span>Requests Remaining: {requestsRemaining}</span>
+                <span>Requests Remaining: {profileInfo.requestsRemaining}</span>
                 <Progress
                   width={400}
-                  percentage={requestsRemaining ? 100 : 0}
+                  percentage={profileInfo.requestsRemaining ? 100 : 0}
                   color="#73f062"
                 />
               </div>
@@ -268,26 +299,31 @@ export default function ProfilePage() {
               {/**Sets Created and Completed */}
               <div className="flex flex-col items-center mt-6">
                 <span>
-                  Sets Completed: {setsCompleted}/{setsCreated}
+                  Sets Completed: {profileInfo.setsCompleted}/
+                  {profileInfo.setsCreated}
                 </span>
-                {setsCompleted !== undefined && setsCreated !== undefined && (
-                  <Progress
-                    width={400}
-                    percentage={
-                      setsCompleted > 0
-                        ? (setsCompleted / setsCreated) * 100
-                        : 0
-                    }
-                  />
-                )}
+                {profileInfo.setsCompleted !== undefined &&
+                  profileInfo.setsCreated !== undefined && (
+                    <Progress
+                      width={400}
+                      percentage={
+                        profileInfo.setsCompleted > 0
+                          ? (profileInfo.setsCompleted /
+                              profileInfo.setsCreated) *
+                            100
+                          : 0
+                      }
+                    />
+                  )}
               </div>
 
               {/**Top Categories */}
               <div className="pt-5">
                 <span className="font-bold text-lg">Top Categories</span>
                 <div className="flex flex-wrap justify-center items-center gap-2 mt-2">
-                  {topCategories && topCategories.length > 0 ? (
-                    topCategories.map((category, index) => {
+                  {profileInfo.topCategories &&
+                  profileInfo.topCategories.length > 0 ? (
+                    profileInfo.topCategories.map((category, index) => {
                       return (
                         <div
                           className="inline-block bg-gray-200 rounded-full px-2"
@@ -310,7 +346,9 @@ export default function ProfilePage() {
 
             {/*Stat Cards*/}
             <div className="flex flex-col gap-6">
-              {completedLessons && overallProgress && averageQuizScore ? (
+              {profileInfo.completedLessons &&
+              profileInfo.overallProgress &&
+              profileInfo.averageQuizScore ? (
                 Array(3)
                   .fill(0)
                   .map((_, index) => {
@@ -327,10 +365,10 @@ export default function ProfilePage() {
                         }
                         data={
                           index === 0
-                            ? `${completedLessons}`
+                            ? `${profileInfo.completedLessons}`
                             : index === 1
-                              ? `${overallProgress}%`
-                              : `${averageQuizScore}%`
+                              ? `${profileInfo.overallProgress}%`
+                              : `${profileInfo.averageQuizScore}%`
                         }
                       />
                     );
@@ -360,16 +398,19 @@ export default function ProfilePage() {
                   className="font-semibold hover:bg-gray-200 px-2 py-1 rounded-full cursor-pointer border-2 border-gray-200 transition-colors duration-200 whitespace-nowrap"
                   onClick={() => setDisplayCompletedSets(!displayCompletedSets)}
                 >
-                  {displayCompletedSets ? "Hide" : `View (${setsCompleted})`}
+                  {displayCompletedSets
+                    ? "Hide"
+                    : `View (${profileInfo.setsCompleted})`}
                 </button>
               </div>
 
               {/**The actual sets */}
               {displayCompletedSets && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 w-full px-5 py-5">
-                  {setData &&
-                  setData.filter((set) => set.completed).length > 0 ? (
-                    setData
+                  {profileInfo.setData &&
+                  profileInfo.setData.filter((set) => set.completed).length >
+                    0 ? (
+                    profileInfo.setData
                       .filter((set) => set.completed)
                       .map((set, index) => {
                         return (
@@ -382,7 +423,7 @@ export default function ProfilePage() {
                                 ? formatDate(set.completed_at)
                                 : "N/A"
                             }
-                            isSubscribed={isSubscribed || false}
+                            isSubscribed={profileInfo.isSubscribed || false}
                           />
                         );
                       })

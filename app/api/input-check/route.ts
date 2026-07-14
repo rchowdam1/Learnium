@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { franc } from "franc";
-import OpenAI from "openai";
+import OpenAI, { APIError } from "openai";
 import { zodTextFormat, zodResponseFormat } from "openai/helpers/zod";
 import { zOutputSchema } from "@/app/schema/OutputSchema";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { createClient } from "@/lib/server";
 import { createSet } from "@/actions/dbops";
 import {
   decrementRequests,
+  incrementRequests,
   resetSets,
   updateSetResetDate,
 } from "@/actions/ProfileUpdates";
@@ -165,83 +166,113 @@ export async function POST(request: Request) {
   any lessons and set "flagged" as true. If "flagged" is true, then set all of the properties as empty strings. As you're generating the lessons, make sure that
   the lessons are related to the description and are easily digestible by the user`;
 
-  const response = await openai.responses.parse({
-    model: "gpt-4o",
-    input: [
-      {
-        role: "system",
-        content: systemPrompt,
+  try {
+    const response = await openai.responses.parse({
+      model: "gpt-4o",
+      input: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `The description given is "${data.description}". Generate the microlearning set`,
+        },
+      ],
+      text: {
+        format: zodTextFormat(zOutputSchema, "output_schema"),
       },
-      {
-        role: "user",
-        content: `The description given is "${data.description}". Generate the microlearning set`,
-      },
-    ],
-    text: {
-      format: zodTextFormat(zOutputSchema, "output_schema"),
-    },
-  });
-
-  const parsedResponse = response.output_parsed;
-  console.log(
-    parsedResponse,
-    /*`| this response used ${response.usage?.total_tokens}, with ${response.usage?.prompt_tokens} prompt tokens and ${response.usage?.completion_tokens} completion tokens`*/
-  );
-
-  if (parsedResponse && parsedResponse.flagged) {
-    // add to the flagged table
-
-    const { error } = await supabase.from("flagged").insert({
-      profile_id: user?.id,
-      profile_email: user?.email,
-      query: data.description,
     });
 
-    if (error) {
-      console.log("Flagged Response, but couldn't add it to db");
-    }
-
-    return NextResponse.json(
-      { error: "Could not process your request" },
-      { status: 200 },
-    );
-  }
-
-  let numLessons = 0;
-  // create the sets
-  if (parsedResponse) {
-    const title = data.title;
-    const description = data.description;
-    const category = data.category;
-    const result = await createSet(
+    const parsedResponse = response.output_parsed;
+    console.log(
       parsedResponse,
-      title,
-      description,
-      category,
+      /*`| this response used ${response.usage?.total_tokens}, with ${response.usage?.prompt_tokens} prompt tokens and ${response.usage?.completion_tokens} completion tokens`*/
     );
 
-    if (result === false) {
+    if (parsedResponse && parsedResponse.flagged) {
+      // add to the flagged table
+
+      const { error } = await supabase.from("flagged").insert({
+        profile_id: user?.id,
+        profile_email: user?.email,
+        query: data.description,
+      });
+
+      if (error) {
+        console.log("Flagged Response, but couldn't add it to db");
+      }
+
       return NextResponse.json(
-        {
-          success: false,
-          message: "Set creation in the database was unsuccessful",
-        },
-        { status: 400 },
+        { error: "Could not process your request" },
+        { status: 200 },
       );
     }
 
-    return NextResponse.json({
-      parsedResponse,
-      setId: result.id,
-    });
-  }
+    // create the sets
+    if (parsedResponse) {
+      const title = data.title;
+      const description = data.description;
+      const category = data.category;
+      const result = await createSet(
+        parsedResponse,
+        title,
+        description,
+        category,
+      );
 
-  return NextResponse.json(
-    {
-      parsedResponse,
-    },
-    {
-      status: 200,
-    },
-  );
+      if (result === false) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Set creation in the database was unsuccessful",
+          },
+          { status: 400 },
+        );
+      }
+
+      return NextResponse.json({
+        parsedResponse,
+        setId: result.id,
+        profile_id: user?.id,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        parsedResponse,
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+
+    const refundResult = await incrementRequests();
+    if (refundResult.success === false) {
+      console.log(
+        "Could not refund set request after OpenAI failure:",
+        refundResult.message,
+      );
+    }
+
+    if (error instanceof APIError && error.code === "insufficient_quota") {
+      return NextResponse.json(
+        {
+          error:
+            "Our AI service is temporarily unavailable due to usage limits. Please try again later.",
+        },
+        { status: 200 },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        error:
+          "An error occurred while generating your set. Please try again later.",
+      },
+      { status: 200 },
+    );
+  }
 }
