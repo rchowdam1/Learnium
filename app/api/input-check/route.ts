@@ -234,6 +234,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         parsedResponse,
         setId: result.id,
+        profile_id: user?.id,
       });
     }
 

@@ -44,3 +44,56 @@ export function optimisticallyCompleteLesson(
     { revalidate: true },
   );
 }
+
+export function optimisticallyCreateSet(
+  title: string,
+  description: string,
+  category: string,
+  numLessons: number,
+  setId: number,
+  profile_id: string,
+  is_flagged: boolean,
+) {
+  mutate(
+    SETS_KEY,
+    (current: SetData[] | undefined) => {
+      return [
+        ...(current ?? []),
+        {
+          id: setId,
+          title,
+          description,
+          category,
+          numLessons,
+          completedLessons: 0,
+          completed: false,
+          date: new Date().toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          profile_id,
+          is_flagged,
+        },
+      ];
+    },
+    { revalidate: true },
+  );
+
+  mutate(
+    PROFILE_KEY,
+    (current: ProfileData | undefined) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        setsCreated: current.setsCreated + 1,
+        requestsRemaining:
+          current.requestsRemaining !== undefined
+            ? Math.max(0, current.requestsRemaining - 1)
+            : current.requestsRemaining,
+      };
+    },
+    { revalidate: true },
+  );
+}

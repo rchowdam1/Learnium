@@ -7,7 +7,6 @@ import StudyBuddyCard from "../components/cards/StudyBuddyCards";
 import CreateSetController from "../components/controllers/CreateSetController";
 import CreateStudyBuddyController from "../components/controllers/CreateStudyBuddyController";
 
-import { Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -17,7 +16,9 @@ import {
   SetData,
   BuddyData,
   ProfileData,
+  OnCreateSet,
 } from "@/types/dashboard/DashboardTypes";
+import { optimisticallyCreateSet } from "@/lib/swr-mutations";
 
 type StatCards = {
   title: string;
@@ -46,22 +47,6 @@ type StudyBuddyCards = {
     name: string;
     size: number;
   }[];
-};
-
-type SetResponse = {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  numLessons: number;
-  date: string;
-  profile_id: string;
-  is_flagged: boolean;
-};
-
-type APIResponse = {
-  data?: SetResponse;
-  error?: string;
 };
 
 export default function Dashboard() {
@@ -93,29 +78,20 @@ export default function Dashboard() {
     },
   ];
 
-  const createSet = (
-    title: string,
-    description: string,
-    category: string,
-    numLessons?: number,
-    setId?: number,
-  ): void => {
+  const createSet = (createSetData: OnCreateSet): void => {
     //create a set
     toast.success("Set created successfully!");
-    setSetCards((prevSetCards) => {
-      return [
-        ...prevSetCards,
-        {
-          id: setId ?? 0,
-          title: title,
-          category: category,
-          description: description,
-          totalLessons: numLessons ?? 5,
-          completedLessons: 0,
-          date: new Date().toISOString(),
-        },
-      ];
-    });
+
+    // optimistic UI update for set creation
+    optimisticallyCreateSet(
+      createSetData.title,
+      createSetData.description,
+      createSetData.category,
+      createSetData.numLessons,
+      createSetData.setId,
+      createSetData.profile_id,
+      createSetData.is_flagged,
+    );
   };
 
   const createStudyBuddy = (
