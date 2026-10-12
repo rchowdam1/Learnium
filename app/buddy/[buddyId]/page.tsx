@@ -26,7 +26,7 @@ export type APIResponse = {
 
 export default function BuddyPage() {
   const param = useParams();
-  // comment
+  //
 
   const buddyId = param.buddyId;
 
