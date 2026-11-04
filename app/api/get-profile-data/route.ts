@@ -49,9 +49,12 @@ export async function GET() {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
+  if (userError || !user) {
     console.log("User is not logged in");
-    return NextResponse.json({ data: { success: false } }, { status: 403 });
+    return NextResponse.json(
+      { error: "User is not logged in" },
+      { status: 401 },
+    );
   }
 
   // get the profile
@@ -64,7 +67,10 @@ export async function GET() {
 
   if (profileError) {
     console.log("Could not fetch profile data");
-    return NextResponse.json({ data: { success: false } }, { status: 400 });
+    return NextResponse.json(
+      { error: "Could not fetch profile data" },
+      { status: 500 },
+    );
   }
 
   // username, email, requests remaining
@@ -110,7 +116,10 @@ export async function GET() {
 
   if (setError) {
     console.log("Could not retrieve sets");
-    return NextResponse.json({ data: { success: false } }, { status: 200 });
+    return NextResponse.json(
+      { error: "Could not retrieve sets" },
+      { status: 500 },
+    );
   }
 
   // Sets created and sets completed
@@ -132,7 +141,10 @@ export async function GET() {
 
     if (lessonError) {
       console.log(`Could not retrieve lessons for set ${set.id}`);
-      return NextResponse.json({ data: { success: false } }, { status: 200 });
+      return NextResponse.json(
+        { error: "Could not retrieve lessons for a set" },
+        { status: 500 },
+      );
     }
 
     totalLessons += lessonData.length;
@@ -148,7 +160,10 @@ export async function GET() {
 
       if (quizError) {
         console.log("Could not retrieve quizzes for a lesson");
-        return NextResponse.json({ data: { success: false } }, { status: 200 });
+        return NextResponse.json(
+          { error: "Could not retrieve quizzes for a lesson" },
+          { status: 500 },
+        );
       }
 
       // get the number of questions for this quiz
@@ -167,8 +182,8 @@ export async function GET() {
           if (questionError) {
             console.log("Could not retrieve questions for a quiz");
             return NextResponse.json(
-              { data: { success: false } },
-              { status: 200 },
+              { error: "Could not retrieve questions for a quiz" },
+              { status: 500 },
             );
           }
 
