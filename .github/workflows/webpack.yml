@@ -27,3 +27,5 @@ jobs:
 
       - name: Build
         run: npx webpack
+        env:
+          CI: false
