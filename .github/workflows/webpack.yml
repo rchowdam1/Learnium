@@ -27,3 +27,5 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
