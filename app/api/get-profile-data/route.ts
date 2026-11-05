@@ -2,19 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 import { resetSets, updateSetResetDate } from "@/actions/ProfileUpdates";
 
-type Categories = {
-  Business?: number;
-  Communication?: number;
-  Creativity?: number;
-  Health?: number;
-  Humanities?: number;
-  Mathematics?: number;
-  Productivity?: number;
-  Science?: number;
-  Technology?: number;
-  "Test Prep"?: number;
-  Miscellaneous?: number;
-};
+type Categories = Record<string, number>;
 
 export async function GET() {
   const supabase = await createClient();

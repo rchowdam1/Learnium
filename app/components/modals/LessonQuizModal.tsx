@@ -64,10 +64,8 @@ type QuestionProps = {
   onSelectAnswer: (selected: string) => void;
   currentQues: number;
   totalQues: number;
-  disabled: boolean;
   next: () => void;
   prev: () => void;
-  setAnswer: (answer: string) => void;
   displayCorrectAnswers: boolean;
   previousAnswer?: string;
 };
@@ -80,8 +78,6 @@ const Question = ({
   onSelectAnswer,
   next,
   prev,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  disabled,
   currentQues,
   totalQues,
   displayCorrectAnswers,

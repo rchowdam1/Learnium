@@ -39,8 +39,7 @@ function ChatMessage({
 }
 
 export default function Chat({ buddyId }: { buddyId: string }) {
-  // resume here 1/13 figure out why chats aren't loading
-  const chatWindowRef = useRef(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[] | undefined>(undefined);
   const [title, setTitle] = useState<string>("");
@@ -80,7 +79,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
     scrollToBottom();
   }, [messages]);
 
-  const onSendMessage = async (e) => {
+  const onSendMessage = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log("Executed");
 
@@ -88,7 +87,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
 
     if (!messageToSend.trim()) return; // Safety Check for empty messages
 
-    setMessages((prevMessages) => {
+    setMessages((prevMessages = []) => {
       return [
         ...prevMessages,
         {
@@ -141,7 +140,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
             toast.error(
               "You have no chats remaining for the day. Please try again tomorrow!",
             );
-            setMessages((prevMessages) => {
+            setMessages((prevMessages = []) => {
               //prevMessages?.pop(); // remove the loading message
               prevMessages[prevMessages.length - 1] = {
                 is_user_message: false,
@@ -161,7 +160,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
           );
         } else {
           const assistantMessage = data.assistantMessage;
-          setMessages((prevMessages) => {
+          setMessages((prevMessages = []) => {
             //prevMessages?.pop(); // remove the loading message
             prevMessages[prevMessages.length - 1] = {
               is_user_message: false,
@@ -173,9 +172,9 @@ export default function Chat({ buddyId }: { buddyId: string }) {
       }
     } catch (error) {
       toast.error(error as string);
-      setMessages((prevMessages) => {
+      setMessages((prevMessages = []) => {
         //prevMessages?.pop(); // remove the loading message
-        prevMessage[prevMessages.length - 1] = {
+        prevMessages[prevMessages.length - 1] = {
           is_user_message: false,
           message: "Sorry, an error occurred while trying to get a response.",
         };
@@ -183,7 +182,6 @@ export default function Chat({ buddyId }: { buddyId: string }) {
       });
     }
 
-    e.target.value = "";
     setCurrentMessage("");
   };
 

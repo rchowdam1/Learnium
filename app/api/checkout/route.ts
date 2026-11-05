@@ -14,7 +14,7 @@ export async function POST(_request: Request) {
     error: userError,
   } = await supabase.auth.getUser();
 
-  if (userError) {
+  if (userError || !user) {
     console.log("User is not logged in");
     return NextResponse.json(
       { error: "User is not logged in" },
@@ -33,7 +33,7 @@ export async function POST(_request: Request) {
     ],
     customer_email: user?.email ?? "",
     mode: "subscription",
-    metadata: { userId: user?.id },
+    metadata: { userId: user.id },
     success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_URL}/subscriptions`,
   });

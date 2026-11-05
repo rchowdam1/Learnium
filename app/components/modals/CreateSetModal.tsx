@@ -167,7 +167,7 @@ export default function CreateSetModal({
     return validFields;
   };
 
-  const formSubmit = async (e) => {
+  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);

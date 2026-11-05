@@ -70,7 +70,7 @@ export default function CreateStudyBuddyModal({
   };
 
   // form submission
-  const formSubmit = async (e) => {
+  const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);

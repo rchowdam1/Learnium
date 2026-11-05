@@ -102,6 +102,7 @@ export default function Dashboard() {
           title: title,
           description: description,
           category: category,
+          documents: [],
         },
       ];
     });

@@ -127,8 +127,8 @@ export async function GET(
   // to get all of the quizzes go through all of the lessons and get
   // the quizzes associated with their ids
   // the index of the quiz will indicate which lesson it belongs to
-  const quizzes: Quiz[] = await Promise.all(
-    lessonData.map(async (lesson) => {
+  const quizzes = await Promise.all(
+    lessonData.map(async (lesson): Promise<Quiz> => {
       const { data: quizData, error: quizError } = await supabase
         .from("quizzes")
         .select("*")
@@ -137,14 +137,14 @@ export async function GET(
         .single();
 
       if (quizError) {
-        console.log("Could not retrieve quiz data");
-        return {};
+        throw new Error("Could not retrieve quiz data");
       }
 
-      const quiz: Quiz = {};
-
-      quiz.lessonId = lesson.id;
-      quiz.quizId = quizData.id;
+      const quiz: Quiz = {
+        lessonId: lesson.id,
+        quizId: quizData.id,
+        questions: [],
+      };
 
       if (quizData) {
         // to store the previous answers if quiz has been completed
@@ -161,8 +161,7 @@ export async function GET(
           .eq("quiz_id", quizData.id);
 
         if (questionError) {
-          console.log("Could not retrieve question data");
-          return {};
+          throw new Error("Could not retrieve question data");
         }
 
         if (questionData) {
@@ -238,7 +237,14 @@ export async function GET(
 
       return quiz;
     }),
-  );
+  ).catch(() => null);
+
+  if (!quizzes) {
+    return NextResponse.json(
+      { error: "Could not retrieve quiz data for this set" },
+      { status: 500 },
+    );
+  }
 
   // calculate completed lessons
 
