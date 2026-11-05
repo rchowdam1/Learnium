@@ -83,7 +83,6 @@ const Question = ({
   displayCorrectAnswers,
   previousAnswer,
 }: QuestionProps) => {
-  const count: number = "3";
   return (
     <div className="w-140 py-4 bg-white rounded-lg shadow-md border border-gray-300 m-5">
       <p className="text-lg font-semibold my-5 break-words max-w-[90%] mx-auto">
