@@ -4,11 +4,6 @@ import { BookOpen } from "lucide-react";
 import Profile from "../misc/Profile";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
-import toast from "react-hot-toast";
-import { createSupabaseClient } from "@/lib/supabase";
-import Link from "next/link";
-
-import { useState, useEffect } from "react";
 
 export default function AuthNav() {
   /*const [username, setUsername] = useState<string>("");

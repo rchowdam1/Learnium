@@ -56,6 +56,7 @@ type APIResponse = {
   quizzes: QuizData[];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function SetPage({ params }: { params: { setId: string } }) {
   const param = useParams();
 
@@ -153,6 +154,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
     };
 
     getSetData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -168,6 +170,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
         setPreviousAnswers(quizzes[currentLesson].previousAnswers);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLesson]);
 
   return (
@@ -272,17 +275,15 @@ export default function SetPage({ params }: { params: { setId: string } }) {
             quizId={quizzes[currentLesson].quizId}
             open={quizOpen}
             onClose={() => setQuizOpen(false)}
-            questions={quizzes[currentLesson].questions.map((question, key) => {
+            questions={quizzes[currentLesson].questions.map((question) => {
               return question.question;
             })}
-            options={quizzes[currentLesson].questions.map((question, key) => {
+            options={quizzes[currentLesson].questions.map((question) => {
               return question.options;
             })}
-            correctAnswers={quizzes[currentLesson].questions.map(
-              (question, key) => {
-                return question.correctAnswer;
-              },
-            )}
+            correctAnswers={quizzes[currentLesson].questions.map((question) => {
+              return question.correctAnswer;
+            })}
             onComplete={async () => {
               setCurrentLessonCompleted(true);
 
@@ -318,6 +319,7 @@ export default function SetPage({ params }: { params: { setId: string } }) {
                       toast.error("Could not complete set");
                     }
                   }
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
                   toast.error("Could not complete set.");
                   console.log("Could not mark set as complete");

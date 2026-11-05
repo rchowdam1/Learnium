@@ -1,5 +1,4 @@
 import { X, PartyPopper } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type SetCompleteModalProps = {
@@ -29,7 +28,7 @@ export default function SetCompleteModal({
         />
         <PartyPopper className="w-10 h-10 text-[#9e975c]" />
         <span className="text-2xl font-semibold">Congratulations!</span>
-        <p>You just finished "{setTitle}"!</p>
+        <p>You just finished &quot;{setTitle}&quot;!</p>
         <p>You can keep track of your completed sets in your profile.</p>
 
         <button

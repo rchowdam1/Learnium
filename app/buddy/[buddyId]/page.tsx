@@ -1,12 +1,10 @@
 "use client";
 
 import AuthNav from "@/app/components/nav/AuthNav";
-import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Undo2 } from "lucide-react";
 import Chat from "@/app/components/study-buddy/Chat";
-import toast from "react-hot-toast";
 
 export type Message = {
   id?: number;

@@ -80,6 +80,7 @@ const Question = ({
   onSelectAnswer,
   next,
   prev,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   disabled,
   currentQues,
   totalQues,
@@ -158,6 +159,7 @@ export default function LessonQuizModal({
   options,
   correctAnswers,
   onComplete,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   lessonCompleted,
   quizSubmitted,
   previousAnswers,
@@ -166,6 +168,7 @@ export default function LessonQuizModal({
   displayCompletedSetModal,
 }: LessonQuizModalProps) {
   const [currentAnswers, setCurrentAnswers] = useState<string[]>(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     questions.map((question, key) => {
       return "";
     }),
@@ -194,10 +197,8 @@ export default function LessonQuizModal({
   // current question
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
 
-  const correctColors: string[] = ["#cef0c2", "green-400"];
-  const incorrectColors: string[] = ["#f0c2c6", "red-400"];
-
   // state to decide whether to display the correct answers
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayCorrectAnswers, setDisplayCorrectAnswers] =
     useState<boolean>(false);
 
@@ -206,6 +207,7 @@ export default function LessonQuizModal({
 
   const onQuizClose = (): void => {
     setCurrentAnswers(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       questions.map((_) => {
         return "";
       }),
@@ -344,6 +346,7 @@ export default function LessonQuizModal({
                     //onClose();
                   }
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
               } catch (error) {
                 console.error("Could not complete set");
               }

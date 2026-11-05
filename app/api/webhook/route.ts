@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/server";
 import Stripe from "stripe";
 import stripe from "@/lib/stripe";
 
-export async function POST(request: NextRequest) {
-  const supabase = await createClient();
+export async function POST(request: Request) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
+
+  if (!signature) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
 
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: "Webhook secret not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -21,8 +23,9 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_WEBHOOK_SECRET,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }

@@ -74,7 +74,7 @@ export default function Chat({ buddyId }: { buddyId: string }) {
     };
 
     getBuddyData();
-  }, []);
+  }, [buddyId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -105,8 +105,6 @@ export default function Chat({ buddyId }: { buddyId: string }) {
 
     // Send the query to RAG
     setCurrentMessage("");
-
-    let assistantMessage: string = "";
 
     /**
      * First, check if the user has chats remaining for the day. If not, show a toast error and return.

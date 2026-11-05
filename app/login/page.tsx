@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -91,7 +90,7 @@ export default function LoginPage() {
 
           <Link href="/signup" className="text-center">
             <span className="text-center text-[#166ea8] cursor-pointer hover:underline">
-              Don't have an account? Create One
+              Don&apos;t have an account? Create One
             </span>
           </Link>
 

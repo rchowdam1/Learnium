@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
   const supabase = await createClient();
 
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     console.log("Could not get authenticated user");
     return NextResponse.json(
       { error: "User is not logged in" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
       },
       {
         status: 400,
-      }
+      },
     );
   }
 
@@ -87,7 +88,7 @@ export async function GET(request: Request) {
         profile_id: set.profile_id,
         is_flagged: set.is_flagged,
       };
-    })
+    }),
   );
 
   /*console.log("The response is", response);
@@ -101,6 +102,6 @@ export async function GET(request: Request) {
     },
     {
       status: 200,
-    }
+    },
   );
 }

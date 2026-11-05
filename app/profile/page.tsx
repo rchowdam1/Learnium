@@ -429,7 +429,7 @@ export default function ProfilePage() {
                       })
                   ) : (
                     <span className="mt-3 font-semibold text-xl">
-                      You haven't completed any sets
+                      You haven&apos;t completed any sets
                     </span>
                   )}
                 </div>

@@ -17,6 +17,7 @@ type Document = {
   size: number;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
   const supabase = await createClient();
 
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
   // get the documents' metadata for each study buddy
   // documents will be an array
 
-  let documents: Document[][] = [];
+  const documents: Document[][] = [];
 
   for (const buddy of buddyData as StudyBuddy[]) {
     // each buddy's documents will be in the same order the buddies

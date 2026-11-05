@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Play, Newspaper } from "lucide-react";
 import DocumentModal from "../modals/DocumentModal";
 
@@ -26,8 +25,6 @@ export default function StudyBuddyCard({
   description,
   documents,
 }: StudyBuddyCardProps) {
-  const router = useRouter();
-
   const [documentModalOpen, setDocumentModalOpen] = useState<boolean>(false);
 
   return (

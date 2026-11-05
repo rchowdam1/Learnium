@@ -10,13 +10,14 @@ type CreateStudyBuddyModalProps = {
   onCreateStudyBuddy: (
     title: string,
     description: string,
-    category: string
+    category: string,
   ) => void;
 };
 
 export default function CreateStudyBuddyModal({
   open,
   onClose,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onCreateStudyBuddy,
 }: CreateStudyBuddyModalProps) {
   // state for form inputs
@@ -62,7 +63,7 @@ export default function CreateStudyBuddyModal({
         });
       } else {
         toast.error(
-          "You have already uploaded 4 files. To upload another, please remove one."
+          "You have already uploaded 4 files. To upload another, please remove one.",
         );
       }
     }
@@ -111,7 +112,7 @@ export default function CreateStudyBuddyModal({
 
       if (!response.ok) {
         toast.error(
-          "There was an error creating your Study Buddy. Please try again. - buddy creation"
+          "There was an error creating your Study Buddy. Please try again. - buddy creation",
         );
         setIsLoading(false);
         return;
@@ -142,7 +143,7 @@ export default function CreateStudyBuddyModal({
 
       if (!response.ok) {
         toast.error(
-          "There was an error creating your Study Buddy. Please try again. - AI creation"
+          "There was an error creating your Study Buddy. Please try again. - AI creation",
         );
         setIsLoading(false);
         return;
@@ -167,7 +168,7 @@ export default function CreateStudyBuddyModal({
     } catch (error) {
       console.log("Error creating study buddy:", error);
       toast.error(
-        "There was an error creating your Study Buddy. Please try again."
+        "There was an error creating your Study Buddy. Please try again.",
       );
       setIsLoading(false);
       return;

@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import toast from "react-hot-toast";
 import SignInWithGoogle from "../components/misc/SignInWithGoogle";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   // state for input errors
   const [usernameError, setUsernameError] = useState<boolean>(false); // please enter at least 5 alphanumeric characters
   const [usernameLengthError, setUsernameLengthError] =
@@ -102,6 +99,7 @@ export default function SignupPage() {
       // request was successful, redirect to confirm email page (create confirm email page)
       toast.success("Check your email to confirm your account!");
       setLoading(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Signup failed. Please try again");
       setLoading(false);
@@ -116,7 +114,7 @@ export default function SignupPage() {
         Welcome to Learnium
       </div>
       <span className="my-2 text-xl text-gray-500">
-        We're thrilled to have you!
+        We&apos;re thrilled to have you!
       </span>
       <div className="w-120 py-8 bg-[#142937] rounded-md shadow-lg text-white flex flex-col items-center justify-center space-y-2">
         <span className="text-2xl font-extrabold">Sign Up</span>
@@ -142,8 +140,8 @@ export default function SignupPage() {
             {usernameLengthError
               ? "Please enter no more than 15 characters"
               : usernameError
-              ? "Please enter at least 5 alphanumeric characters"
-              : ""}
+                ? "Please enter at least 5 alphanumeric characters"
+                : ""}
           </span>
           <label>Email</label>
           <input
@@ -165,8 +163,8 @@ export default function SignupPage() {
             {passwordLengthError
               ? "Please use at least 8 characters"
               : passwordError
-              ? "Please use special, uppercase, and lowercase letters"
-              : ""}
+                ? "Please use special, uppercase, and lowercase letters"
+                : ""}
           </span>
 
           <label>Confirm Password</label>

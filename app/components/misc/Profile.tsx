@@ -32,7 +32,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const deleteAccount = async (e) => {
+  const deleteAccount = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     //console.log("Deleting account...");
 
@@ -53,6 +53,7 @@ export default function Profile({ onSignOut, onViewProfile }: ProfileProps) {
         router.replace("/");
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("An error occurred while trying to delete the account.");
     }

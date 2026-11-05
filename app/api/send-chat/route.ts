@@ -92,6 +92,7 @@ export async function POST(request: Request) {
     // data.response is the assistant message
     assistantMessage = data.response;
     // we have successfully gotten the assistant message
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("An error happened while trying to chat with the RAG API");
     return NextResponse.json(

@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
-import { createSupabaseClient } from "@/lib/supabase";
 
 export default function SignInWithGoogle({ login }: { login: boolean }) {
   return (

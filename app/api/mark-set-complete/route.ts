@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         success: false,
         error: "Set ID is required",
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   console.log(body);
 
-  const { data: updateSetData, error: updateSetError } = await supabase
+  const { error: updateSetError } = await supabase
     .from("sets")
     .update({
       completed: true,
@@ -44,6 +44,6 @@ export async function POST(request: Request) {
       success: true,
       message: "Set marked as complete",
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

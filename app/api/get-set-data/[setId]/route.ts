@@ -39,7 +39,7 @@ type Quiz = {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ setId: string }> }
+  { params }: { params: Promise<{ setId: string }> },
 ) {
   const supabase = await createClient();
 
@@ -71,7 +71,7 @@ export async function GET(
       },
       {
         status: 200,
-      }
+      },
     );
   }
 
@@ -97,7 +97,7 @@ export async function GET(
 
   // fetch the paragraphs for each lesson
   const paragraphs = await Promise.all(
-    lessonData.map(async (lesson, key) => {
+    lessonData.map(async (lesson) => {
       const { data: paragraphData, error: paragraphError } = await supabase
         .from("paragraphs")
         .select("*")
@@ -121,14 +121,14 @@ export async function GET(
       }
 
       return [...paragraphData];
-    })
+    }),
   );
 
   // to get all of the quizzes go through all of the lessons and get
   // the quizzes associated with their ids
   // the index of the quiz will indicate which lesson it belongs to
   const quizzes: Quiz[] = await Promise.all(
-    lessonData.map(async (lesson, key) => {
+    lessonData.map(async (lesson) => {
       const { data: quizData, error: quizError } = await supabase
         .from("quizzes")
         .select("*")
@@ -148,7 +148,7 @@ export async function GET(
 
       if (quizData) {
         // to store the previous answers if quiz has been completed
-        let previousAnswers: string[] = [];
+        const previousAnswers: string[] = [];
 
         // also get the quiz score
         if (quizData.completed) {
@@ -225,7 +225,7 @@ export async function GET(
                 // once the question attributes have been filled, append it to curQuestions
                 curQuestions.push(curQuestion);
               }
-            })
+            }),
           );
           quiz.questions = curQuestions;
         }
@@ -237,7 +237,7 @@ export async function GET(
       }
 
       return quiz;
-    })
+    }),
   );
 
   // calculate completed lessons
@@ -252,6 +252,6 @@ export async function GET(
     },
     {
       status: 200,
-    }
+    },
   );
 }

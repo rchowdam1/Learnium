@@ -1,9 +1,8 @@
 "use client";
 
-import { BookOpen, EllipsisVertical, Play } from "lucide-react";
+import { BookOpen, Play } from "lucide-react";
 import Progress from "../misc/Progress";
 import SetDropdown from "../modals/SetDropdown";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type SetCardProps = {
@@ -30,8 +29,6 @@ export default function SetCard({
   // convert date to readable format
   const readDate: Date = new Date(date);
 
-  const router = useRouter();
-
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
@@ -44,21 +41,6 @@ export default function SetCard({
   const onSetDelete = () => {
     console.log("deleting");
     onDeleteSet(id);
-  };
-
-  const goToSet = async () => {
-    /*try {
-      const response = await fetch(`/api/get-set-data/${id}`);
-
-      if (response.ok) {
-        const data = await response.json();
-
-        console.log(data, "data received from get-set-data");
-      }
-    } catch (error) {
-      console.log("Error fetching set data");
-    }*/
-    router.replace(`/sets/${id}`);
   };
 
   return (

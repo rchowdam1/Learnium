@@ -52,7 +52,7 @@ export default function Home() {
               <p className="mt-8 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Transform complex topics into bite-sized, personalized lessons.
                 Learn faster, retain more, and achieve your goals with
-                Learnium's intelligent learning platform.
+                Learnium&apos;s intelligent learning platform.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href="/signup">
@@ -288,8 +288,8 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "Learnium helped me master React in just 3 weeks. The
-                  bite-sized lessons fit perfectly into my busy schedule!"
+                  &quot;Learnium helped me master React in just 3 weeks. The
+                  bite-sized lessons fit perfectly into my busy schedule!&quot;
                 </p>
               </div>
               <div className="bg-gray-50 rounded-2xl p-8">
@@ -305,8 +305,8 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "Finally learned data analysis! The personalized approach made
-                  complex topics actually enjoyable."
+                  &quot;Finally learned data analysis! The personalized approach
+                  made complex topics actually enjoyable.&quot;
                 </p>
               </div>
               <div className="bg-gray-50 rounded-2xl p-8">
@@ -322,8 +322,8 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "The progress tracking keeps me motivated. I've completed 5
-                  courses and counting!"
+                  &quot;The progress tracking keeps me motivated. I&apos;ve
+                  completed 5 courses and counting!&quot;
                 </p>
               </div>
             </div>

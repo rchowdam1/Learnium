@@ -174,7 +174,7 @@ export async function storeBuddyDocuments(buddyId: number, files: File[]) {
   const supabase = await createClient();
 
   for (const file of files) {
-    const { data, error: uploadError } = await supabase
+    const { error: uploadError } = await supabase
       .from("study_bot_documents")
       .insert({
         study_bot_id: buddyId,

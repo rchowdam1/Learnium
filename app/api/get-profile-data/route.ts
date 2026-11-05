@@ -16,17 +16,6 @@ type Categories = {
   Miscellaneous?: number;
 };
 
-type SetData = {
-  id: number;
-  created_at: string;
-  profile_id: string;
-  title: string;
-  description: string;
-  category: string;
-  is_flagged: boolean;
-  completed: boolean;
-};
-
 export async function GET() {
   const supabase = await createClient();
 
@@ -74,10 +63,10 @@ export async function GET() {
   }
 
   // username, email, requests remaining
-  let username = profileData.username;
-  let email = user?.email;
+  const username = profileData.username;
+  const email = user?.email;
   //let requestsRemaining = profileData.sets_remaining;
-  let isSubscribed = profileData.is_subscribed;
+  const isSubscribed = profileData.is_subscribed;
   let requestsRemaining;
 
   // if today is >= profileData.sets_refresh_at, then reset requests and update the value
@@ -106,6 +95,7 @@ export async function GET() {
     // result.success == true
   }
 
+  // eslint-disable-next-line prefer-const
   requestsRemaining = profileData.sets_remaining;
 
   // get the sets
@@ -123,8 +113,8 @@ export async function GET() {
   }
 
   // Sets created and sets completed
-  let setsCreated = setData.length;
-  let setsCompleted = setData.filter((set) => set.completed).length;
+  const setsCreated = setData.length;
+  const setsCompleted = setData.filter((set) => set.completed).length;
 
   // completed lessons
   let completedLessons = 0;
@@ -195,10 +185,9 @@ export async function GET() {
     }
   }
 
-  let overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
-  let averageQuizScore = (numQuizzesCompleted > 0
-    ? (totalQuizScore / numQuizzesCompleted) * 100
-    : 0
+  const overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
+  const averageQuizScore = (
+    numQuizzesCompleted > 0 ? (totalQuizScore / numQuizzesCompleted) * 100 : 0
   ).toFixed(2);
 
   // Get the top categories of the user

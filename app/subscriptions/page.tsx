@@ -1,7 +1,5 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
-
 import AuthNav from "../components/nav/AuthNav";
 import SubscriptionCards from "../components/cards/SubscriptionCards";
 import { Undo2 } from "lucide-react";
@@ -12,7 +10,7 @@ import { useState, useEffect } from "react";
 
 // Subscription Page to display when the user is logged in
 export default function SubscriptionsPage() {
-  const [userEmail, setUserEmail] = useState<string>();
+  const [, setUserEmail] = useState<string>();
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
 
   useEffect(() => {
@@ -27,6 +25,7 @@ export default function SubscriptionsPage() {
           setUserEmail(data.email);
           setIsSubscribed(data.isSubscribed);
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("An error occurred while fetching subscription status");
       }

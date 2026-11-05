@@ -20,12 +20,6 @@ import {
 } from "@/types/dashboard/DashboardTypes";
 import { optimisticallyCreateSet } from "@/lib/swr-mutations";
 
-type StatCards = {
-  title: string;
-  icon: number;
-  content: string;
-};
-
 type SetCards = {
   id: number;
   title: string;
@@ -51,16 +45,15 @@ type StudyBuddyCards = {
 
 export default function Dashboard() {
   // state for skeleton loading
-  const [loading, setLoading] = useState<boolean>(true);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [setCards, setSetCards] = useState<SetCards[]>([]);
 
   // state to toggle between learning sets and ai studdy buddy
   const [isLearningSetsActive, setIsLearningSetsActive] =
     useState<boolean>(true);
-  const [studyBuddySets, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
-  const [profileData, setProfileData] = useState<StatCards[]>([]);
-  const sampleStatCards: StatCards[] = [
+  const [, setStudyBuddySets] = useState<StudyBuddyCards[]>([]);
+  /*const sampleStatCards: StatCards[] = [
     {
       title: "Total Sets",
       icon: 1,
@@ -76,7 +69,7 @@ export default function Dashboard() {
       icon: 3,
       content: "26%",
     },
-  ];
+  ];*/
 
   const createSet = (createSetData: OnCreateSet): void => {
     //create a set

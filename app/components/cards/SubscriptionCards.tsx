@@ -1,5 +1,5 @@
 "use client";
-import { Check, Settings } from "lucide-react";
+import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -67,8 +67,8 @@ export default function SubscriptionCards({
               ? "bg-gray-200 hover:bg-gray-100 cursor-pointer"
               : "bg-gray-100 cursor-not-allowed"
             : isSubscribed
-            ? "bg-blue-400 hover:bg-blue-300 cursor-not-allowed"
-            : "bg-black hover:bg-gray-600 cursor-pointer"
+              ? "bg-blue-400 hover:bg-blue-300 cursor-not-allowed"
+              : "bg-black hover:bg-gray-600 cursor-pointer"
         } ${free ? "text-gray-600" : "text-white"}`}
         onClick={async () => {
           if ((free && !isSubscribed) || (!free && isSubscribed)) {
@@ -125,8 +125,8 @@ export default function SubscriptionCards({
             ? "Switch to Free"
             : "Active"
           : isSubscribed
-          ? "Active"
-          : "Subscribe"}
+            ? "Active"
+            : "Subscribe"}
       </button>
     </div>
   );

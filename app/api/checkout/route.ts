@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/server";
-import Stripe from "stripe";
+//import Stripe from "stripe";
 import stripe from "@/lib/stripe";
 
 //const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export async function POST(request: Request) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function POST(_request: Request) {
   const supabase = await createClient();
 
   const {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     console.log("User is not logged in");
     return NextResponse.json(
       { error: "User is not logged in" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
