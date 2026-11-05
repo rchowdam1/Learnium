@@ -56,7 +56,6 @@ type APIResponse = {
   quizzes: QuizData[];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function SetPage() {
   const param = useParams();
 
