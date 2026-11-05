@@ -28,4 +28,11 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_API_KEY: ${{ secrets.SUPABASE_API_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          STRIPE_PRICE_ID: ${{ vars.STRIPE_PRICE_ID }}
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
