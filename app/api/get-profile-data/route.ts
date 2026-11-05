@@ -156,7 +156,7 @@ export async function GET() {
         .from("quizzes")
         .select("*")
         .eq("lesson_id", lesson.id)
-        .single(); // should be 1 quiz per lesson that is returned
+        .maybeSingle(); // incomplete sets may have a lesson without a quiz
 
       if (quizError) {
         console.log("Could not retrieve quizzes for a lesson");
@@ -196,9 +196,10 @@ export async function GET() {
   }
 
   let overallProgress = ((completedLessons / totalLessons) * 100).toFixed(2);
-  let averageQuizScore = ((totalQuizScore / numQuizzesCompleted) * 100).toFixed(
-    2,
-  );
+  let averageQuizScore = (numQuizzesCompleted > 0
+    ? (totalQuizScore / numQuizzesCompleted) * 100
+    : 0
+  ).toFixed(2);
 
   // Get the top categories of the user
   const categoryCounts: Categories = {};
