@@ -57,7 +57,7 @@ type APIResponse = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function SetPage({ params }: { params: { setId: string } }) {
+export default function SetPage() {
   const param = useParams();
 
   const setId = param.setId;
